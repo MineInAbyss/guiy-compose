@@ -1,7 +1,9 @@
 pluginManagement {
     repositories {
+        google()
         gradlePluginPortal()
         maven("https://repo.mineinabyss.com/releases")
+        maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
     }
 
     val idofrontConventions: String by settings
@@ -16,3 +18,9 @@ pluginManagement {
 
 rootProject.name = "guiy-compose"
 
+
+//include(
+////    ":compose:compiler",
+////    ":compose:compiler-hosted",
+////    ":compose:runtime"
+//)
