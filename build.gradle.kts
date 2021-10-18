@@ -1,5 +1,7 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
+val idofrontVersion: String by project
+
 plugins {
     id("com.mineinabyss.conventions.kotlin")
     id("com.mineinabyss.conventions.papermc")
@@ -30,6 +32,9 @@ repositories {
 
 dependencies {
     // Download at runtime
+    slim(kotlin("stdlib-jdk8"))
+
+    // Shaded
     implementation(compose.runtime)
-    implementation(kotlin("stdlib-jdk8"))
+    implementation("com.mineinabyss:idofront:$idofrontVersion")
 }

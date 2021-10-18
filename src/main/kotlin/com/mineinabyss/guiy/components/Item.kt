@@ -4,24 +4,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ComposeNode
 import com.mineinabyss.guiy.nodes.BoxNode
 import com.mineinabyss.guiy.nodes.GuiyNodeApplier
+import com.mineinabyss.guiy.nodes.ItemNode
+import org.bukkit.inventory.ItemStack
 
 @Composable
-fun Box(width: Int, height: Int, children: @Composable () -> Unit) {
-    ComposeNode<BoxNode, GuiyNodeApplier>(
-        factory = ::BoxNode,
-        update = {
-            println("Updating")
-            set(width) { this.width = width }
-            set(height) { this.height = height }
-        },
-        content = children
+fun Item(itemStack: ItemStack) {
+    ComposeNode<ItemNode, GuiyNodeApplier>(
+        factory = { ItemNode(itemStack) },
+        update = { set(itemStack) { this.item = itemStack } }
     )
 }
-
-//@Composable
-//fun Item(itemStack: ItemStack) {
-//    ComposeNode<BoxNode, GuiyNodeApplier>(
-//        factory = ::BoxNode,
-//        update = { }
-//    )
-//}
