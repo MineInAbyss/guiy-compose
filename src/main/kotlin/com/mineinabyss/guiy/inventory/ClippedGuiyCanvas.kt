@@ -13,7 +13,7 @@ internal class ClippedGuiyCanvas(
     override val height = bottom - top + 1
 
     override fun set(x: Int, y: Int, item: ItemStack?) {
-        parent.set(x + left, y + top, item)
+        parent.set(x, y, item)
     }
 
     override fun clear(left: Int, top: Int, right: Int, bottom: Int) {

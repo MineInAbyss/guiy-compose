@@ -2,8 +2,8 @@ package com.mineinabyss.guiy.nodes
 
 import com.mineinabyss.guiy.inventory.GuiyCanvas
 
-internal class BoxNode : GuiyNode() {
-    val children = mutableListOf<GuiyNode>()
+internal open class BoxNode : GuiyNode(), ChildHoldingNode {
+    override val children = mutableListOf<GuiyNode>()
 
     /** If row, otherwise column. */
     var isRow = true
@@ -76,6 +76,12 @@ internal class BoxNode : GuiyNode() {
             val bottom = top + child.height - 1
             child.renderTo(canvas[top..bottom, left..right])
         }
+    }
+
+    override fun processClick(x: Int, y: Int) {
+        super.processClick(x, y)
+        children.firstOrNull { x in it.x until (it.x + it.width) && y in it.y until (it.y + it.height) }
+            ?.processClick(x, y)
     }
 
     override fun toString() = children.joinToString(prefix = "Box(", postfix = ")")

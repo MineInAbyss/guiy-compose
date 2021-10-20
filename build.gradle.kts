@@ -1,3 +1,4 @@
+import Com_mineinabyss_conventions_platform_gradle.*
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 val idofrontVersion: String by project
@@ -33,6 +34,7 @@ repositories {
 dependencies {
     // Download at runtime
     slim(kotlin("stdlib-jdk8"))
+    implementation(Deps.minecraft.skedule)
 
     // Shaded
     implementation(compose.runtime)

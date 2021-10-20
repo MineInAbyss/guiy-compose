@@ -2,7 +2,7 @@ package com.mineinabyss.guiy.inventory
 
 import org.bukkit.inventory.ItemStack
 
-interface GuiyCanvas {
+internal interface GuiyCanvas {
     val width: Int
     val height: Int
 
@@ -22,7 +22,6 @@ interface GuiyCanvas {
     fun set(x: Int, y: Int, item: ItemStack?)
 
     fun clear(left: Int = 0, top: Int = 0, right: Int = width - 1, bottom: Int = height - 1)
-
 }
 
 //TODO does mc not allow any other widths?

@@ -8,9 +8,12 @@ import com.mineinabyss.guiy.nodes.ItemNode
 import org.bukkit.inventory.ItemStack
 
 @Composable
-fun Item(itemStack: ItemStack) {
+fun Item(itemStack: ItemStack, onClick: (() -> Unit)? = null) {
     ComposeNode<ItemNode, GuiyNodeApplier>(
-        factory = { ItemNode(itemStack) },
-        update = { set(itemStack) { this.item = itemStack } }
+        factory = { ItemNode() },
+        update = {
+            set(itemStack) { this.item = itemStack }
+            set(onClick) { this.onClick = onClick }
+        }
     )
 }

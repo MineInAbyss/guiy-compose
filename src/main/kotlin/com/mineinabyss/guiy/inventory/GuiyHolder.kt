@@ -5,114 +5,82 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Composition
 import androidx.compose.runtime.Recomposer
 import androidx.compose.runtime.snapshots.Snapshot
-import com.mineinabyss.guiy.nodes.BoxNode
 import com.mineinabyss.guiy.nodes.GuiyNodeApplier
+import com.mineinabyss.guiy.nodes.RootNode
 import kotlinx.coroutines.*
 import net.kyori.adventure.text.Component
-import org.bukkit.Bukkit
-import org.bukkit.inventory.Inventory
-import org.bukkit.inventory.InventoryHolder
-import org.bukkit.inventory.ItemStack
+import kotlin.coroutines.CoroutineContext
 
-class GuiyHolder(
-    override val height: Int,
-    val title: Component = Component.text("")
-) : GuiyCanvas, InventoryHolder {
+class GuiyHolder : CoroutineScope {
     var hasFrameWaiters = false
     val clock = BroadcastFrameClock { hasFrameWaiters = true }
     val composeScope = CoroutineScope(Dispatchers.Default) + clock
-    val composeContext = composeScope.coroutineContext
+    override val coroutineContext: CoroutineContext = composeScope.coroutineContext
 
-
-    private val inventory: Inventory = Bukkit.createInventory(this, INVENTORY_WIDTH * height, title)
-    override fun getInventory(): Inventory = inventory
-
-    override val width = INVENTORY_WIDTH
-
-    override fun set(x: Int, y: Int, item: ItemStack?) {
-        inventory.setItem(y * INVENTORY_WIDTH + x, item)
-    }
-
-    override fun clear(left: Int, top: Int, right: Int, bottom: Int) {
-        for (x in left..right)
-            for (y in top..bottom)
-                inventory.clear(y * INVENTORY_WIDTH + x)
-    }
-
+    private val rootNode = RootNode()
 
     var running = false
-
-    private val rootNode = BoxNode()
-    private val recomposer = Recomposer(composeContext)
+    private val recomposer = Recomposer(coroutineContext)
     private val composition = Composition(GuiyNodeApplier(rootNode), recomposer)
 
-    fun stop() {
-        recomposer.close()
-        inventory.close()
-    }
-
-    val scope = object : GuiyScope {}
-
-    fun start() {
-        !running || return
-        running = true
-
-        composeScope.apply {
-            launch(composeContext) {
-                recomposer.runRecomposeAndApplyChanges()
-            }
-            launch(composeContext) {
-                while (running) {
-                    if (hasFrameWaiters) {
-                        hasFrameWaiters = false
-                        clock.sendFrame(0L) // Frame time value is not used by Compose runtime.
-
-                        clear()
-                        rootNode.render(this@GuiyHolder)
-                    }
-                    delay(50)
-                }
-            }
-
-            launch(composeContext) {
-                var applyScheduled = false
-                val snapshotHandle = Snapshot.registerGlobalWriteObserver {
-                    if (!applyScheduled) {
-                        applyScheduled = true
-                        composeScope.launch {
-                            applyScheduled = false
-                            Snapshot.sendApplyNotifications()
-                        }
-                    }
-                }
-                try {
-                    recomposer.join()
-                } finally {
-                    recomposer.close()
-                    snapshotHandle.dispose()
-                    composition.dispose()
-                }
+    var applyScheduled = false
+    val snapshotHandle = Snapshot.registerGlobalWriteObserver {
+        if (!applyScheduled) {
+            applyScheduled = true
+            composeScope.launch {
+                applyScheduled = false
+                Snapshot.sendApplyNotifications()
             }
         }
     }
 
-    fun setContent(content: @Composable GuiyScope.() -> Unit) {
+    fun exit() {
+        running = false
+        recomposer.close()
+        snapshotHandle.dispose()
+        composition.dispose()
+        GuiyScopeManager.scopes -= composeScope
+        composeScope.cancel()
+    }
+
+    fun start(content: @Composable GuiyHolder.() -> Unit) {
+        !running || return
+        running = true
+
+        GuiyScopeManager.scopes += composeScope
+        launch {
+            recomposer.runRecomposeAndApplyChanges()
+        }
+        launch {
+            while (true) {
+                if (hasFrameWaiters) {
+                    hasFrameWaiters = false
+                    clock.sendFrame(0L) // Frame time value is not used by Compose runtime.
+
+                    rootNode.renderToFirstCanvas()
+                }
+                delay(50)
+            }
+        }
+
+        launch {
+            setContent(content)
+            recomposer.join()
+        }
+    }
+
+    private fun setContent(content: @Composable GuiyHolder.() -> Unit) {
         hasFrameWaiters = true
         composition.setContent {
-            scope.content()
+            content()
         }
     }
 }
 
-interface GuiyScope
-
 fun guiy(
-    height: Int = 6,
-    title: Component = Component.text(""),
-    content: @Composable GuiyScope.() -> Unit
+    content: @Composable GuiyHolder.() -> Unit
 ): GuiyHolder {
-    return GuiyHolder(height, title).apply {
-        start()
-        setContent(content)
+    return GuiyHolder().apply {
+        start(content)
     }
 }
