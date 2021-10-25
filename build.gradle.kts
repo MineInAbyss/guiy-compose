@@ -34,6 +34,7 @@ repositories {
 dependencies {
     // Download at runtime
     slim(kotlin("stdlib-jdk8"))
+    implementation("com.github.DRE2N.HeadLib:headlib-core:7e2d443678")
     implementation(Deps.minecraft.skedule)
 
     // Shaded

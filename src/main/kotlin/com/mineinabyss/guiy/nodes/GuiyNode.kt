@@ -1,33 +1,19 @@
 package com.mineinabyss.guiy.nodes
 
 import com.mineinabyss.guiy.inventory.GuiyCanvas
+import com.mineinabyss.guiy.layout.Measurer
+import com.mineinabyss.guiy.layout.Placer
+import com.mineinabyss.guiy.modifiers.Modifier
 
-internal abstract class GuiyNode {
-    open var width = 0
+interface GuiyNode {
+    var measurer: Measurer
+    var placer: Placer
+    var modifier: Modifier
+    var width: Int
+    var height: Int
+    var x: Int
+    var y: Int
 
-    //        set(value) {
-//            println("Set width to $value")
-//            field = value
-//        }
-    open var height = 0
-
-    //        set(value) {
-//            println("Set height to $value")
-//            field = value
-//        }
-
-    var x = 0
-    var y = 0
-
-
-    var onClick: (() -> Unit)? = null
-
-    open fun processClick(x: Int, y: Int) {
-        onClick?.let { it() }
-    }
-
-    abstract fun measure()
-    abstract fun layout()
-
-    abstract fun renderTo(canvas: GuiyCanvas)
+    fun renderTo(canvas: GuiyCanvas)
 }
+

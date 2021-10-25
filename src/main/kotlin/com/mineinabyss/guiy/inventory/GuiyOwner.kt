@@ -1,23 +1,24 @@
 package com.mineinabyss.guiy.inventory
 
-import androidx.compose.runtime.BroadcastFrameClock
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Composition
-import androidx.compose.runtime.Recomposer
+import androidx.compose.runtime.*
 import androidx.compose.runtime.snapshots.Snapshot
+import com.mineinabyss.guiy.components.GuiyUIScopeMarker
 import com.mineinabyss.guiy.nodes.GuiyNodeApplier
 import com.mineinabyss.guiy.nodes.RootNode
 import kotlinx.coroutines.*
-import net.kyori.adventure.text.Component
+import org.bukkit.entity.Player
 import kotlin.coroutines.CoroutineContext
 
-class GuiyHolder : CoroutineScope {
+@GuiyUIScopeMarker
+class GuiyOwner : CoroutineScope {
     var hasFrameWaiters = false
     val clock = BroadcastFrameClock { hasFrameWaiters = true }
     val composeScope = CoroutineScope(Dispatchers.Default) + clock
     override val coroutineContext: CoroutineContext = composeScope.coroutineContext
 
     private val rootNode = RootNode()
+    val viewers by derivedStateOf { mutableStateListOf<Player>() }
+    internal var canvas: GuiyCanvas? = null
 
     var running = false
     private val recomposer = Recomposer(coroutineContext)
@@ -40,10 +41,11 @@ class GuiyHolder : CoroutineScope {
         snapshotHandle.dispose()
         composition.dispose()
         GuiyScopeManager.scopes -= composeScope
+        viewers.forEach { it.closeInventory() }
         composeScope.cancel()
     }
 
-    fun start(content: @Composable GuiyHolder.() -> Unit) {
+    fun start(content: @Composable GuiyOwner.() -> Unit) {
         !running || return
         running = true
 
@@ -69,7 +71,7 @@ class GuiyHolder : CoroutineScope {
         }
     }
 
-    private fun setContent(content: @Composable GuiyHolder.() -> Unit) {
+    private fun setContent(content: @Composable GuiyOwner.() -> Unit) {
         hasFrameWaiters = true
         composition.setContent {
             content()
@@ -78,9 +80,9 @@ class GuiyHolder : CoroutineScope {
 }
 
 fun guiy(
-    content: @Composable GuiyHolder.() -> Unit
-): GuiyHolder {
-    return GuiyHolder().apply {
+    content: @Composable GuiyOwner.() -> Unit
+): GuiyOwner {
+    return GuiyOwner().apply {
         start(content)
     }
 }

@@ -1,6 +1,6 @@
 package com.mineinabyss.guiy.inventory
 
-import com.mineinabyss.guiy.nodes.InventoryNode
+import com.mineinabyss.guiy.nodes.InventoryCanvas
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
@@ -11,23 +11,24 @@ import org.bukkit.event.inventory.InventoryDragEvent
 class GuiyEventListener : Listener {
     @EventHandler
     fun InventoryClickEvent.onClick() {
-        val guiyHolder = inventory.holder as? InventoryNode ?: return
+        val guiyHolder = inventory.holder as? InventoryCanvas ?: return
         isCancelled = true
         if (clickedInventory?.holder === guiyHolder)
-            guiyHolder.processClick(slot)
+            guiyHolder.processClick(click, slot)
     }
 
     @EventHandler
     fun InventoryCloseEvent.onClose() {
-        val guiyHolder = inventory.holder as? InventoryNode ?: return
-        if (!guiyHolder.updateRunning)
+        val guiyHolder = inventory.holder as? InventoryCanvas ?: return
+        if (reason != InventoryCloseEvent.Reason.PLUGIN) {
             guiyHolder.onClose(player as Player)
+        }
     }
 
 
     @EventHandler
     fun InventoryDragEvent.onInventoryDrag() {
-        if (inventory.holder !is InventoryNode) return
+        if (inventory.holder !is InventoryCanvas) return
         isCancelled = true
     }
 }
