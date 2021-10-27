@@ -1,10 +1,17 @@
 package com.mineinabyss.guiy.modifiers
 
-class ClickModifier(val onClick: (() -> Unit)) {
+import org.bukkit.event.inventory.ClickType
+
+interface ClickScope {
+    val clickType: ClickType
 }
 
-override fun processClick(x: Int, y: Int) {
-    super.processClick(x, y)
-    children.firstOrNull { x in it.x until (it.x + it.width) && y in it.y until (it.y + it.height) }
-        ?.processClick(x, y)
+class ClickModifier(val onClick: (ClickScope.() -> Unit)): Modifier.Element
+
+fun Modifier.clickable(onClick: ClickScope.() -> Unit) = then(ClickModifier(onClick))
+
+fun Modifier.getClickModifiers() = foldIn(mutableListOf<ClickModifier>()) { list, modifier ->
+    if(modifier is ClickModifier)
+        list.add(modifier)
+    list
 }

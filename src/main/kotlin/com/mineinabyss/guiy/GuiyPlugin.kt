@@ -2,12 +2,13 @@ package com.mineinabyss.guiy
 
 import androidx.compose.runtime.*
 import com.mineinabyss.guiy.components.Item
-import com.mineinabyss.guiy.components.Row
 import com.mineinabyss.guiy.components.canvases.Chest
 import com.mineinabyss.guiy.inventory.GuiyEventListener
 import com.mineinabyss.guiy.inventory.GuiyScopeManager
 import com.mineinabyss.guiy.inventory.guiy
+import com.mineinabyss.guiy.layout.Row
 import com.mineinabyss.guiy.modifiers.Modifier
+import com.mineinabyss.guiy.modifiers.clickable
 import com.mineinabyss.guiy.nodes.InventoryCanvas
 import com.mineinabyss.idofront.commands.execution.ExperimentalCommandDSL
 import com.mineinabyss.idofront.commands.execution.IdofrontCommandExecutor
@@ -67,11 +68,12 @@ class GuiyCommands : IdofrontCommandExecutor() {
                                     for (i in 1..9) {
                                         Item(ItemStack(Material.STONE).editItemMeta {
                                             setDisplayName("$i")
-                                        }, onClick = { screenState = Screen.Details("$i") })
+                                        }, Modifier.clickable { screenState = Screen.Details("$i")  })
                                     }
                                 }
 
-                                Item(ItemStack(Material.CACTUS), Modifier.at(3, 1))
+//                                Item(ItemStack(Material.CACTUS), Modifier.at(3, 1))
+//                                Item(ItemStack(Material.CACTUS), Modifier.at(3, 2))
                             }
                             is Screen.Details -> Chest(viewers, title = screen.text, height = height, onClose = {
                                 screenState = Screen.Default

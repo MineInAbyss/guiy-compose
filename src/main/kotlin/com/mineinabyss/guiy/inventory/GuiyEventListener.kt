@@ -14,7 +14,7 @@ class GuiyEventListener : Listener {
         val guiyHolder = inventory.holder as? InventoryCanvas ?: return
         isCancelled = true
         if (clickedInventory?.holder === guiyHolder)
-            guiyHolder.processClick(click, slot)
+            guiyHolder.processClick(slot, click)
     }
 
     @EventHandler

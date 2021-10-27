@@ -1,29 +1,30 @@
 package com.mineinabyss.guiy.nodes
 
 import androidx.compose.runtime.AbstractApplier
+import com.mineinabyss.guiy.layout.LayoutNode
 
-internal class GuiyNodeApplier(root: RootNode) : AbstractApplier<GuiyNode>(root) {
-    override fun insertTopDown(index: Int, instance: GuiyNode) {
+internal class GuiyNodeApplier(root: LayoutNode) : AbstractApplier<LayoutNode>(root) {
+    override fun insertTopDown(index: Int, instance: LayoutNode) {
         // Ignored, we insert bottom-up.
     }
 
-    override fun insertBottomUp(index: Int, instance: GuiyNode) {
-        val boxNode = current as ChildHoldingNode
-        boxNode.children.add(index, instance)
+    override fun insertBottomUp(index: Int, instance: LayoutNode) {
+        current.children.add(index, instance)
+        check(instance.parent == null) {
+            "$instance must not have a parent when being inserted."
+        }
+        instance.parent = current
     }
 
     override fun remove(index: Int, count: Int) {
-        val boxNode = current as ChildHoldingNode
-        boxNode.children.remove(index, count)
+        current.children.remove(index, count)
     }
 
     override fun move(from: Int, to: Int, count: Int) {
-        val boxNode = current as ChildHoldingNode
-        boxNode.children.move(from, to, count)
+        current.children.move(from, to, count)
     }
 
     override fun onClear() {
-        val boxNode = root as ChildHoldingNode
-        boxNode.children.clear()
+        current.children.clear()
     }
 }

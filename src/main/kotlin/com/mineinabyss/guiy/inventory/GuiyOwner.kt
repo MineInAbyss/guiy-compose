@@ -3,8 +3,10 @@ package com.mineinabyss.guiy.inventory
 import androidx.compose.runtime.*
 import androidx.compose.runtime.snapshots.Snapshot
 import com.mineinabyss.guiy.components.GuiyUIScopeMarker
+import com.mineinabyss.guiy.layout.ChildPlacer
+import com.mineinabyss.guiy.layout.LayoutNode
 import com.mineinabyss.guiy.nodes.GuiyNodeApplier
-import com.mineinabyss.guiy.nodes.RootNode
+import com.mineinabyss.guiy.nodes.InventoryCanvas
 import kotlinx.coroutines.*
 import org.bukkit.entity.Player
 import kotlin.coroutines.CoroutineContext
@@ -16,9 +18,9 @@ class GuiyOwner : CoroutineScope {
     val composeScope = CoroutineScope(Dispatchers.Default) + clock
     override val coroutineContext: CoroutineContext = composeScope.coroutineContext
 
-    private val rootNode = RootNode()
+    private val rootNode = LayoutNode()
     val viewers by derivedStateOf { mutableStateListOf<Player>() }
-    internal var canvas: GuiyCanvas? = null
+    internal var canvas: InventoryCanvas? = null
 
     var running = false
     private val recomposer = Recomposer(coroutineContext)
@@ -59,7 +61,9 @@ class GuiyOwner : CoroutineScope {
                     hasFrameWaiters = false
                     clock.sendFrame(0L) // Frame time value is not used by Compose runtime.
 
-                    rootNode.renderToFirstCanvas()
+                    rootNode.measure()
+                    rootNode.placeChildren()
+                    canvas?.render()
                 }
                 delay(50)
             }
@@ -67,7 +71,6 @@ class GuiyOwner : CoroutineScope {
 
         launch {
             setContent(content)
-            recomposer.join()
         }
     }
 

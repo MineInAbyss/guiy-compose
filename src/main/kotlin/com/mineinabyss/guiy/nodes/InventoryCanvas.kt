@@ -18,11 +18,11 @@ interface InventoryCloseScope {
 }
 
 @GuiyUIScopeMarker
-object InventoryNodeScope {
+object InventoryCanvasScope {
     fun Modifier.at(x: Int = 0, y: Int = 0) = then(PositionModifier(x, y))
 }
 
-internal abstract class InventoryCanvas: GuiyCanvas, InventoryHolder {
+internal abstract class InventoryCanvas : LayoutNode(), GuiyCanvas, InventoryHolder {
     abstract var activeInventory: Inventory
     var onClose: (InventoryCloseScope.(player: Player) -> Unit)? = null
     var viewers = listOf<Player>()
@@ -42,11 +42,7 @@ internal abstract class InventoryCanvas: GuiyCanvas, InventoryHolder {
 
     override fun getInventory(): Inventory = activeInventory
 
-    abstract fun processClick(clickType: ClickType, slot: Int)
-
-    fun render() = renderTo(this)
-
-    fun processClick(x: Int, y: Int) = children.forEach { it.processClick(x, y) }
+    abstract fun processClick(slot: Int, clickType: ClickType)
 
     fun onClose(player: Player) {
         val scope = object : InventoryCloseScope {
@@ -80,6 +76,11 @@ internal abstract class InventoryCanvas: GuiyCanvas, InventoryHolder {
             updateRunning = false
             render()
         }
+    }
+
+    fun render() {
+        clear()
+        renderTo(this)
     }
 
     override fun clear() {

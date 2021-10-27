@@ -1,20 +1,20 @@
 package com.mineinabyss.guiy.nodes
 
 import com.mineinabyss.guiy.inventory.GuiyCanvas
+import com.mineinabyss.guiy.layout.LayoutNode
+import com.mineinabyss.guiy.layout.MeasureResult
+import com.mineinabyss.guiy.layout.Measurer
+import com.mineinabyss.guiy.layout.Placer
 import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
 
-internal class ItemNode: GuiyNode() {
+internal class ItemNode: LayoutNode() {
     var item: ItemStack = ItemStack(Material.AIR)
 
     init {
-        width = 1
-        height = 1
+        measurer = Measurer { MeasureResult(1, 1) }
+        placer = Placer {  }
     }
-
-    override fun measure() {}
-
-    override fun layout() {}
 
     override fun renderTo(canvas: GuiyCanvas) {
         canvas.set(x, y, item)

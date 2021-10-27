@@ -8,7 +8,7 @@ class OffsetCanvas(
     val delegate: GuiyCanvas,
 ): GuiyCanvas {
     override fun set(x: Int, y: Int, item: ItemStack?) {
-        delegate.set(x + offsetX, y + offsetX, item)
+        delegate.set(x + offsetX, y + offsetY, item)
     }
 
     override fun clear() {
