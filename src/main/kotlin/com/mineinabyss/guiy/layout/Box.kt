@@ -13,7 +13,7 @@ fun Row(modifier: Modifier = Modifier, children: @Composable () -> Unit) {
         RowMeasurer,
         RowPlacer,
         modifier = modifier,
-        children = children
+        content = children
     )
 }
 
@@ -23,6 +23,6 @@ fun Column(modifier: Modifier = Modifier, children: @Composable () -> Unit) {
         ColumnMeasurer,
         ColumnPlacer,
         modifier = modifier,
-        children = children
+        content = children
     )
 }

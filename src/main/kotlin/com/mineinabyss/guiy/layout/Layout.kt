@@ -2,7 +2,6 @@ package com.mineinabyss.guiy.layout
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ComposeNode
-import androidx.compose.runtime.ReusableComposeNode
 import com.mineinabyss.guiy.modifiers.Modifier
 import com.mineinabyss.guiy.nodes.GuiyNodeApplier
 
@@ -14,7 +13,7 @@ fun Layout(
     placer: Placer = ChildPlacer,
     renderer: Renderer = LayoutNode.EmptyRenderer,
     modifier: Modifier = Modifier,
-    children: @Composable () -> Unit = {}
+    content: @Composable () -> Unit = {}
 ) {
     ComposeNode<LayoutNode, GuiyNodeApplier>(
         factory = ::LayoutNode,
@@ -25,6 +24,6 @@ fun Layout(
             set(renderer) { this.renderer = it }
             set(modifier) { this.modifier = it }
         },
-        content = children,
+        content = content,
     )
 }

@@ -1,7 +1,7 @@
 package com.mineinabyss.guiy.nodes
 
+import com.mineinabyss.guiy.Guiy
 import com.mineinabyss.guiy.components.GuiyUIScopeMarker
-import com.mineinabyss.guiy.guiyPlugin
 import com.mineinabyss.guiy.inventory.GuiyCanvas
 import com.mineinabyss.guiy.layout.LayoutNode
 import com.mineinabyss.guiy.modifiers.Modifier
@@ -31,7 +31,7 @@ internal abstract class InventoryCanvas : LayoutNode(), GuiyCanvas, InventoryHol
             (viewers - value).forEach {
                 it.closeInventory(InventoryCloseEvent.Reason.PLUGIN)
             }
-            guiyPlugin.schedule {
+            Guiy.activePlugin.schedule {
                 (value - viewers).forEach {
                     it.closeInventory(InventoryCloseEvent.Reason.PLUGIN)
                     it.openInventory(inventory)
@@ -51,7 +51,7 @@ internal abstract class InventoryCanvas : LayoutNode(), GuiyCanvas, InventoryHol
                     .forEach { it.openInventory(inventory) }
             }
         }
-        guiyPlugin.schedule {
+        Guiy.activePlugin.schedule {
             waitFor(1)
             onClose?.invoke(scope, player)
         }
@@ -71,7 +71,7 @@ internal abstract class InventoryCanvas : LayoutNode(), GuiyCanvas, InventoryHol
     fun updateInventory() {
         !updateRunning || return
         updateRunning = true
-        guiyPlugin.schedule {
+        Guiy.activePlugin.schedule {
             activeInventory = transferViewers(createInventory())
             updateRunning = false
             render()
