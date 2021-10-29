@@ -1,0 +1,8 @@
+name: Guiy
+version: ${plugin_version}
+author: Offz
+main: com.mineinabyss.guiy.GuiyPlugin
+api-version: 1.17
+
+prefix: Guiy
+description: Minecraft UI built on Jetpack Compose
