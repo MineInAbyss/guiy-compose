@@ -17,10 +17,3 @@ pluginManagement {
 }
 
 rootProject.name = "guiy-compose"
-
-
-//include(
-////    ":compose:compiler",
-////    ":compose:compiler-hosted",
-////    ":compose:runtime"
-//)

@@ -3,8 +3,8 @@ package com.mineinabyss.guiy
 import com.mineinabyss.guiy.inventory.GuiyEventListener
 import com.mineinabyss.guiy.inventory.GuiyScopeManager
 import com.mineinabyss.guiy.nodes.InventoryCanvas
+import com.mineinabyss.idofront.platforms.IdofrontPlatforms
 import com.mineinabyss.idofront.plugin.registerEvents
-import com.mineinabyss.idofront.slimjar.IdofrontSlimjar
 import kotlinx.coroutines.cancel
 import org.bukkit.Bukkit
 import org.bukkit.event.inventory.InventoryCloseEvent
@@ -14,7 +14,7 @@ val guiyPlugin = Bukkit.getPluginManager().getPlugin("Guiy") as JavaPlugin
 
 class GuiyPlugin : JavaPlugin() {
     override fun onLoad() {
-        IdofrontSlimjar.loadToLibraryLoader(this)
+        IdofrontPlatforms.load(this, "mineinabyss")
     }
 
     override fun onEnable() {

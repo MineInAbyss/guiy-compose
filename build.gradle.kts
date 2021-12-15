@@ -6,11 +6,10 @@ val idofrontVersion: String by project
 plugins {
     id("com.mineinabyss.conventions.kotlin")
     id("com.mineinabyss.conventions.papermc")
-    id("com.mineinabyss.conventions.slimjar")
     id("com.mineinabyss.conventions.copyjar")
     id("com.mineinabyss.conventions.publication")
     id("com.mineinabyss.conventions.testing")
-    id("org.jetbrains.compose") version "1.0.0-alpha4-build398"
+    id("org.jetbrains.compose") version "1.0.1-rc2"
 }
 
 tasks.withType<KotlinCompile> {
@@ -24,20 +23,20 @@ tasks.withType<KotlinCompile> {
 
 
 repositories {
-    google()
     mavenCentral()
+    google()
+    maven("https://jitpack.io")
     maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
     maven("https://dl.bintray.com/korlibs/korlibs")
-    maven("https://jitpack.io")
 }
 
 dependencies {
-    // Download at runtime
-    slim(kotlin("stdlib-jdk8"))
-    slim(Deps.kotlinx.coroutines)
-    slim(Deps.kotlin.reflect)
-    implementation("com.github.DRE2N.HeadLib:headlib-core:7e2d443678")
-    implementation(Deps.minecraft.skedule)
+    // MineInAbyss platform
+    compileOnly(kotlin("stdlib-jdk8"))
+    compileOnly(Deps.kotlinx.coroutines)
+    compileOnly(Deps.kotlin.reflect)
+    // TODO update to jitpack in idofront
+    compileOnly("com.github.okkero:Skedule:v1.2.6")
 
     // Shaded
     api(compose.runtime) {
