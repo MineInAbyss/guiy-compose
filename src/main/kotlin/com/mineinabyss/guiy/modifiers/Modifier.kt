@@ -34,7 +34,7 @@ interface Modifier {
      * of the elements that appear after it. [foldIn] may be used to accumulate a value starting
      * from the parent or head of the modifier chain to the final wrapped child.
      */
-    fun <R> foldIn(initial: R, operation: (R, Element) -> R): R
+    fun <R> foldIn(initial: R, operation: (R, Element<*>) -> R): R
 
     /**
      * Accumulates a value starting with [initial] and applying [operation] to the current value
@@ -45,18 +45,18 @@ interface Modifier {
      * of the elements that appear after it. [foldOut] may be used to accumulate a value starting
      * from the child or tail of the modifier chain up to the parent or head of the chain.
      */
-    fun <R> foldOut(initial: R, operation: (Element, R) -> R): R
+    fun <R> foldOut(initial: R, operation: (Element<*>, R) -> R): R
 
     /**
      * Returns `true` if [predicate] returns true for any [Element] in this [Modifier].
      */
-    fun any(predicate: (Element) -> Boolean): Boolean
+    fun any(predicate: (Element<*>) -> Boolean): Boolean
 
     /**
      * Returns `true` if [predicate] returns true for all [Element]s in this [Modifier] or if
      * this [Modifier] contains no [Element]s.
      */
-    fun all(predicate: (Element) -> Boolean): Boolean
+    fun all(predicate: (Element<*>) -> Boolean): Boolean
 
     /**
      * Concatenates this modifier with another.
@@ -69,16 +69,20 @@ interface Modifier {
     /**
      * A single element contained within a [Modifier] chain.
      */
-    interface Element : Modifier {
-        override fun <R> foldIn(initial: R, operation: (R, Element) -> R): R =
+    interface Element<Self : Element<Self>> : Modifier {
+        override fun <R> foldIn(initial: R, operation: (R, Element<*>) -> R): R =
             operation(initial, this)
 
-        override fun <R> foldOut(initial: R, operation: (Element, R) -> R): R =
+        override fun <R> foldOut(initial: R, operation: (Element<*>, R) -> R): R =
             operation(this, initial)
 
-        override fun any(predicate: (Element) -> Boolean): Boolean = predicate(this)
+        override fun any(predicate: (Element<*>) -> Boolean): Boolean = predicate(this)
 
-        override fun all(predicate: (Element) -> Boolean): Boolean = predicate(this)
+        override fun all(predicate: (Element<*>) -> Boolean): Boolean = predicate(this)
+
+        fun mergeWith(other: Self): Self
+
+        fun unsafeMergeWith(other: Element<*>) = mergeWith(other as Self)
     }
 
     /**
@@ -89,10 +93,10 @@ interface Modifier {
     // The companion object implements `Modifier` so that it may be used  as the start of a
     // modifier extension factory expression.
     companion object : Modifier {
-        override fun <R> foldIn(initial: R, operation: (R, Element) -> R): R = initial
-        override fun <R> foldOut(initial: R, operation: (Element, R) -> R): R = initial
-        override fun any(predicate: (Element) -> Boolean): Boolean = false
-        override fun all(predicate: (Element) -> Boolean): Boolean = true
+        override fun <R> foldIn(initial: R, operation: (R, Element<*>) -> R): R = initial
+        override fun <R> foldOut(initial: R, operation: (Element<*>, R) -> R): R = initial
+        override fun any(predicate: (Element<*>) -> Boolean): Boolean = false
+        override fun all(predicate: (Element<*>) -> Boolean): Boolean = true
         override infix fun then(other: Modifier): Modifier = other
         override fun toString() = "Modifier"
     }
@@ -106,16 +110,16 @@ class CombinedModifier(
     private val outer: Modifier,
     private val inner: Modifier
 ) : Modifier {
-    override fun <R> foldIn(initial: R, operation: (R, Modifier.Element) -> R): R =
+    override fun <R> foldIn(initial: R, operation: (R, Modifier.Element<*>) -> R): R =
         inner.foldIn(outer.foldIn(initial, operation), operation)
 
-    override fun <R> foldOut(initial: R, operation: (Modifier.Element, R) -> R): R =
+    override fun <R> foldOut(initial: R, operation: (Modifier.Element<*>, R) -> R): R =
         outer.foldOut(inner.foldOut(initial, operation), operation)
 
-    override fun any(predicate: (Modifier.Element) -> Boolean): Boolean =
+    override fun any(predicate: (Modifier.Element<*>) -> Boolean): Boolean =
         outer.any(predicate) || inner.any(predicate)
 
-    override fun all(predicate: (Modifier.Element) -> Boolean): Boolean =
+    override fun all(predicate: (Modifier.Element<*>) -> Boolean): Boolean =
         outer.all(predicate) && inner.all(predicate)
 
     override fun equals(other: Any?): Boolean =

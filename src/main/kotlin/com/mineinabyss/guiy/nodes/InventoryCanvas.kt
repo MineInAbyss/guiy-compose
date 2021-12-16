@@ -1,8 +1,8 @@
 package com.mineinabyss.guiy.nodes
 
-import com.mineinabyss.guiy.components.GuiyUIScopeMarker
 import com.mineinabyss.guiy.guiyPlugin
 import com.mineinabyss.guiy.inventory.GuiyCanvas
+import com.mineinabyss.guiy.inventory.GuiyUIScopeMarker
 import com.mineinabyss.guiy.layout.LayoutNode
 import com.mineinabyss.guiy.modifiers.Modifier
 import com.mineinabyss.guiy.modifiers.PositionModifier

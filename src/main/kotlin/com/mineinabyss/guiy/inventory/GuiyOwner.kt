@@ -2,12 +2,13 @@ package com.mineinabyss.guiy.inventory
 
 import androidx.compose.runtime.*
 import androidx.compose.runtime.snapshots.Snapshot
-import com.mineinabyss.guiy.components.GuiyUIScopeMarker
-import com.mineinabyss.guiy.layout.ChildPlacer
+import com.mineinabyss.guiy.guiyPlugin
 import com.mineinabyss.guiy.layout.LayoutNode
+import com.mineinabyss.guiy.modifiers.Constraints
 import com.mineinabyss.guiy.nodes.GuiyNodeApplier
 import com.mineinabyss.guiy.nodes.InventoryCanvas
 import kotlinx.coroutines.*
+import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import kotlin.coroutines.CoroutineContext
 
@@ -55,22 +56,17 @@ class GuiyOwner : CoroutineScope {
         launch {
             recomposer.runRecomposeAndApplyChanges()
         }
-        launch {
-            while (true) {
-                if (hasFrameWaiters) {
-                    hasFrameWaiters = false
-                    clock.sendFrame(0L) // Frame time value is not used by Compose runtime.
-
-                    rootNode.measure()
-                    rootNode.placeChildren()
-                    canvas?.render()
-                }
-                delay(50)
-            }
-        }
 
         launch {
             setContent(content)
+            Bukkit.getScheduler().scheduleSyncRepeatingTask(guiyPlugin, {
+                if (hasFrameWaiters) {
+                    hasFrameWaiters = false
+                    clock.sendFrame(System.nanoTime()) // Frame time value is not used by Compose runtime.
+                    rootNode.measure(Constraints())
+                    canvas?.render()
+                }
+            }, 0, 1)
         }
     }
 

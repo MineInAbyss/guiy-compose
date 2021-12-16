@@ -1,53 +1,34 @@
 package com.mineinabyss.guiy.nodes
 
+import com.mineinabyss.guiy.layout.MeasurePolicy
 import com.mineinabyss.guiy.layout.MeasureResult
-import com.mineinabyss.guiy.layout.Measurer
-import com.mineinabyss.guiy.layout.Placer
 
-val RowMeasurer = Measurer { children ->
-    var width = 0
-    var height = 0
-    for (child in children) {
-        child.measure()
-        width += child.width
-        height = maxOf(height, child.height)
-    }
+val RowMeasurePolicy = MeasurePolicy { measurables, constraints ->
+    val noMinConstraints = constraints.copy(minWidth = 0, minHeight = 0)
+    val placeables = measurables.map { it.measure(noMinConstraints) }
+    val width = placeables.sumOf { it.width }
+    val height = placeables.maxOfOrNull { it.height } ?: 0
 
-    MeasureResult(width, height)
-}
-
-val ColumnMeasurer = Measurer { children ->
-    var width = 0
-    var height = 0
-    for (child in children) {
-        child.measure()
-        width = maxOf(width, child.width)
-        height += child.height
-    }
-
-    MeasureResult(width, height)
-}
-
-val RowPlacer = Placer { children ->
-    var childX = 0
-    for (child in children) {
-        child.placeAt(childX, 0)
-        child.placeChildren()
-        childX += child.width
+    MeasureResult(width, height) {
+        var childX = 0
+        for (child in placeables) {
+            child.placeAt(childX, 0)
+            childX += child.width
+        }
     }
 }
 
-val ColumnPlacer = Placer { children ->
-    var childX = 0
-    for (child in children) {
-        child.placeAt(childX, 0)
-        child.placeChildren()
-        childX += child.width
-    }
-    var childY = 0
-    for (child in children) {
-        child.placeAt(0, childY)
-        child.placeChildren()
-        childY += child.height
+val ColumnMeasurePolicy = MeasurePolicy {  measurables, constraints ->
+    val noMinConstraints = constraints.copy(minWidth = 0, minHeight = 0)
+    val placeables = measurables.map { it.measure(noMinConstraints) }
+    val width = placeables.maxOfOrNull { it.width } ?: 0
+    val height = placeables.sumOf { it.height }
+
+    MeasureResult(width, height) {
+        var childY = 0
+        for (child in placeables) {
+            child.placeAt(0, childY)
+            childY += child.height
+        }
     }
 }

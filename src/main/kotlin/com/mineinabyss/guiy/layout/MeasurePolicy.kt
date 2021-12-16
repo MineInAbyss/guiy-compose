@@ -2,21 +2,23 @@ package com.mineinabyss.guiy.layout
 
 import androidx.compose.runtime.Stable
 import com.mineinabyss.guiy.inventory.GuiyCanvas
+import com.mineinabyss.guiy.modifiers.Constraints
 import com.mineinabyss.guiy.nodes.GuiyNode
 
 data class MeasureResult(
     val width: Int,
     val height: Int,
+    val placer: Placer,
 )
 
 @Stable
-fun interface Measurer {
-    fun measure(children: List<Measurable>): MeasureResult
+fun interface MeasurePolicy {
+    fun measure(measurables: List<Measurable>, constraints: Constraints): MeasureResult
 }
 
 @Stable
 fun interface Placer {
-    fun placeChildren(children: List<Placeable>)
+    fun placeChildren()
 }
 
 @Stable
@@ -25,17 +27,12 @@ fun interface Renderer {
 }
 
 interface Measurable {
-    var width: Int
-    var height: Int
-
-    fun measure(): MeasureResult
+    fun measure(constraints: Constraints): Placeable
 }
 
 interface Placeable {
     var width: Int
     var height: Int
-
-    fun placeChildren()
 
     fun placeAt(x: Int, y: Int)
 }
