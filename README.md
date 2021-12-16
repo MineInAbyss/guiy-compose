@@ -7,7 +7,7 @@
 [![Contribute](https://shields.io/badge/Contribute-e57be5?logo=github%20sponsors&style=flat&logoColor=white)](https://wiki.mineinabyss.com/contribute/)
 </div>
 
-An WIP Spigot/PaperMC UI library built on the [Jetpack Compose](https://developer.android.com/jetpack/compose) compiler.
+A Spigot/PaperMC UI library built on the [Jetpack Compose](https://developer.android.com/jetpack/compose) compiler.
 
 If you are new to Compose, please read the link above. In short, it is a declarative UI library that makes working with
 state good, gives easy access to coroutines, and helps write complex UI faster.
