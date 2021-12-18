@@ -1,15 +1,18 @@
 package com.mineinabyss.guiy.inventory
 
-import androidx.compose.runtime.*
+import androidx.compose.runtime.BroadcastFrameClock
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Composition
+import androidx.compose.runtime.Recomposer
 import androidx.compose.runtime.snapshots.Snapshot
 import com.mineinabyss.guiy.guiyPlugin
 import com.mineinabyss.guiy.layout.LayoutNode
 import com.mineinabyss.guiy.modifiers.Constraints
 import com.mineinabyss.guiy.nodes.GuiyNodeApplier
 import com.mineinabyss.guiy.nodes.InventoryCanvas
+import com.okkero.skedule.schedule
 import kotlinx.coroutines.*
-import org.bukkit.Bukkit
-import org.bukkit.entity.Player
+import org.bukkit.event.inventory.InventoryCloseEvent
 import kotlin.coroutines.CoroutineContext
 
 @GuiyUIScopeMarker
@@ -20,7 +23,6 @@ class GuiyOwner : CoroutineScope {
     override val coroutineContext: CoroutineContext = composeScope.coroutineContext
 
     private val rootNode = LayoutNode()
-    val viewers by derivedStateOf { mutableStateListOf<Player>() }
     internal var canvas: InventoryCanvas? = null
 
     var running = false
@@ -38,14 +40,10 @@ class GuiyOwner : CoroutineScope {
         }
     }
 
+    var exitScheduled = false
+
     fun exit() {
-        running = false
-        recomposer.close()
-        snapshotHandle.dispose()
-        composition.dispose()
-        GuiyScopeManager.scopes -= composeScope
-        viewers.forEach { it.closeInventory() }
-        composeScope.cancel()
+        exitScheduled = true
     }
 
     fun start(content: @Composable GuiyOwner.() -> Unit) {
@@ -59,14 +57,24 @@ class GuiyOwner : CoroutineScope {
 
         launch {
             setContent(content)
-            Bukkit.getScheduler().scheduleSyncRepeatingTask(guiyPlugin, {
+            while (!exitScheduled) {
+                //            Bukkit.getScheduler().scheduleSyncRepeatingTask(guiyPlugin, {
                 if (hasFrameWaiters) {
                     hasFrameWaiters = false
                     clock.sendFrame(System.nanoTime()) // Frame time value is not used by Compose runtime.
                     rootNode.measure(Constraints())
                     canvas?.render()
                 }
-            }, 0, 1)
+                delay(50)
+            }
+            running = false
+            guiyPlugin.schedule {
+                canvas?.viewers?.forEach { it.closeInventory(InventoryCloseEvent.Reason.PLUGIN) }
+            }
+            recomposer.close()
+            snapshotHandle.dispose()
+            composition.dispose()
+            composeScope.cancel()
         }
     }
 

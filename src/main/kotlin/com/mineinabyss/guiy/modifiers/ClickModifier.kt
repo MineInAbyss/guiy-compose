@@ -6,12 +6,16 @@ interface ClickScope {
     val clickType: ClickType
 }
 
-class ClickModifier(val onClick: (ClickScope.() -> Unit)) : Modifier.Element<ClickModifier> {
-    override fun mergeWith(other: ClickModifier) = ClickModifier {
-        onClick()
+open class ClickModifier(
+    val merged: Boolean = false,
+    val onClick: (ClickScope.() -> Unit),
+) : Modifier.Element<ClickModifier> {
+    override fun mergeWith(other: ClickModifier) = ClickModifier(merged = true) {
+        if (!other.merged)
+            onClick()
         other.onClick(this)
     }
 }
 
-fun Modifier.clickable(onClick: ClickScope.() -> Unit) = then(ClickModifier(onClick))
+fun Modifier.clickable(onClick: ClickScope.() -> Unit) = then(ClickModifier(onClick = onClick))
 

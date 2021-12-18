@@ -2,6 +2,7 @@ package com.mineinabyss.guiy.nodes
 
 import com.mineinabyss.guiy.guiyPlugin
 import com.mineinabyss.guiy.inventory.GuiyCanvas
+import com.mineinabyss.guiy.inventory.GuiyOwner
 import com.mineinabyss.guiy.inventory.GuiyUIScopeMarker
 import com.mineinabyss.guiy.layout.LayoutNode
 import com.mineinabyss.guiy.modifiers.Modifier
@@ -24,6 +25,7 @@ object InventoryCanvasScope {
 
 internal abstract class InventoryCanvas : LayoutNode(), GuiyCanvas, InventoryHolder {
     abstract var activeInventory: Inventory
+    var owner: GuiyOwner? = null
     var onClose: (InventoryCloseScope.(player: Player) -> Unit)? = null
     var viewers = listOf<Player>()
         set(value) {

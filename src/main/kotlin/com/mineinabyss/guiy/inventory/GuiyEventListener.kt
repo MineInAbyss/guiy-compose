@@ -20,6 +20,7 @@ class GuiyEventListener : Listener {
     @EventHandler
     fun InventoryCloseEvent.onClose() {
         val guiyHolder = inventory.holder as? InventoryCanvas ?: return
+
         if (reason != InventoryCloseEvent.Reason.PLUGIN) {
             guiyHolder.onClose(player as Player)
         }

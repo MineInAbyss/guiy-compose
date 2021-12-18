@@ -1,8 +1,12 @@
 package com.mineinabyss.guiy.components.canvases
 
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.ComposeNode
 import com.mineinabyss.guiy.inventory.GuiyOwner
-import com.mineinabyss.guiy.nodes.*
+import com.mineinabyss.guiy.nodes.ChestCanvas
+import com.mineinabyss.guiy.nodes.GuiyNodeApplier
+import com.mineinabyss.guiy.nodes.InventoryCanvasScope
+import com.mineinabyss.guiy.nodes.InventoryCloseScope
 import org.bukkit.entity.Player
 
 @Composable
@@ -17,9 +21,10 @@ fun GuiyOwner.Chest(
         factory = { ChestCanvas(height, title) },
         update = {
             set(viewers.toList()) { this.viewers = it }
-            set(height) { this.height = height }
-            set(title) { this.title = title }
-            set(onClose) { this.onClose = onClose }
+            set(height) { this.height = it }
+            set(title) { this.title = it }
+            set(onClose) { this.onClose = it }
+            set(this@Chest) { owner = it }
             init { this@Chest.canvas = this }
         },
         content = { InventoryCanvasScope.children() },
