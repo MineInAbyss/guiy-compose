@@ -10,7 +10,7 @@
 A Spigot/PaperMC UI library built on the [Jetpack Compose](https://developer.android.com/jetpack/compose) compiler.
 
 If you are new to Compose, please read the link above. In short, it is a declarative UI library that makes working with
-state good, gives easy access to coroutines, and helps write complex UI faster.
+state nice, gives easy access to coroutines, and helps write complex UI faster.
 
 ## Beta status
 
@@ -47,7 +47,7 @@ val GREEN = ItemStack(Material.GREEN_WOOL)
 
 @Composable
 fun ToggleButton() {
-    val enabled by remember { mutableStateOf(false) }
+    var enabled by remember { mutableStateOf(false) }
     val display = if (enabled) GREEN else RED
     Item(display, Modifier.clickable {
         enabled = !enabled
@@ -106,7 +106,7 @@ LaunchedEffect support, same as in Jetpack Compose:
 
 ```kotlin
 fun TimedToggle() {
-    val enabled by remember { mutableStateOf(false) }
+    var enabled by remember { mutableStateOf(false) }
     val display = if (enabled) GREEN else RED
     Item(display)
 
