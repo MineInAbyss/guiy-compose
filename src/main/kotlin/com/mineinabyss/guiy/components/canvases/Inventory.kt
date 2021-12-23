@@ -11,7 +11,6 @@ import com.mineinabyss.guiy.modifiers.Modifier
 import com.mineinabyss.guiy.nodes.InventoryCloseScope
 import com.mineinabyss.guiy.nodes.StaticMeasurePolicy
 import com.okkero.skedule.schedule
-import org.bukkit.ChatColor
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryCloseEvent
@@ -70,7 +69,6 @@ fun GuiyOwner.Inventory(
     DisposableEffect(inventory) {
         onDispose {
             guiyPlugin.schedule {
-                println("${ChatColor.RED}Disposing of inventory $inventory")
                 inventory.close()
             }
         }

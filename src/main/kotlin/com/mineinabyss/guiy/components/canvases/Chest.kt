@@ -15,7 +15,6 @@ import com.mineinabyss.guiy.nodes.InventoryCloseScope
 import com.mineinabyss.guiy.nodes.StaticMeasurePolicy
 import net.kyori.adventure.text.Component
 import org.bukkit.Bukkit
-import org.bukkit.ChatColor.GREEN
 import org.bukkit.entity.Player
 import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.ItemStack
@@ -64,7 +63,6 @@ fun GuiyOwner.Chest(
     val inventory: Inventory = remember(title, size) {
         if (size == Size()) return@remember null
         Bukkit.createInventory(holder, CHEST_WIDTH * size.height, Component.text(title)).also {
-            println("${GREEN}Updated inventory to $it, ($CHEST_WIDTH, ${size.height})")
             holder.activeInventory = it
         }
     } ?: run {
@@ -81,7 +79,6 @@ fun GuiyOwner.Chest(
             viewers = viewers,
             modifier = constrainedModifier
         ) {
-            println("Rendering children with inventory $inventory")
             content()
         }
     }
