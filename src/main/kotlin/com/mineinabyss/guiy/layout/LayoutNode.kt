@@ -13,9 +13,10 @@ import kotlin.reflect.KClass
  *  You can configure stuff through [measurePolicy], [placer], and the [modifier], but things creates some problems
  *  when trying to make your own composable nodes that interact with this Layout node.
  */
-internal open class LayoutNode : Measurable, Placeable, GuiyNode {
+internal class LayoutNode : Measurable, Placeable, GuiyNode {
     override var measurePolicy: MeasurePolicy = ChildMeasurePolicy
     override var renderer: Renderer = EmptyRenderer
+    override var canvas: GuiyCanvas? = null
 
     val children = mutableListOf<LayoutNode>()
     override var modifier: Modifier = Modifier
@@ -46,7 +47,7 @@ internal open class LayoutNode : Measurable, Placeable, GuiyNode {
     private fun coercedConstraints(constraints: Constraints) = with(constraints) {
         object : Placeable by this@LayoutNode {
             override var width: Int = this@LayoutNode.width.coerceIn(minWidth..maxWidth)
-            override var height: Int = this@LayoutNode.width.coerceIn(minHeight..maxHeight)
+            override var height: Int = this@LayoutNode.height.coerceIn(minHeight..maxHeight)
         }
     }
 
@@ -58,6 +59,9 @@ internal open class LayoutNode : Measurable, Placeable, GuiyNode {
                 .applyFill(get<HorizontalFillModifier>(), get<VerticalFillModifier>())
         val result = measurePolicy.measure(children, modifierConstraints)
 
+        if (width != result.width || height != result.height) {
+            get<OnSizeChangedModifier>()?.onSizeChanged?.invoke(Size(result.width, result.height))
+        }
         width = result.width
         height = result.height
         result.placer.placeChildren()
@@ -77,24 +81,16 @@ internal open class LayoutNode : Measurable, Placeable, GuiyNode {
         }
     }
 
-    override fun renderTo(canvas: GuiyCanvas) {
-        val offsetCanvas = OffsetCanvas(x, y, canvas)
-        //TODO AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
-        // Yeah Google likes to do this sorta stuff through Modifiers but their architecture might
-        // be a bit too much for the tiny UIs we'd use in Minecraft, this is a temporary compromise.
-        renderer.apply { offsetCanvas.render(this@LayoutNode) }
+    override fun renderTo(canvas: GuiyCanvas?) {
+        val offsetCanvas = (canvas ?: this.canvas)?.let { OffsetCanvas(x, y, it) }
+        renderer.apply { offsetCanvas?.render(this@LayoutNode) }
         for (child in children) child.renderTo(offsetCanvas)
     }
 
-    fun processClick(x: Int, y: Int, type: ClickType) {
-        val scope = object : ClickScope {
-            override val clickType: ClickType = type
-        }
-
+    fun processClick(scope: ClickScope, x: Int, y: Int, type: ClickType) {
         get<ClickModifier>()?.onClick?.invoke(scope)
-
         children.filter { x in it.x until (it.x + it.width) && y in it.y until (it.y + it.height) }
-            .forEach { it.processClick(x - it.x, y - it.y, type) }
+            .forEach { it.processClick(scope, x - it.x, y - it.y, type) }
     }
 
     override fun toString() = children.joinToString(prefix = "LayoutNode(", postfix = ")")

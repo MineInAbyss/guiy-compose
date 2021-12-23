@@ -1,12 +1,8 @@
 package com.mineinabyss.guiy.inventory
 
+import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.ItemStack
 
 interface GuiyCanvas {
-    fun set(x: Int, y: Int, item: ItemStack?)
-
-    fun clear()
+    fun set(inventory: Inventory, x: Int, y: Int, item: ItemStack?)
 }
-
-const val MAX_CHEST_WIDTH = 9
-const val MAX_CHEST_HEIGHT = 6

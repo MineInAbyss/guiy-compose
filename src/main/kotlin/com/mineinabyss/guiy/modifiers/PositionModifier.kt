@@ -7,3 +7,4 @@ class PositionModifier(
     override fun mergeWith(other: PositionModifier) = other
 }
 
+fun Modifier.at(x: Int = 0, y: Int = 0) = then(PositionModifier(x, y))

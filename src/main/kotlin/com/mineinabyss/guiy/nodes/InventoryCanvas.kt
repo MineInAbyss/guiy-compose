@@ -1,91 +1,16 @@
 package com.mineinabyss.guiy.nodes
 
-import com.mineinabyss.guiy.guiyPlugin
-import com.mineinabyss.guiy.inventory.GuiyCanvas
-import com.mineinabyss.guiy.inventory.GuiyOwner
-import com.mineinabyss.guiy.inventory.GuiyUIScopeMarker
-import com.mineinabyss.guiy.layout.LayoutNode
-import com.mineinabyss.guiy.modifiers.Modifier
-import com.mineinabyss.guiy.modifiers.PositionModifier
-import com.okkero.skedule.schedule
-import org.bukkit.entity.Player
-import org.bukkit.event.inventory.ClickType
-import org.bukkit.event.inventory.InventoryCloseEvent
-import org.bukkit.inventory.Inventory
-import org.bukkit.inventory.InventoryHolder
+import com.mineinabyss.guiy.layout.MeasurePolicy
+import com.mineinabyss.guiy.layout.MeasureResult
 
 interface InventoryCloseScope {
     fun reopen()
 }
 
-@GuiyUIScopeMarker
-object InventoryCanvasScope {
-    fun Modifier.at(x: Int = 0, y: Int = 0) = then(PositionModifier(x, y))
-}
-
-internal abstract class InventoryCanvas : LayoutNode(), GuiyCanvas, InventoryHolder {
-    abstract var activeInventory: Inventory
-    var owner: GuiyOwner? = null
-    var onClose: (InventoryCloseScope.(player: Player) -> Unit)? = null
-    var viewers = listOf<Player>()
-        set(value) {
-            val viewers = field
-            (viewers - value).forEach {
-                it.closeInventory(InventoryCloseEvent.Reason.PLUGIN)
-            }
-            guiyPlugin.schedule {
-                (value - viewers).forEach {
-                    it.closeInventory(InventoryCloseEvent.Reason.PLUGIN)
-                    it.openInventory(inventory)
-                }
-            }
-            field = value
-        }
-
-    override fun getInventory(): Inventory = activeInventory
-
-    abstract fun processClick(slot: Int, clickType: ClickType)
-
-    fun onClose(player: Player) {
-        val scope = object : InventoryCloseScope {
-            override fun reopen() {
-                viewers.filter { it.openInventory.topInventory != inventory }
-                    .forEach { it.openInventory(inventory) }
-            }
-        }
-        guiyPlugin.schedule {
-            waitFor(1)
-            onClose?.invoke(scope, player)
-        }
-    }
-
-    fun transferViewers(to: Inventory): Inventory {
-        viewers.forEach {
-            it.closeInventory(InventoryCloseEvent.Reason.PLUGIN)
-            it.openInventory(to)
-        }
-        return to
-    }
-
-    abstract fun createInventory(): Inventory
-
-    var updateRunning: Boolean = false
-    fun updateInventory() {
-        !updateRunning || return
-        updateRunning = true
-        guiyPlugin.schedule {
-            activeInventory = transferViewers(createInventory())
-            updateRunning = false
-            render()
-        }
-    }
-
-    fun render() {
-        clear()
-        renderTo(this)
-    }
-
-    override fun clear() {
-        inventory.clear()
+val StaticMeasurePolicy = MeasurePolicy { measurables, constraints ->
+    val noMinConstraints = constraints.copy(minWidth = 0, minHeight = 0)
+    val placeables = measurables.map { it.measure(noMinConstraints) }
+    MeasureResult(constraints.minWidth, constraints.minHeight) {
+        placeables.forEach { it.placeAt(0, 0) }
     }
 }

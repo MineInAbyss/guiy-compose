@@ -1,19 +1,23 @@
 package com.mineinabyss.guiy.inventory
 
-import androidx.compose.runtime.BroadcastFrameClock
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.Composition
-import androidx.compose.runtime.Recomposer
+import androidx.compose.runtime.*
 import androidx.compose.runtime.snapshots.Snapshot
-import com.mineinabyss.guiy.guiyPlugin
 import com.mineinabyss.guiy.layout.LayoutNode
+import com.mineinabyss.guiy.modifiers.ClickScope
 import com.mineinabyss.guiy.modifiers.Constraints
 import com.mineinabyss.guiy.nodes.GuiyNodeApplier
-import com.mineinabyss.guiy.nodes.InventoryCanvas
-import com.okkero.skedule.schedule
 import kotlinx.coroutines.*
-import org.bukkit.event.inventory.InventoryCloseEvent
+import org.bukkit.event.inventory.ClickType
 import kotlin.coroutines.CoroutineContext
+
+val LocalClickHandler: ProvidableCompositionLocal<ClickHandler> =
+    staticCompositionLocalOf { error("No provider for local click handler") }
+val LocalCanvas: ProvidableCompositionLocal<GuiyCanvas?> =
+    staticCompositionLocalOf { null }
+
+interface ClickHandler {
+    fun processClick(scope: ClickScope, slot: Int, type: ClickType)
+}
 
 @GuiyUIScopeMarker
 class GuiyOwner : CoroutineScope {
@@ -23,7 +27,6 @@ class GuiyOwner : CoroutineScope {
     override val coroutineContext: CoroutineContext = composeScope.coroutineContext
 
     private val rootNode = LayoutNode()
-    internal var canvas: InventoryCanvas? = null
 
     var running = false
     private val recomposer = Recomposer(coroutineContext)
@@ -63,14 +66,11 @@ class GuiyOwner : CoroutineScope {
                     hasFrameWaiters = false
                     clock.sendFrame(System.nanoTime()) // Frame time value is not used by Compose runtime.
                     rootNode.measure(Constraints())
-                    canvas?.render()
+                    rootNode.render()
                 }
                 delay(50)
             }
             running = false
-            guiyPlugin.schedule {
-                canvas?.viewers?.forEach { it.closeInventory(InventoryCloseEvent.Reason.PLUGIN) }
-            }
             recomposer.close()
             snapshotHandle.dispose()
             composition.dispose()
@@ -81,7 +81,19 @@ class GuiyOwner : CoroutineScope {
     private fun setContent(content: @Composable GuiyOwner.() -> Unit) {
         hasFrameWaiters = true
         composition.setContent {
-            content()
+            CompositionLocalProvider(LocalClickHandler provides object : ClickHandler {
+                override fun processClick(scope: ClickScope, slot: Int, type: ClickType) {
+                    val width = rootNode.width
+                    rootNode.children.forEach { node ->
+                        val w = node.width
+                        val x = if (w == 0) 0 else slot % rootNode.width
+                        val y = if (w == 0) 0 else slot / rootNode.width
+                        rootNode.processClick(scope, x, y, type)
+                    }
+                }
+            }) {
+                content()
+            }
         }
     }
 }

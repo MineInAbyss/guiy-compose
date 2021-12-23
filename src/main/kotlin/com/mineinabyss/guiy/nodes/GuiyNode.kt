@@ -9,13 +9,15 @@ import com.mineinabyss.guiy.modifiers.Modifier
 interface GuiyNode {
     var measurePolicy: MeasurePolicy
     var renderer: Renderer
+    var canvas: GuiyCanvas?
     var modifier: Modifier
     var width: Int
     var height: Int
     var x: Int
     var y: Int
 
-    fun renderTo(canvas: GuiyCanvas)
+    fun render() = renderTo(null)
+    fun renderTo(canvas: GuiyCanvas?)
 
     companion object {
         val Constructor: () -> GuiyNode = ::LayoutNode

@@ -33,7 +33,7 @@ guiy {
 @Composable
 fun GuiyOwner.ExampleMenu(player: Player) {
     // Guiy will dynamically update players, title, or height if you use a state.
-    Chest(listOf(player), title = "Example", height = 4, onClose = { exit() /*reopen()*/ }) {
+    Chest(setOf(player), title = "Example", height = 4, onClose = { exit() /*reopen()*/ }) {
         ToggleButton()
     }
 }
