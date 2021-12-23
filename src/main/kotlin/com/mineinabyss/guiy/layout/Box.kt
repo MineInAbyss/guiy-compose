@@ -6,19 +6,19 @@ import com.mineinabyss.guiy.nodes.ColumnMeasurePolicy
 import com.mineinabyss.guiy.nodes.RowMeasurePolicy
 
 @Composable
-fun Row(modifier: Modifier = Modifier, children: @Composable () -> Unit) {
+fun Row(modifier: Modifier = Modifier, content: @Composable () -> Unit) {
     Layout(
         RowMeasurePolicy,
         modifier = modifier,
-        content = children
+        content = content
     )
 }
 
 @Composable
-fun Column(modifier: Modifier = Modifier, children: @Composable () -> Unit) {
+fun Column(modifier: Modifier = Modifier, content: @Composable () -> Unit) {
     Layout(
         ColumnMeasurePolicy,
         modifier = modifier,
-        content = children
+        content = content
     )
 }

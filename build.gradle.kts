@@ -39,7 +39,6 @@ dependencies {
     compileOnly("com.github.okkero:Skedule:v1.2.6")
 
     // Shaded
-    implementation(Deps.minecraft.anvilgui)
     api(compose.runtime) {
         exclude("org.jetbrains.kotlin")
         exclude("org.jetbrains.kotlinx")

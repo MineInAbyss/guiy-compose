@@ -64,7 +64,7 @@ fun GuiyOwner.Inventory(
     inventory: Inventory,
     viewers: Set<Player>,
     modifier: Modifier = Modifier,
-    children: @Composable () -> Unit,
+    content: @Composable () -> Unit,
 ) {
     // Close inventory when it switches to a new one
     DisposableEffect(inventory) {
@@ -75,34 +75,29 @@ fun GuiyOwner.Inventory(
             }
         }
     }
+    // Manage opening inventory for new viewers or when inventory changes
+    LaunchedEffect(viewers, inventory) {
+        val oldViewers = inventory.viewers.toSet()
+
+        guiyPlugin.schedule {
+            // Close inventory for removed viewers
+            (oldViewers - viewers).forEach {
+                it.closeInventory(InventoryCloseEvent.Reason.PLUGIN)
+            }
+
+            // Open inventory for new viewers
+            (viewers - oldViewers).forEach {
+                it.closeInventory(InventoryCloseEvent.Reason.PLUGIN)
+                it.openInventory(inventory)
+            }
+        }
+    }
 
     CompositionLocalProvider(LocalInventory provides inventory) {
         Layout(
             measurePolicy = StaticMeasurePolicy,
             modifier = modifier,
-        ) {
-//        InventoryScope(holder).apply { children() }
-//        val inventory = holder.activeInventory
-
-            // Manage opening inventory for new viewers or when inventory changes
-            LaunchedEffect(viewers, inventory) {
-                val oldViewers = inventory.viewers.toSet()
-
-                guiyPlugin.schedule {
-                    // Close inventory for removed viewers
-                    (oldViewers - viewers).forEach {
-                        it.closeInventory(InventoryCloseEvent.Reason.PLUGIN)
-                    }
-
-                    // Open inventory for new viewers
-                    (viewers - oldViewers).forEach {
-                        it.closeInventory(InventoryCloseEvent.Reason.PLUGIN)
-                        it.openInventory(inventory)
-                    }
-                }
-            }
-
-            children()
-        }
+            content = content,
+        )
     }
 }

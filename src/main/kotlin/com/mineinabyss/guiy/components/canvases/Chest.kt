@@ -31,7 +31,7 @@ fun GuiyOwner.Chest(
     title: String,
     modifier: Modifier = Modifier,
     onClose: (InventoryCloseScope.(player: Player) -> Unit) = {},
-    children: @Composable () -> Unit,
+    content: @Composable () -> Unit,
 ) {
     val constrainedModifier = modifier.sizeIn(CHEST_WIDTH, CHEST_WIDTH, MIN_CHEST_HEIGHT, MAX_CHEST_HEIGHT)
     //TODO a proper way of reading size (onSizeChange recomposes twice when both title and size change.)
@@ -82,7 +82,7 @@ fun GuiyOwner.Chest(
             modifier = constrainedModifier
         ) {
             println("Rendering children with inventory $inventory")
-            children()
+            content()
         }
     }
 }
