@@ -123,8 +123,7 @@ fun TimedToggle() {
 ### Real world use
 
 We are using this project internally, so you should be able to find up-to-date usage in
-our [main project](https://github.com/MineInAbyss/MineInAbyss/tree/master/mineinabyss-systems/src/main/kotlin/com/mineinabyss)
-.
+our [main project](https://github.com/MineInAbyss/MineInAbyss/tree/master/mineinabyss-features/src/main/kotlin/com/mineinabyss/guilds/menus).
 
 ## Usage
 
