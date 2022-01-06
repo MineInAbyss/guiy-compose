@@ -3,7 +3,7 @@
 # Guiy
 
 [![Java CI with Gradle](https://github.com/MineInAbyss/guiy-compose/actions/workflows/gradle-ci.yml/badge.svg)](https://github.com/MineInAbyss/guiy-compose/actions/workflows/gradle-ci.yml)
-[![Maven](https://badgen.net/maven/v/metadata-url/repo.mineinabyss.com/releases/com/mineinabyss/guiy-compose/maven-metadata.xml)](https://repo.mineinabyss.com/releases/com/mineinabyss/guiy-compose)
+[![Maven](https://img.shields.io/maven-metadata/v?metadataUrl=https://repo.mineinabyss.com/releases/com/mineinabyss/guiy-compose/maven-metadata.xml)](https://repo.mineinabyss.com/#/releases/com/mineinabyss/guiy-compose)
 [![Contribute](https://shields.io/badge/Contribute-e57be5?logo=github%20sponsors&style=flat&logoColor=white)](https://wiki.mineinabyss.com/contribute/)
 </div>
 
