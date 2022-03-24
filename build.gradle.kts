@@ -9,7 +9,7 @@ plugins {
     id("com.mineinabyss.conventions.copyjar")
     id("com.mineinabyss.conventions.publication")
     id("com.mineinabyss.conventions.testing")
-    id("org.jetbrains.compose") version "1.0.1-rc2"
+    id("org.jetbrains.compose") version "1.1.1"
 }
 
 tasks.withType<KotlinCompile> {
@@ -35,6 +35,7 @@ dependencies {
     compileOnly(kotlin("stdlib-jdk8"))
     compileOnly(Deps.kotlinx.coroutines)
     compileOnly(Deps.kotlin.reflect)
+    compileOnly(Deps.minecraft.anvilgui)
     // TODO update to jitpack in idofront
     compileOnly("com.github.okkero:Skedule:v1.2.6")
 
@@ -43,5 +44,8 @@ dependencies {
         exclude("org.jetbrains.kotlin")
         exclude("org.jetbrains.kotlinx")
     }
+    api(compose.foundation)
+
+//    api(compose.foundation)
     implementation("com.mineinabyss:idofront:$idofrontVersion")
 }

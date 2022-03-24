@@ -1,5 +1,6 @@
 package com.mineinabyss.guiy.components.canvases
 
+import androidx.compose.foundation.layout.Row
 import androidx.compose.runtime.*
 import com.mineinabyss.guiy.guiyPlugin
 import com.mineinabyss.guiy.inventory.GuiyInventoryHolder
@@ -91,6 +92,7 @@ fun GuiyOwner.Inventory(
         }
     }
 
+    inventory.clear() //TODO check if this works
     CompositionLocalProvider(LocalInventory provides inventory) {
         Layout(
             measurePolicy = StaticMeasurePolicy,

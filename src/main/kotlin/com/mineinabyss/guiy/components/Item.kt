@@ -17,8 +17,8 @@ fun Item(itemStack: ItemStack, modifier: Modifier = Modifier) {
         },
         renderer = { node ->
             val inv = canvas
-            for(x in 0 until node.width)
-                for(y in 0 until node.height)
+            for (x in 0 until node.width)
+                for (y in 0 until node.height)
                     set(inv, x, y, itemStack)
         },
         modifier = Modifier.sizeIn(minWidth = 1, minHeight = 1).then(modifier)
