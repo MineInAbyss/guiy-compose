@@ -9,7 +9,7 @@ import com.mineinabyss.guiy.modifiers.sizeIn
 import org.bukkit.inventory.ItemStack
 
 @Composable
-fun Item(itemStack: ItemStack, modifier: Modifier = Modifier) {
+fun Item(itemStack: ItemStack?, modifier: Modifier = Modifier) {
     val canvas = LocalInventory.current
     Layout(
         measurePolicy = { measurables, constraints ->

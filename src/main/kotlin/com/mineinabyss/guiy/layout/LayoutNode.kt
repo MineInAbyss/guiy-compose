@@ -87,10 +87,10 @@ internal class LayoutNode : Measurable, Placeable, GuiyNode {
         for (child in children) child.renderTo(offsetCanvas)
     }
 
-    fun processClick(scope: ClickScope, x: Int, y: Int, type: ClickType) {
+    fun processClick(scope: ClickScope, x: Int, y: Int) {
         get<ClickModifier>()?.onClick?.invoke(scope)
         children.filter { x in it.x until (it.x + it.width) && y in it.y until (it.y + it.height) }
-            .forEach { it.processClick(scope, x - it.x, y - it.y, type) }
+            .forEach { it.processClick(scope, x - it.x, y - it.y) }
     }
 
     override fun toString() = children.joinToString(prefix = "LayoutNode(", postfix = ")")

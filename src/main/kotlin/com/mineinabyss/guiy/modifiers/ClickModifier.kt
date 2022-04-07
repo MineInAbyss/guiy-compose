@@ -6,7 +6,7 @@ import org.bukkit.inventory.ItemStack
 interface ClickScope {
     val clickType: ClickType
     val slot: Int
-    val item: ItemStack?
+    var cursor: ItemStack?
 }
 
 open class ClickModifier(

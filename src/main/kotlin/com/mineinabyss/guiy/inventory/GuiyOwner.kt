@@ -7,7 +7,7 @@ import com.mineinabyss.guiy.modifiers.ClickScope
 import com.mineinabyss.guiy.modifiers.Constraints
 import com.mineinabyss.guiy.nodes.GuiyNodeApplier
 import kotlinx.coroutines.*
-import org.bukkit.event.inventory.ClickType
+import org.bukkit.event.inventory.InventoryClickEvent
 import kotlin.coroutines.CoroutineContext
 
 val LocalClickHandler: ProvidableCompositionLocal<ClickHandler> =
@@ -16,7 +16,7 @@ val LocalCanvas: ProvidableCompositionLocal<GuiyCanvas?> =
     staticCompositionLocalOf { null }
 
 interface ClickHandler {
-    fun processClick(scope: ClickScope, slot: Int, type: ClickType)
+    fun processClick(scope: ClickScope, clickEvent: InventoryClickEvent)
 }
 
 @GuiyUIScopeMarker
@@ -82,13 +82,14 @@ class GuiyOwner : CoroutineScope {
         hasFrameWaiters = true
         composition.setContent {
             CompositionLocalProvider(LocalClickHandler provides object : ClickHandler {
-                override fun processClick(scope: ClickScope, slot: Int, type: ClickType) {
+                override fun processClick(scope: ClickScope, clickEvent: InventoryClickEvent) {
+                    val slot = clickEvent.slot
                     val width = rootNode.width
                     rootNode.children.forEach { node ->
                         val w = node.width
-                        val x = if (w == 0) 0 else slot % rootNode.width
-                        val y = if (w == 0) 0 else slot / rootNode.width
-                        rootNode.processClick(scope, x, y, type)
+                        val x = if (w == 0) 0 else slot % width
+                        val y = if (w == 0) 0 else slot / width
+                        rootNode.processClick(scope, x, y)
                     }
                 }
             }) {

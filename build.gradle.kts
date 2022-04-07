@@ -4,12 +4,13 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 val idofrontVersion: String by project
 
 plugins {
+    kotlin("jvm")
     id("com.mineinabyss.conventions.kotlin")
     id("com.mineinabyss.conventions.papermc")
     id("com.mineinabyss.conventions.copyjar")
     id("com.mineinabyss.conventions.publication")
     id("com.mineinabyss.conventions.testing")
-    id("org.jetbrains.compose") version "1.1.1"
+    id("org.jetbrains.compose")
 }
 
 tasks.withType<KotlinCompile> {
@@ -17,7 +18,7 @@ tasks.withType<KotlinCompile> {
         freeCompilerArgs = listOf(
             "-Xopt-in=kotlinx.serialization.ExperimentalSerializationApi"
         )
-        jvmTarget = "16"
+        jvmTarget = "17"
     }
 }
 
@@ -32,20 +33,15 @@ repositories {
 
 dependencies {
     // MineInAbyss platform
-    compileOnly(kotlin("stdlib-jdk8"))
-    compileOnly(Deps.kotlinx.coroutines)
-    compileOnly(Deps.kotlin.reflect)
-    compileOnly(Deps.minecraft.anvilgui)
-    // TODO update to jitpack in idofront
-    compileOnly("com.github.okkero:Skedule:v1.2.6")
+    compileOnly(libs.kotlinx.coroutines)
+    compileOnly(libs.kotlin.reflect)
+    compileOnly(libs.minecraft.anvilgui)
+    compileOnly(libs.minecraft.skedule)
 
     // Shaded
     api(compose.runtime) {
         exclude("org.jetbrains.kotlin")
         exclude("org.jetbrains.kotlinx")
     }
-    api(compose.foundation)
-
-//    api(compose.foundation)
     implementation("com.mineinabyss:idofront:$idofrontVersion")
 }

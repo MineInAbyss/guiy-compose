@@ -1,6 +1,5 @@
 package com.mineinabyss.guiy.components.canvases
 
-import androidx.compose.foundation.layout.Row
 import androidx.compose.runtime.*
 import com.mineinabyss.guiy.guiyPlugin
 import com.mineinabyss.guiy.inventory.GuiyInventoryHolder
@@ -12,8 +11,10 @@ import com.mineinabyss.guiy.modifiers.Modifier
 import com.mineinabyss.guiy.nodes.InventoryCloseScope
 import com.mineinabyss.guiy.nodes.StaticMeasurePolicy
 import com.okkero.skedule.schedule
+import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.ClickType
+import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.event.inventory.InventoryCloseEvent
 import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.ItemStack
@@ -32,14 +33,18 @@ inline fun rememberInventoryHolder(
     val clickHandler = LocalClickHandler.current
     return remember(clickHandler) {
         object : GuiyInventoryHolder() {
-            override fun processClick(slot: Int, clickType: ClickType) {
+            override fun processClick(clickEvent: InventoryClickEvent) {
                 val scope = object : ClickScope {
-                    override val clickType: ClickType = clickType
-                    override val slot: Int = slot
-                    override val item: ItemStack? = inventory.getItem(slot)
+                    override val clickType: ClickType = clickEvent.click
+                    override val slot: Int = clickEvent.slot
+                    override var cursor: ItemStack?
+                        get() = clickEvent.cursor.takeIf { it?.type != Material.AIR }
+                        set(value) { clickEvent.cursor = value}
                 }
-
-                clickHandler.processClick(scope, slot, clickType)
+                clickHandler.processClick(scope, clickEvent)
+                // We always cancel the click event and try to hide info on the actual clicked item
+                // since its state should already be known in the gui tree.
+                clickEvent.isCancelled = true
             }
 
             override fun onClose(player: Player) {
