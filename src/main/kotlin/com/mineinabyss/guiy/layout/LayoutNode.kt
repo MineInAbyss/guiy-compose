@@ -1,10 +1,11 @@
 package com.mineinabyss.guiy.layout
 
+import com.mineinabyss.guiy.components.canvases.CHEST_WIDTH
 import com.mineinabyss.guiy.inventory.GuiyCanvas
 import com.mineinabyss.guiy.inventory.OffsetCanvas
 import com.mineinabyss.guiy.modifiers.*
 import com.mineinabyss.guiy.nodes.GuiyNode
-import org.bukkit.event.inventory.ClickType
+import org.bukkit.inventory.ItemStack
 import kotlin.reflect.KClass
 
 /**
@@ -91,6 +92,39 @@ internal class LayoutNode : Measurable, Placeable, GuiyNode {
         get<ClickModifier>()?.onClick?.invoke(scope)
         children.filter { x in it.x until (it.x + it.width) && y in it.y until (it.y + it.height) }
             .forEach { it.processClick(scope, x - it.x, y - it.y) }
+    }
+
+    fun indexIntersects(child: GuiyNode): Boolean {
+        return true
+    }
+    class DragInfo(
+        val dragModifier: DragModifier,
+        val itemMap: MutableMap<Int, ItemStack> = mutableMapOf(),
+    )
+
+    fun buildDragMap(index: Int, item: ItemStack, dragMap: MutableMap<GuiyNode, DragInfo>): Boolean {
+        val iX = index % CHEST_WIDTH
+        val iY = index / CHEST_WIDTH
+        if (iX !in 0 until width || iY !in 0 until height) return false
+        val dragModifier = get<DragModifier>()
+        if(dragModifier != null) {
+            dragMap.getOrPut(this) { DragInfo(dragModifier) }.itemMap[index] = item
+            return true
+        }
+        return children.any { child ->
+            val newIndex = (iX - x + child.x) + (iY - x + child.x) * CHEST_WIDTH
+            child.buildDragMap(newIndex, item, dragMap)
+        }
+    }
+
+    fun processDrag(scope: DragScope) {
+        val dragMap = mutableMapOf<GuiyNode, DragInfo>()
+        scope.updatedItems.forEach { (i, item) ->
+            buildDragMap(i, item, dragMap)
+        }
+        dragMap.forEach { (_, info) ->
+            info.dragModifier.onDrag.invoke(scope.copy(updatedItems = info.itemMap))
+        }
     }
 
     override fun toString() = children.joinToString(prefix = "LayoutNode(", postfix = ")")

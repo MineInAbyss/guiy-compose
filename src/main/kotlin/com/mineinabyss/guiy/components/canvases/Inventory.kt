@@ -7,13 +7,17 @@ import com.mineinabyss.guiy.inventory.GuiyOwner
 import com.mineinabyss.guiy.inventory.LocalClickHandler
 import com.mineinabyss.guiy.layout.Layout
 import com.mineinabyss.guiy.modifiers.ClickScope
+import com.mineinabyss.guiy.modifiers.DragScope
 import com.mineinabyss.guiy.modifiers.Modifier
 import com.mineinabyss.guiy.nodes.InventoryCloseScope
 import com.mineinabyss.guiy.nodes.StaticMeasurePolicy
+import com.mineinabyss.idofront.nms.aliases.NMSItemStack
+import com.mineinabyss.idofront.nms.aliases.NMSPlayer
+import com.mineinabyss.idofront.nms.aliases.toNMS
 import com.okkero.skedule.schedule
+import kotlinx.coroutines.delay
 import org.bukkit.Material
 import org.bukkit.entity.Player
-import org.bukkit.event.inventory.ClickType
 import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.event.inventory.InventoryCloseEvent
 import org.bukkit.inventory.Inventory
@@ -34,17 +38,19 @@ inline fun rememberInventoryHolder(
     return remember(clickHandler) {
         object : GuiyInventoryHolder() {
             override fun processClick(clickEvent: InventoryClickEvent) {
-                val scope = object : ClickScope {
-                    override val clickType: ClickType = clickEvent.click
-                    override val slot: Int = clickEvent.slot
-                    override var cursor: ItemStack?
-                        get() = clickEvent.cursor.takeIf { it?.type != Material.AIR }
-                        set(value) { clickEvent.cursor = value}
-                }
+                val scope = ClickScope(
+                    clickEvent.click,
+                    clickEvent.slot,
+                    clickEvent.cursor.takeIf { it?.type != Material.AIR }
+                )
                 clickHandler.processClick(scope, clickEvent)
-                // We always cancel the click event and try to hide info on the actual clicked item
-                // since its state should already be known in the gui tree.
                 clickEvent.isCancelled = true
+
+                clickEvent.cursor = scope.cursor
+            }
+
+            override fun processDrag(scope: DragScope) {
+                clickHandler.processDrag(scope)
             }
 
             override fun onClose(player: Player) {

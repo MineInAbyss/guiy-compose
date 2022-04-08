@@ -3,9 +3,11 @@ package com.mineinabyss.guiy.inventory
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
+import com.mineinabyss.guiy.modifiers.DragScope
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.event.inventory.InventoryCloseEvent
+import org.bukkit.event.inventory.InventoryDragEvent
 import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.InventoryHolder
 
@@ -16,6 +18,7 @@ abstract class GuiyInventoryHolder : InventoryHolder {
         activeInventory ?: error("Guiy inventory is used in bukkit but has not been rendered yet.")
 
     abstract fun processClick(clickEvent: InventoryClickEvent)
+    abstract fun processDrag(scope: DragScope)
 
     abstract fun onClose(player: Player)
 

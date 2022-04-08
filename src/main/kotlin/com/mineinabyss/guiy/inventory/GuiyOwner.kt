@@ -5,9 +5,11 @@ import androidx.compose.runtime.snapshots.Snapshot
 import com.mineinabyss.guiy.layout.LayoutNode
 import com.mineinabyss.guiy.modifiers.ClickScope
 import com.mineinabyss.guiy.modifiers.Constraints
+import com.mineinabyss.guiy.modifiers.DragScope
 import com.mineinabyss.guiy.nodes.GuiyNodeApplier
 import kotlinx.coroutines.*
 import org.bukkit.event.inventory.InventoryClickEvent
+import org.bukkit.event.inventory.InventoryDragEvent
 import kotlin.coroutines.CoroutineContext
 
 val LocalClickHandler: ProvidableCompositionLocal<ClickHandler> =
@@ -17,6 +19,7 @@ val LocalCanvas: ProvidableCompositionLocal<GuiyCanvas?> =
 
 interface ClickHandler {
     fun processClick(scope: ClickScope, clickEvent: InventoryClickEvent)
+    fun processDrag(scope: DragScope)
 }
 
 @GuiyUIScopeMarker
@@ -91,6 +94,10 @@ class GuiyOwner : CoroutineScope {
                         val y = if (w == 0) 0 else slot / width
                         rootNode.processClick(scope, x, y)
                     }
+                }
+
+                override fun processDrag(scope: DragScope) {
+                    rootNode.processDrag(scope)
                 }
             }) {
                 content()
