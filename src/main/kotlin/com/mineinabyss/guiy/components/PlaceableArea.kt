@@ -19,7 +19,31 @@ class ItemGridState(
         repeat(MAX_CHEST_HEIGHT * CHEST_WIDTH) { add(null) }
     }
 
+    fun add(item: ItemStack, width: Int, height: Int): ItemStack? {
+        val remaining = item.clone()
+        items.forEachIndexed { i, gridItem ->
+            if (i % CHEST_WIDTH >= width || i / CHEST_WIDTH >= height) return@forEachIndexed
+            if (gridItem == null) {
+                items[i] = remaining
+                return null
+            }
+            if (gridItem.isSimilar(item)) {
+                val add = (gridItem.amount + remaining.amount).coerceAtMost(item.maxStackSize) - gridItem.amount
+                item.amount += add
+                remaining.amount -= add
+                items[i] = null
+                items[i] = item
+                if (remaining.amount == 0) return null
+            }
+        }
+        return remaining
+    }
 
+    fun get(x: Int, y: Int) = items[x + y * CHEST_WIDTH]
+
+    fun set(x: Int, y: Int, item: ItemStack?) {
+        items[x + y * CHEST_WIDTH] = item
+    }
 }
 
 @Composable
@@ -46,8 +70,7 @@ fun ItemGrid(
                 Item(item, Modifier.clickable {
                     val newItem = when (clickType) {
                         ClickType.LEFT -> {
-                            if (item?.type == cursor?.type) {
-                                if (item == null || cursor == null) return@clickable
+                            if (item != null && cursor?.isSimilar(item) == true) {
                                 val total = (item.amount + (cursor?.amount ?: 0))
                                 item.amount = total.coerceAtMost(item.maxStackSize)
                                 cursor?.amount = total - item.amount

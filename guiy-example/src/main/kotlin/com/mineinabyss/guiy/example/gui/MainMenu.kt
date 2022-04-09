@@ -12,18 +12,23 @@ import com.mineinabyss.guiy.modifiers.size
 import kotlinx.coroutines.delay
 import org.bukkit.Material
 import org.bukkit.entity.Player
+import org.bukkit.event.inventory.ClickType
 import org.bukkit.inventory.ItemStack
 
 @Composable
 fun GuiyOwner.MainMenu(player: Player) {
     val title = "Hello world"
+    val state = rememberItemGridState()
     Chest(
         setOf(player),
         title,
         onClose = { exit() },
-        modifier = Modifier.clickable { println("Chest clicked") }
+        modifier = Modifier.clickable {
+            if(clickType == ClickType.SHIFT_LEFT) {
+                cursor = cursor?.let { state.add(it, 4, 1) }
+            }
+        }
     ) {
-        val state = rememberItemGridState()
         ItemGrid(state, Modifier.size(4, 1))
     }
 }
