@@ -9,6 +9,7 @@ plugins {
     id("com.mineinabyss.conventions.nms")
     id("com.mineinabyss.conventions.publication")
     id("com.mineinabyss.conventions.testing")
+    id("com.mineinabyss.conventions.copyjar")
     id("org.jetbrains.compose")
     id("com.github.johnrengelman.shadow") version "7.1.2"
 }
@@ -46,20 +47,11 @@ dependencies {
     implementation(libs.idofront.nms)
 }
 
-val pluginPath = project.findProperty("plugin_path")!!
-
 tasks {
-    register<Copy>("copyJar") {
-        from(findByName("reobfJar") ?: findByName("shadowJar"))
-        into(pluginPath)
-        doLast {
-            println("Copied to plugin directory $pluginPath")
-        }
-    }
-
     assemble {
         dependsOn(reobfJar)
     }
+
     build {
         dependsOn("copyJar")
     }
