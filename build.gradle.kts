@@ -51,8 +51,4 @@ tasks {
     assemble {
         dependsOn(reobfJar)
     }
-
-    build {
-        dependsOn("copyJar")
-    }
 }
