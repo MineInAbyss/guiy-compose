@@ -1,4 +1,3 @@
-import Com_mineinabyss_conventions_platform_gradle.Deps
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 val idofrontVersion: String by project
@@ -17,12 +16,11 @@ plugins {
 tasks.withType<KotlinCompile> {
     kotlinOptions {
         freeCompilerArgs = listOf(
-            "-Xopt-in=kotlinx.serialization.ExperimentalSerializationApi"
+            "-opt-in=kotlinx.serialization.ExperimentalSerializationApi"
         )
         jvmTarget = "17"
     }
 }
-
 
 repositories {
     mavenCentral()
