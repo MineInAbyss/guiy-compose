@@ -1,11 +1,11 @@
 package com.mineinabyss.guiy.inventory
 
+import com.github.shynixn.mccoroutine.bukkit.launch
 import com.mineinabyss.guiy.guiyPlugin
 import com.mineinabyss.guiy.modifiers.DragScope
 import com.mineinabyss.idofront.nms.aliases.NMSItemStack
 import com.mineinabyss.idofront.nms.aliases.NMSPlayer
 import com.mineinabyss.idofront.nms.aliases.toNMS
-import com.okkero.skedule.schedule
 import kotlinx.coroutines.delay
 import org.bukkit.Material
 import org.bukkit.entity.Player
@@ -47,7 +47,7 @@ class GuiyEventListener : Listener {
         if (inGuiy.isNotEmpty()) {
             isCancelled = true
             result = Event.Result.DEFAULT
-            val newCursor = oldCursor.apply { inGuiy.map { inventory.getItem(it.key)?.amount ?: 0 }.sum()  }
+            val newCursor = oldCursor.apply { inGuiy.map { inventory.getItem(it.key)?.amount ?: 0 }.sum() }
             val event = InventoryDragEvent(
                 view, newCursor, oldCursor, type == DragType.SINGLE, inPlayerInv
             )
@@ -60,7 +60,7 @@ class GuiyEventListener : Listener {
 
                 val scope = DragScope(type, inGuiy, newCursor)
                 guiyHolder.processDrag(scope)
-                guiyPlugin.schedule {
+                guiyPlugin.launch {
                     delay(1)
                     val nmsView = whoClicked.toNMS<NMSPlayer>().containerMenu
                     nmsView.carried = NMSItemStack.fromBukkitCopy(scope.cursor ?: ItemStack(Material.AIR))

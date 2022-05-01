@@ -1,6 +1,7 @@
 package com.mineinabyss.guiy.components.canvases
 
 import androidx.compose.runtime.*
+import com.github.shynixn.mccoroutine.bukkit.launch
 import com.mineinabyss.guiy.guiyPlugin
 import com.mineinabyss.guiy.inventory.GuiyInventoryHolder
 import com.mineinabyss.guiy.inventory.GuiyOwner
@@ -11,17 +12,13 @@ import com.mineinabyss.guiy.modifiers.DragScope
 import com.mineinabyss.guiy.modifiers.Modifier
 import com.mineinabyss.guiy.nodes.InventoryCloseScope
 import com.mineinabyss.guiy.nodes.StaticMeasurePolicy
-import com.mineinabyss.idofront.nms.aliases.NMSItemStack
-import com.mineinabyss.idofront.nms.aliases.NMSPlayer
-import com.mineinabyss.idofront.nms.aliases.toNMS
-import com.okkero.skedule.schedule
+import com.mineinabyss.idofront.time.ticks
 import kotlinx.coroutines.delay
 import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.event.inventory.InventoryCloseEvent
 import org.bukkit.inventory.Inventory
-import org.bukkit.inventory.ItemStack
 
 //val LocalHolder: ProvidableCompositionLocal<GuiyInventoryHolder> =
 //    staticCompositionLocalOf { error("No local holder defined") }
@@ -61,8 +58,8 @@ inline fun rememberInventoryHolder(
                             .forEach { it.openInventory(inventory) }
                     }
                 }
-                guiyPlugin.schedule {
-                    waitFor(1)
+                guiyPlugin.launch {
+                    delay(1.ticks)
                     onClose.invoke(scope, player)
                 }
             }
@@ -80,7 +77,7 @@ fun GuiyOwner.Inventory(
     // Close inventory when it switches to a new one
     DisposableEffect(inventory) {
         onDispose {
-            guiyPlugin.schedule {
+            guiyPlugin.launch {
                 inventory.close()
             }
         }
@@ -89,7 +86,7 @@ fun GuiyOwner.Inventory(
     LaunchedEffect(viewers, inventory) {
         val oldViewers = inventory.viewers.toSet()
 
-        guiyPlugin.schedule {
+        guiyPlugin.launch {
             // Close inventory for removed viewers
             (oldViewers - viewers).forEach {
                 it.closeInventory(InventoryCloseEvent.Reason.PLUGIN)

@@ -27,15 +27,15 @@ repositories {
     mavenCentral()
     google()
     maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
-    maven("https://jitpack.io")
+    maven("https://repo.codemc.org/repository/maven-public/")
 }
 
 dependencies {
     // MineInAbyss platform
     compileOnly(libs.kotlinx.coroutines)
+    compileOnly(libs.minecraft.mccoroutine)
     compileOnly(libs.kotlin.reflect)
     compileOnly(libs.minecraft.anvilgui)
-    compileOnly(libs.minecraft.skedule)
 
     // Shaded
     api(compose.runtime) {
@@ -43,12 +43,6 @@ dependencies {
         exclude("org.jetbrains.kotlinx")
     }
 
-    implementation("com.mineinabyss:idofront:$idofrontVersion")
+    implementation(libs.idofront.core)
     implementation(libs.idofront.nms)
-}
-
-tasks {
-    assemble {
-        dependsOn(reobfJar)
-    }
 }
