@@ -13,6 +13,7 @@ import com.mineinabyss.guiy.modifiers.SizeModifier
 import com.mineinabyss.guiy.modifiers.sizeIn
 import com.mineinabyss.guiy.nodes.InventoryCloseScope
 import com.mineinabyss.guiy.nodes.StaticMeasurePolicy
+import com.mineinabyss.idofront.messaging.miniMsg
 import net.kyori.adventure.text.Component
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
@@ -28,6 +29,17 @@ const val MAX_CHEST_HEIGHT = 6
 fun GuiyOwner.Chest(
     viewers: Set<Player>,
     title: String,
+    modifier: Modifier = Modifier,
+    onClose: (InventoryCloseScope.(player: Player) -> Unit) = {},
+    content: @Composable () -> Unit,
+) {
+    Chest(viewers, title.miniMsg(), modifier, onClose, content)
+}
+
+@Composable
+fun GuiyOwner.Chest(
+    viewers: Set<Player>,
+    title: Component,
     modifier: Modifier = Modifier,
     onClose: (InventoryCloseScope.(player: Player) -> Unit) = {},
     content: @Composable () -> Unit,
@@ -62,7 +74,7 @@ fun GuiyOwner.Chest(
     // Create new inventory when any appropriate value changes
     val inventory: Inventory = remember(title, size) {
         if (size == Size()) return@remember null
-        Bukkit.createInventory(holder, CHEST_WIDTH * size.height, Component.text(title)).also {
+        Bukkit.createInventory(holder, CHEST_WIDTH * size.height, title).also {
             holder.activeInventory = it
         }
     } ?: run {
