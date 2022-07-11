@@ -27,6 +27,11 @@ class Navigator<T>(val default: () -> T) {
         open(default())
     }
 
+    fun refresh() {
+        screens.clear()
+        open(screen ?: default())
+    }
+
     /**
      * Entrypoint for handling composition based on screen.
      *
