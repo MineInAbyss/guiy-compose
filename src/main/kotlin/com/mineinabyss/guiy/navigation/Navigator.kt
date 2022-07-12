@@ -28,7 +28,8 @@ class Navigator<T>(val default: () -> T) {
     }
 
     fun refresh() {
-        screens.clear()
+        val screen = screen
+        screens.remove(screen)
         open(screen ?: default())
     }
 
