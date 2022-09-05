@@ -7,7 +7,6 @@ import com.mineinabyss.guiy.modifiers.DragScope
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.event.inventory.InventoryCloseEvent
-import org.bukkit.event.inventory.InventoryDragEvent
 import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.InventoryHolder
 
@@ -20,6 +19,7 @@ abstract class GuiyInventoryHolder : InventoryHolder {
     abstract fun processClick(clickEvent: InventoryClickEvent)
     abstract fun processDrag(scope: DragScope)
 
+    abstract fun onOpen(player: Player)
     abstract fun onClose(player: Player)
 
     fun close() {

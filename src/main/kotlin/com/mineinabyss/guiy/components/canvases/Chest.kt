@@ -12,6 +12,7 @@ import com.mineinabyss.guiy.modifiers.Modifier
 import com.mineinabyss.guiy.modifiers.SizeModifier
 import com.mineinabyss.guiy.modifiers.sizeIn
 import com.mineinabyss.guiy.nodes.InventoryCloseScope
+import com.mineinabyss.guiy.nodes.InventoryOpenScope
 import com.mineinabyss.guiy.nodes.StaticMeasurePolicy
 import com.mineinabyss.idofront.messaging.miniMsg
 import net.kyori.adventure.text.Component
@@ -30,10 +31,11 @@ fun GuiyOwner.Chest(
     viewers: Set<Player>,
     title: String,
     modifier: Modifier = Modifier,
+    onOpen: (InventoryOpenScope.(player: Player) -> Unit) = {},
     onClose: (InventoryCloseScope.(player: Player) -> Unit) = {},
     content: @Composable () -> Unit,
 ) {
-    Chest(viewers, title.miniMsg(), modifier, onClose, content)
+    Chest(viewers, title.miniMsg(), modifier, onOpen, onClose, content)
 }
 
 @Composable
@@ -41,6 +43,7 @@ fun GuiyOwner.Chest(
     viewers: Set<Player>,
     title: Component,
     modifier: Modifier = Modifier,
+    onOpen: (InventoryOpenScope.(player: Player) -> Unit) = {},
     onClose: (InventoryCloseScope.(player: Player) -> Unit) = {},
     content: @Composable () -> Unit,
 ) {
@@ -69,7 +72,7 @@ fun GuiyOwner.Chest(
         }
     }
 
-    val holder = rememberInventoryHolder(viewers, onClose)
+    val holder = rememberInventoryHolder(viewers, onOpen, onClose)
 
     // Create new inventory when any appropriate value changes
     val inventory: Inventory = remember(title, size) {

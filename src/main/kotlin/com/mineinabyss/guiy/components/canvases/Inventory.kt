@@ -11,6 +11,7 @@ import com.mineinabyss.guiy.modifiers.ClickScope
 import com.mineinabyss.guiy.modifiers.DragScope
 import com.mineinabyss.guiy.modifiers.Modifier
 import com.mineinabyss.guiy.nodes.InventoryCloseScope
+import com.mineinabyss.guiy.nodes.InventoryOpenScope
 import com.mineinabyss.guiy.nodes.StaticMeasurePolicy
 import com.mineinabyss.idofront.time.ticks
 import kotlinx.coroutines.delay
@@ -29,6 +30,7 @@ val LocalInventory: ProvidableCompositionLocal<Inventory> =
 @Composable
 inline fun rememberInventoryHolder(
     viewers: Set<Player>,
+    crossinline onOpen: InventoryOpenScope.(Player) -> Unit = {},
     crossinline onClose: InventoryCloseScope.(Player) -> Unit = {},
 ): GuiyInventoryHolder {
     val clickHandler = LocalClickHandler.current
@@ -43,11 +45,24 @@ inline fun rememberInventoryHolder(
                 clickHandler.processClick(scope, clickEvent)
                 clickEvent.isCancelled = true
 
-                clickEvent.cursor = scope.cursor
+                clickEvent.whoClicked.setItemOnCursor(scope.cursor)
             }
 
             override fun processDrag(scope: DragScope) {
                 clickHandler.processDrag(scope)
+            }
+
+            override fun onOpen(player: Player) {
+                val scope = object : InventoryOpenScope {
+                    override fun open() {
+                        viewers.filter { it.openInventory.topInventory != inventory }
+                            .forEach { it.openInventory(inventory) }
+                    }
+                }
+                guiyPlugin.launch {
+                    delay(1.ticks)
+                    onOpen.invoke(scope, player)
+                }
             }
 
             override fun onClose(player: Player) {

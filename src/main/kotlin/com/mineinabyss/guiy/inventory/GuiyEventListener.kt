@@ -12,11 +12,8 @@ import org.bukkit.entity.Player
 import org.bukkit.event.Event
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
+import org.bukkit.event.inventory.*
 import org.bukkit.event.inventory.ClickType.*
-import org.bukkit.event.inventory.DragType
-import org.bukkit.event.inventory.InventoryClickEvent
-import org.bukkit.event.inventory.InventoryCloseEvent
-import org.bukkit.event.inventory.InventoryDragEvent
 import org.bukkit.inventory.ItemStack
 import kotlin.math.abs
 
@@ -27,6 +24,12 @@ class GuiyEventListener : Listener {
         if (click !in setOf(LEFT, RIGHT, MIDDLE)) isCancelled = true
         if (clickedInventory?.holder === guiyHolder)
             guiyHolder.processClick(this)
+    }
+
+    @EventHandler
+    fun InventoryOpenEvent.onOpen() {
+        val guiyHolder = inventory.holder as? GuiyInventoryHolder ?: return
+        guiyHolder.onOpen(player as Player)
     }
 
     @EventHandler
