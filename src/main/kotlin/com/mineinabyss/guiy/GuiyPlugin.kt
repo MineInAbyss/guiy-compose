@@ -3,26 +3,21 @@ package com.mineinabyss.guiy
 import com.mineinabyss.guiy.inventory.GuiyEventListener
 import com.mineinabyss.guiy.inventory.GuiyInventoryHolder
 import com.mineinabyss.guiy.inventory.GuiyScopeManager
-import com.mineinabyss.idofront.nms.aliases.NMSItemStack
-import com.mineinabyss.idofront.nms.aliases.toNMS
-import com.mineinabyss.idofront.platforms.IdofrontPlatforms
-import com.mineinabyss.idofront.plugin.registerEvents
+import com.mineinabyss.idofront.platforms.Platforms
+import com.mineinabyss.idofront.plugin.listeners
 import kotlinx.coroutines.cancel
-import net.minecraft.world.item.Items
 import org.bukkit.Bukkit
-import org.bukkit.Material
-import org.bukkit.inventory.ItemStack
 import org.bukkit.plugin.java.JavaPlugin
 
 val guiyPlugin = Bukkit.getPluginManager().getPlugin("Guiy") as JavaPlugin
 
 class GuiyPlugin : JavaPlugin() {
     override fun onLoad() {
-        IdofrontPlatforms.load(this, "mineinabyss")
+        Platforms.load(this, "mineinabyss")
     }
 
     override fun onEnable() {
-        registerEvents(GuiyEventListener())
+        listeners(GuiyEventListener())
     }
 
     override fun onDisable() {

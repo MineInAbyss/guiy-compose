@@ -7,6 +7,7 @@ plugins {
     id("com.mineinabyss.conventions.kotlin")
     id("com.mineinabyss.conventions.papermc")
     id("com.mineinabyss.conventions.nms")
+    id("com.mineinabyss.conventions.autoversion")
     id("com.mineinabyss.conventions.publication")
     id("com.mineinabyss.conventions.testing")
     id("com.mineinabyss.conventions.copyjar")
@@ -43,6 +44,6 @@ dependencies {
         exclude("org.jetbrains.kotlinx")
     }
 
-    implementation(libs.idofront.core)
+    implementation(libs.bundles.idofront.core)
     implementation(libs.idofront.nms)
 }
