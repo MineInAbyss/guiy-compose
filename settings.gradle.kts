@@ -7,13 +7,6 @@ pluginManagement {
         maven("https://repo.papermc.io/repository/maven-public/")
     }
 
-    plugins {
-        val kotlinVersion: String by settings
-        val composeVersion: String by settings
-        kotlin("jvm") version kotlinVersion
-        id("org.jetbrains.compose") version composeVersion
-    }
-
     val idofrontVersion: String by settings
 
     resolutionStrategy {
