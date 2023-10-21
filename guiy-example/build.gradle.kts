@@ -2,9 +2,9 @@ val idofrontVersion: String by project
 
 plugins {
     alias(libs.plugins.mia.kotlin.jvm)
-    id("com.mineinabyss.conventions.papermc")
-    id("com.mineinabyss.conventions.copyjar")
-    id("org.jetbrains.compose")
+    alias(libs.plugins.mia.papermc)
+    alias(libs.plugins.mia.copyjar)
+    alias(libs.plugins.compose)
 }
 
 dependencies {

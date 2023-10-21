@@ -38,12 +38,12 @@ inline fun rememberInventoryHolder(
                 val scope = ClickScope(
                     clickEvent.click,
                     clickEvent.slot,
-                    clickEvent.cursor.takeIf { it?.type != Material.AIR }
+                    clickEvent.cursor.takeIf { it.type != Material.AIR }
                 )
                 clickHandler.processClick(scope, clickEvent)
                 clickEvent.isCancelled = true
 
-                clickEvent.cursor = scope.cursor
+                clickEvent.setCursor(scope.cursor)
             }
 
             override fun processDrag(scope: DragScope) {

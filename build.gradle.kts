@@ -4,14 +4,15 @@ val idofrontVersion: String by project
 
 plugins {
     alias(libs.plugins.mia.kotlin.jvm)
-    id("com.mineinabyss.conventions.papermc")
-    id("com.mineinabyss.conventions.nms")
-    id("com.mineinabyss.conventions.autoversion")
-    id("com.mineinabyss.conventions.publication")
-    id("com.mineinabyss.conventions.testing")
-    id("com.mineinabyss.conventions.copyjar")
+    alias(libs.plugins.mia.papermc)
+    alias(libs.plugins.mia.nms)
+    alias(libs.plugins.mia.copyjar)
+    alias(libs.plugins.mia.publication)
+    alias(libs.plugins.mia.autoversion)
+    alias(libs.plugins.mia.testing)
     alias(libs.plugins.compose)
 }
+
 
 tasks.withType<KotlinCompile> {
     kotlinOptions {
