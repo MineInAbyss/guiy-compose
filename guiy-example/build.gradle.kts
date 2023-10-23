@@ -11,8 +11,7 @@ dependencies {
     // MineInAbyss platform
     compileOnly(project(":"))
     compileOnly(libs.kotlinx.coroutines)
-    implementation("com.mineinabyss:idofront-commands:$idofrontVersion")
-    implementation("com.mineinabyss:idofront-platform-loader:$idofrontVersion")
+    compileOnly(libs.idofront.commands)
 }
 
 tasks {

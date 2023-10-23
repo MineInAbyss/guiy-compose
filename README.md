@@ -19,6 +19,8 @@ may change some behaviour like how `Grid` organizes itself.
 
 ## Examples
 
+See the `guiy-example` package for a full demonstration, below are snippets.
+
 ### Entry
 
 ```kotlin
@@ -165,10 +167,8 @@ Guiy does not package the Kotlin runtime in itself, it uses our library idofront
 isolated way.
 
 - [Download](https://github.com/MineInAbyss/guiy-compose/releases/latest) and install Guiy into your plugin folder.
-- [Download](https://github.com/MineInAbyss/Idofront/releases/latest) and install our dependency platform into your
-  plugin folder.
-- Use our [platform loader](https://github.com/MineInAbyss/Idofront/tree/master/idofront-platform-loader) to load Kotlin
-  for yourself.
+- [Download](https://github.com/MineInAbyss/Idofront/releases/latest) Idofront, a required dependency.
+- Depend on Guiy in a [paper-plugin](https://docs.papermc.io/paper/dev/getting-started/paper-plugins), this will give you access to Guiy and any libraries in Idofront in an isolated manner.
 
 There is currently no support for shading guiy.
 

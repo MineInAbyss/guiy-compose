@@ -1,9 +1,0 @@
-name: Guiy-Example
-version: ${plugin_version}
-author: Offz
-main: com.mineinabyss.guiy.example.GuiyExamplePlugin
-api-version: 1.18
-softdepend: [ Guiy ]
-
-commands:
-  guiyexample: {}
