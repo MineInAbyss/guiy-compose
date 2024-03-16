@@ -3,14 +3,14 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 val idofrontVersion: String by project
 
 plugins {
-    alias(libs.plugins.mia.kotlin.jvm)
-    alias(libs.plugins.mia.papermc)
-    alias(libs.plugins.mia.nms)
-    alias(libs.plugins.mia.copyjar)
-    alias(libs.plugins.mia.publication)
-    alias(libs.plugins.mia.autoversion)
-    alias(libs.plugins.mia.testing)
-    alias(libs.plugins.compose)
+    alias(idofrontLibs.plugins.mia.kotlin.jvm)
+    alias(idofrontLibs.plugins.mia.papermc)
+    alias(idofrontLibs.plugins.mia.nms)
+    alias(idofrontLibs.plugins.mia.copyjar)
+    alias(idofrontLibs.plugins.mia.publication)
+    alias(idofrontLibs.plugins.mia.autoversion)
+    alias(idofrontLibs.plugins.mia.testing)
+    alias(idofrontLibs.plugins.compose)
 }
 
 
@@ -32,10 +32,10 @@ repositories {
 
 dependencies {
     // MineInAbyss platform
-    compileOnly(libs.kotlinx.coroutines)
-    compileOnly(libs.minecraft.mccoroutine)
-    compileOnly(libs.kotlin.reflect)
-    compileOnly(libs.minecraft.anvilgui)
+    compileOnly(idofrontLibs.kotlinx.coroutines)
+    compileOnly(idofrontLibs.minecraft.mccoroutine)
+    compileOnly(idofrontLibs.kotlin.reflect)
+    compileOnly(idofrontLibs.minecraft.anvilgui)
 
     // Shaded
     api(compose.runtime) {
@@ -43,6 +43,6 @@ dependencies {
         exclude("org.jetbrains.kotlinx")
     }
 
-    implementation(libs.bundles.idofront.core)
-    implementation(libs.idofront.nms)
+    implementation(idofrontLibs.bundles.idofront.core)
+    implementation(idofrontLibs.idofront.nms)
 }

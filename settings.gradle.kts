@@ -24,7 +24,7 @@ dependencyResolutionManagement {
         maven("https://repo.mineinabyss.com/releases")
     }
 
-    versionCatalogs.create("libs").from("com.mineinabyss:catalog:$idofrontVersion")
+    versionCatalogs.create("idofrontLibs").from("com.mineinabyss:catalog:$idofrontVersion")
 }
 
 rootProject.name = "guiy-compose"
