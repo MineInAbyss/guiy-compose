@@ -1,5 +1,8 @@
 package com.mineinabyss.guiy.modifiers
 
+import androidx.compose.runtime.Immutable
+
+@Immutable
 data class Constraints(
     val minWidth: Int = 0,
     val maxWidth: Int = Int.MAX_VALUE,

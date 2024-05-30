@@ -7,6 +7,9 @@ import com.mineinabyss.guiy.modifiers.Modifier
 import com.mineinabyss.guiy.nodes.GuiyNode
 import com.mineinabyss.guiy.nodes.GuiyNodeApplier
 
+/**
+ * The main component for layout, it measures and positions zero or more children.
+ */
 @Composable
 inline fun Layout(
     measurePolicy: MeasurePolicy,

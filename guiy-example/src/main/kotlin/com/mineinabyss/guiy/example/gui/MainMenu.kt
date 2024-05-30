@@ -1,34 +1,34 @@
 package com.mineinabyss.guiy.example.gui
 
 import androidx.compose.runtime.*
+import com.mineinabyss.guiy.components.CreativeItem
 import com.mineinabyss.guiy.components.Item
-import com.mineinabyss.guiy.components.ItemGrid
 import com.mineinabyss.guiy.components.canvases.Chest
-import com.mineinabyss.guiy.components.rememberItemGridState
-import com.mineinabyss.guiy.inventory.GuiyOwner
+import com.mineinabyss.guiy.components.state.ItemPositions
+import com.mineinabyss.guiy.inventory.LocalGuiyOwner
+import com.mineinabyss.guiy.layout.Row
 import com.mineinabyss.guiy.modifiers.Modifier
-import com.mineinabyss.guiy.modifiers.clickable
+import com.mineinabyss.guiy.modifiers.fillMaxWidth
 import com.mineinabyss.guiy.modifiers.size
-import kotlinx.coroutines.delay
 import org.bukkit.Material
 import org.bukkit.entity.Player
-import org.bukkit.event.inventory.ClickType
 import org.bukkit.inventory.ItemStack
 
 @Composable
-fun GuiyOwner.MainMenu(player: Player) {
+fun MainMenu(player: Player) {
+    val owner = LocalGuiyOwner.current
     val title = "Hello world"
-    val state = rememberItemGridState()
     Chest(
         setOf(player),
         title,
-        onClose = { exit() },
-        modifier = Modifier.clickable {
-            if(clickType == ClickType.SHIFT_LEFT) {
-                cursor = cursor?.let { state.add(it, 4, 1) }
-            }
-        }
+        onClose = { owner.exit() },
     ) {
-        ItemGrid(state, Modifier.size(4, 1))
+        Row {
+            listOf(Material.DIAMOND, Material.EMERALD, Material.GOLD_INGOT, Material.IRON_INGOT)
+                .forEach {
+                    CreativeItem(ItemStack(it))
+                }
+            Item(Material.BARRIER, "<red>No interaction here", modifier = Modifier.fillMaxWidth())
+        }
     }
 }

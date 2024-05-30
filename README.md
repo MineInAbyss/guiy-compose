@@ -33,9 +33,10 @@ guiy {
 
 ```kotlin
 @Composable
-fun GuiyOwner.ExampleMenu(player: Player) {
+fun ExampleMenu(player: Player) {
+    val owner = LocalGuiyOwner.current
     // Guiy will dynamically update players, title, or height if you use a state.
-    Chest(setOf(player), title = "Example", height = 4, onClose = { exit() /*reopen()*/ }) {
+    Chest(setOf(player), title = "Example", height = 4, onClose = { owner.exit() /*owner.reopen()*/ }) {
         ToggleButton()
     }
 }
@@ -125,7 +126,7 @@ fun TimedToggle() {
 ### Real world use
 
 We are using this project internally, so you should be able to find up-to-date usage in
-our [main project](https://github.com/MineInAbyss/MineInAbyss/tree/master/mineinabyss-features/src/main/kotlin/com/mineinabyss/guilds/menus).
+our [main project](https://github.com/MineInAbyss/MineInAbyss/tree/master/mineinabyss-features/src/main/kotlin/com/mineinabyss/features/guilds/menus).
 
 ## Usage
 

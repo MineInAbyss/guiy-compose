@@ -4,7 +4,8 @@ plugins {
     alias(idofrontLibs.plugins.mia.kotlin.jvm)
     alias(idofrontLibs.plugins.mia.papermc)
     alias(idofrontLibs.plugins.mia.copyjar)
-    alias(idofrontLibs.plugins.compose)
+    alias(idofrontLibs.plugins.jetbrainsCompose)
+    alias(idofrontLibs.plugins.compose.compiler)
 }
 
 dependencies {

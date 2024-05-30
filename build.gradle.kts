@@ -10,24 +10,26 @@ plugins {
     alias(idofrontLibs.plugins.mia.publication)
     alias(idofrontLibs.plugins.mia.autoversion)
     alias(idofrontLibs.plugins.mia.testing)
-    alias(idofrontLibs.plugins.compose)
+    alias(idofrontLibs.plugins.jetbrainsCompose)
+    alias(idofrontLibs.plugins.compose.compiler)
 }
 
-
-tasks.withType<KotlinCompile> {
-    kotlinOptions {
-        freeCompilerArgs = listOf(
+kotlin {
+    compilerOptions {
+        freeCompilerArgs.addAll(
             "-opt-in=kotlinx.serialization.ExperimentalSerializationApi"
         )
-        jvmTarget = "17"
     }
 }
 
-repositories {
-    mavenCentral()
-    google()
-    maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
-    maven("https://repo.codemc.org/repository/maven-public/")
+allprojects {
+    repositories {
+        mavenCentral()
+        google()
+        maven("https://repo.mineinabyss.com/snapshots")
+        maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")
+        maven("https://repo.codemc.org/repository/maven-public/")
+    }
 }
 
 dependencies {

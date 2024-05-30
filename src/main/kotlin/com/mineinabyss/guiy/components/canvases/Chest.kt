@@ -25,8 +25,13 @@ const val CHEST_WIDTH = 9
 const val MIN_CHEST_HEIGHT = 1
 const val MAX_CHEST_HEIGHT = 6
 
+/**
+ * A Chest GUI [Inventory] composable overload.
+ *
+ * @param title The title of the Chest inventory, formatted with MiniMessage.
+ */
 @Composable
-fun GuiyOwner.Chest(
+fun Chest(
     viewers: Set<Player>,
     title: String,
     modifier: Modifier = Modifier,
@@ -36,8 +41,17 @@ fun GuiyOwner.Chest(
     Chest(viewers, title.miniMsg(), modifier, onClose, content)
 }
 
+/**
+ * A Chest GUI [Inventory] composable.
+ *
+ * @param viewers The set of players who will view the inventory.
+ * @param title The title of the Chest inventory.
+ * @param modifier The modifier for the Chest GUI, default is Modifier.
+ * @param onClose The function to be executed when the Chest GUI is closed, default is an empty function.
+ * @param content The content of the Chest GUI, defined as a Composable function.
+ */
 @Composable
-fun GuiyOwner.Chest(
+fun Chest(
     viewers: Set<Player>,
     title: Component,
     modifier: Modifier = Modifier,

@@ -3,22 +3,31 @@ package com.mineinabyss.guiy.inventory
 import androidx.compose.runtime.*
 import androidx.compose.runtime.snapshots.Snapshot
 import com.mineinabyss.guiy.layout.LayoutNode
-import com.mineinabyss.guiy.modifiers.ClickScope
+import com.mineinabyss.guiy.modifiers.click.ClickScope
 import com.mineinabyss.guiy.modifiers.Constraints
-import com.mineinabyss.guiy.modifiers.DragScope
+import com.mineinabyss.guiy.modifiers.drag.DragScope
 import com.mineinabyss.guiy.nodes.GuiyNodeApplier
 import kotlinx.coroutines.*
-import org.bukkit.event.inventory.InventoryClickEvent
-import org.bukkit.event.inventory.InventoryDragEvent
 import kotlin.coroutines.CoroutineContext
 
 val LocalClickHandler: ProvidableCompositionLocal<ClickHandler> =
     staticCompositionLocalOf { error("No provider for local click handler") }
 val LocalCanvas: ProvidableCompositionLocal<GuiyCanvas?> =
     staticCompositionLocalOf { null }
+val LocalGuiyOwner: ProvidableCompositionLocal<GuiyOwner> =
+    staticCompositionLocalOf { error("No provider for GuiyOwner") }
+
+data class ClickResult(
+    val cancelBukkitEvent: Boolean? = null,
+) {
+    fun mergeWith(other: ClickResult) = ClickResult(
+        // Prioritize true > false > null
+        cancelBukkitEvent = (cancelBukkitEvent ?: other.cancelBukkitEvent)?.or(other.cancelBukkitEvent ?: false)
+    )
+}
 
 interface ClickHandler {
-    fun processClick(scope: ClickScope, clickEvent: InventoryClickEvent)
+    fun processClick(scope: ClickScope): ClickResult
     fun processDrag(scope: DragScope)
 }
 
@@ -52,7 +61,7 @@ class GuiyOwner : CoroutineScope {
         exitScheduled = true
     }
 
-    fun start(content: @Composable GuiyOwner.() -> Unit) {
+    fun start(content: @Composable () -> Unit) {
         !running || return
         running = true
 
@@ -81,18 +90,18 @@ class GuiyOwner : CoroutineScope {
         }
     }
 
-    private fun setContent(content: @Composable GuiyOwner.() -> Unit) {
+    private fun setContent(content: @Composable () -> Unit) {
         hasFrameWaiters = true
         composition.setContent {
             CompositionLocalProvider(LocalClickHandler provides object : ClickHandler {
-                override fun processClick(scope: ClickScope, clickEvent: InventoryClickEvent) {
-                    val slot = clickEvent.slot
+                override fun processClick(scope: ClickScope): ClickResult {
+                    val slot = scope.slot
                     val width = rootNode.width
-                    rootNode.children.forEach { node ->
+                    return rootNode.children.fold(ClickResult()) { acc, node ->
                         val w = node.width
                         val x = if (w == 0) 0 else slot % width
                         val y = if (w == 0) 0 else slot / width
-                        rootNode.processClick(scope, x, y)
+                        acc.mergeWith(rootNode.processClick(scope, x, y))
                     }
                 }
 
@@ -107,9 +116,22 @@ class GuiyOwner : CoroutineScope {
 }
 
 fun guiy(
-    content: @Composable GuiyOwner.() -> Unit
+    content: @Composable () -> Unit
 ): GuiyOwner {
     return GuiyOwner().apply {
-        start(content)
+        start {
+            GuiyCompositionLocal(this) {
+                content()
+            }
+        }
+    }
+}
+
+@Composable
+fun GuiyCompositionLocal(owner: GuiyOwner, content: @Composable () -> Unit) {
+    CompositionLocalProvider(
+        LocalGuiyOwner provides owner
+    ) {
+        content()
     }
 }

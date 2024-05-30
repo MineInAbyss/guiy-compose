@@ -6,6 +6,10 @@ import com.mineinabyss.guiy.layout.MeasurePolicy
 import com.mineinabyss.guiy.layout.MeasureResult
 import com.mineinabyss.guiy.modifiers.Modifier
 
+/**
+ * A grid layout composable that arranges its children in a grid, left-to-right, top-to-bottom, wrapped
+ * to the next row when its width is exceeded.
+ */
 @Composable
 fun Grid(modifier: Modifier = Modifier, content: @Composable () -> Unit) {
     Layout(

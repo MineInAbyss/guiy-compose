@@ -45,6 +45,18 @@ fun Constraints.applyFill(horizontal: HorizontalFillModifier?, vertical: Vertica
     )
 }
 
+/** Forces element width to a percentage between min and max width constraints */
+fun Modifier.fillMaxWidth(percent: Double = 1.0) = then(HorizontalFillModifier(percent))
+
+/** Forces element height to a percentage between min and max height constraints */
+fun Modifier.fillMaxHeight(percent: Double = 1.0) = then(VerticalFillModifier(percent))
+
+/** Forces element width and height to a percentage between min and max width and height constraints */
+fun Modifier.fillMaxSize(percent: Double = 1.0) = then(HorizontalFillModifier(percent)).then(VerticalFillModifier(percent))
+
+/**
+ * Sets min and max, width and height constraints for this element.
+ */
 fun Modifier.sizeIn(
     minWidth: Int = 0,
     maxWidth: Int = Integer.MAX_VALUE,
@@ -52,8 +64,11 @@ fun Modifier.sizeIn(
     maxHeight: Int = Integer.MAX_VALUE,
 ) = then(SizeModifier(Constraints(minWidth, maxWidth, minHeight, maxHeight)))
 
+/** Sets identical min/max width and height constraints for this element. */
 fun Modifier.size(width: Int, height: Int) = then(sizeIn(width, width, height, height))
 
+/** Sets identical min/max width constraints for this element. */
 fun Modifier.width(width: Int) = then(sizeIn(width, width, 0, Integer.MAX_VALUE))
 
+/** Sets identical min/max height constraints for this element. */
 fun Modifier.height(height: Int) = then(sizeIn(0, Integer.MAX_VALUE, height, height))
