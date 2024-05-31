@@ -54,7 +54,7 @@ fun Item(
     val loreMM = remember(lore) { lore.map { it.miniMsg() } }
 
     Item(ItemStack(material, amount).editItemMeta {
-        displayName(titleMM)
+        itemName(titleMM)
         lore(loreMM)
     }, modifier)
 }
