@@ -1,25 +1,22 @@
 package com.mineinabyss.guiy.components.canvases
 
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import com.mineinabyss.guiy.inventory.GuiyCanvas
-import com.mineinabyss.guiy.inventory.GuiyOwner
 import com.mineinabyss.guiy.inventory.LocalCanvas
 import com.mineinabyss.guiy.layout.Layout
 import com.mineinabyss.guiy.layout.Size
 import com.mineinabyss.guiy.modifiers.Modifier
-import com.mineinabyss.guiy.modifiers.SizeModifier
+import com.mineinabyss.guiy.modifiers.onSizeChanged
 import com.mineinabyss.guiy.modifiers.sizeIn
 import com.mineinabyss.guiy.nodes.InventoryCloseScope
 import com.mineinabyss.guiy.nodes.StaticMeasurePolicy
+import com.mineinabyss.idofront.entities.title
 import com.mineinabyss.idofront.textcomponents.miniMsg
 import net.kyori.adventure.text.Component
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import org.bukkit.inventory.Inventory
 import org.bukkit.inventory.ItemStack
-import java.lang.Integer.max
 
 const val CHEST_WIDTH = 9
 const val MIN_CHEST_HEIGHT = 1
@@ -58,18 +55,9 @@ fun Chest(
     onClose: (InventoryCloseScope.(player: Player) -> Unit) = {},
     content: @Composable () -> Unit,
 ) {
+    var size by remember { mutableStateOf(Size()) }
     val constrainedModifier = modifier.sizeIn(CHEST_WIDTH, CHEST_WIDTH, MIN_CHEST_HEIGHT, MAX_CHEST_HEIGHT)
-    //TODO a proper way of reading size (onSizeChange recomposes twice when both title and size change.)
-    val size = remember(constrainedModifier) {
-        constrainedModifier.foldOut(Size()) { element, acc ->
-            if (element is SizeModifier)
-                acc.copy(
-                    width = max(element.constraints.minWidth, acc.width),
-                    height = max(element.constraints.minHeight, acc.height)
-                )
-            else acc
-        }
-    }
+        .onSizeChanged { if (size != it) size = it }
 
     val canvas = remember(size) {
         object : GuiyCanvas {
@@ -86,7 +74,7 @@ fun Chest(
     val holder = rememberInventoryHolder(viewers, onClose)
 
     // Create new inventory when any appropriate value changes
-    val inventory: Inventory = remember(title, size) {
+    val inventory: Inventory = remember(size) {
         if (size == Size()) return@remember null
         Bukkit.createInventory(holder, CHEST_WIDTH * size.height, title).also {
             holder.activeInventory = it
@@ -98,6 +86,13 @@ fun Chest(
         )
         return
     }
+
+    LaunchedEffect(title) {
+        // This just sends a packet, doesn't need to be on sync thread
+        inventory.viewers.forEach { it.openInventory.title(title) }
+    }
+
+    //TODO handle sending correct title when player list changes
 
     CompositionLocalProvider(LocalCanvas provides canvas) {
         Inventory(

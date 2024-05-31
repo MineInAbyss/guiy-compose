@@ -1,15 +1,13 @@
 package com.mineinabyss.guiy.example.gui
 
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
 import com.mineinabyss.guiy.components.CreativeItem
 import com.mineinabyss.guiy.components.Item
 import com.mineinabyss.guiy.components.canvases.Chest
-import com.mineinabyss.guiy.components.state.ItemPositions
 import com.mineinabyss.guiy.inventory.LocalGuiyOwner
 import com.mineinabyss.guiy.layout.Row
 import com.mineinabyss.guiy.modifiers.Modifier
 import com.mineinabyss.guiy.modifiers.fillMaxWidth
-import com.mineinabyss.guiy.modifiers.size
 import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack

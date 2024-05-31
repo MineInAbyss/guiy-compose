@@ -2,6 +2,7 @@ package com.mineinabyss.guiy.components.canvases
 
 import androidx.compose.runtime.*
 import com.github.shynixn.mccoroutine.bukkit.launch
+import com.github.shynixn.mccoroutine.bukkit.minecraftDispatcher
 import com.mineinabyss.guiy.guiyPlugin
 import com.mineinabyss.guiy.inventory.GuiyInventoryHolder
 import com.mineinabyss.guiy.inventory.LocalClickHandler
@@ -13,6 +14,7 @@ import com.mineinabyss.guiy.nodes.InventoryCloseScope
 import com.mineinabyss.guiy.nodes.StaticMeasurePolicy
 import com.mineinabyss.idofront.time.ticks
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.withContext
 import org.bukkit.entity.Player
 import org.bukkit.event.Cancellable
 import org.bukkit.event.inventory.InventoryCloseEvent
@@ -47,7 +49,7 @@ fun Inventory(
     LaunchedEffect(viewers, inventory) {
         val oldViewers = inventory.viewers.toSet()
 
-        guiyPlugin.launch {
+        withContext(guiyPlugin.minecraftDispatcher){
             // Close inventory for removed viewers
             (oldViewers - viewers).forEach {
                 it.closeInventory(InventoryCloseEvent.Reason.PLUGIN)

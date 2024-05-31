@@ -1,15 +1,11 @@
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-
 val idofrontVersion: String by project
 
 plugins {
     alias(idofrontLibs.plugins.mia.kotlin.jvm)
     alias(idofrontLibs.plugins.mia.papermc)
-    alias(idofrontLibs.plugins.mia.nms)
     alias(idofrontLibs.plugins.mia.copyjar)
     alias(idofrontLibs.plugins.mia.publication)
     alias(idofrontLibs.plugins.mia.autoversion)
-    alias(idofrontLibs.plugins.mia.testing)
     alias(idofrontLibs.plugins.jetbrainsCompose)
     alias(idofrontLibs.plugins.compose.compiler)
 }
