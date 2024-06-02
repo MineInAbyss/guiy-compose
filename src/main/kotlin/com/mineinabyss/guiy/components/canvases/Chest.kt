@@ -1,8 +1,7 @@
 package com.mineinabyss.guiy.components.canvases
 
 import androidx.compose.runtime.*
-import com.mineinabyss.guiy.inventory.GuiyCanvas
-import com.mineinabyss.guiy.inventory.LocalCanvas
+import com.mineinabyss.guiy.components.state.IntCoordinates
 import com.mineinabyss.guiy.layout.Layout
 import com.mineinabyss.guiy.layout.Size
 import com.mineinabyss.guiy.modifiers.Modifier
@@ -16,7 +15,6 @@ import net.kyori.adventure.text.Component
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import org.bukkit.inventory.Inventory
-import org.bukkit.inventory.ItemStack
 
 const val CHEST_WIDTH = 9
 const val MIN_CHEST_HEIGHT = 1
@@ -59,32 +57,23 @@ fun Chest(
     val constrainedModifier = modifier.sizeIn(CHEST_WIDTH, CHEST_WIDTH, MIN_CHEST_HEIGHT, MAX_CHEST_HEIGHT)
         .onSizeChanged { if (size != it) size = it }
 
-    val canvas = remember(size) {
-        object : GuiyCanvas {
-            override fun set(inventory: Inventory, x: Int, y: Int, item: ItemStack?) {
-                if (/*!updating && */x in 0 until size.width && y in 0 until size.height) {
-                    val slot = y * size.width + x
-                    if (slot < inventory.size)
-                        inventory.setItem(slot, item)
-                }
-            }
-        }
-    }
-
     val holder = rememberInventoryHolder(viewers, onClose)
 
     // Create new inventory when any appropriate value changes
-    val inventory: Inventory = remember(size) {
-        if (size == Size()) return@remember null
-        Bukkit.createInventory(holder, CHEST_WIDTH * size.height, title).also {
-            holder.activeInventory = it
-        }
-    } ?: run {
+
+    // Draw nothing if empty
+    if (size == Size()) {
         Layout(
             measurePolicy = StaticMeasurePolicy,
             modifier = constrainedModifier
         )
         return
+    }
+
+    val inventory: Inventory = remember(size) {
+        Bukkit.createInventory(holder, CHEST_WIDTH * size.height, title).also {
+            holder.activeInventory = it
+        }
     }
 
     LaunchedEffect(title) {
@@ -93,14 +82,18 @@ fun Chest(
     }
 
     //TODO handle sending correct title when player list changes
-
-    CompositionLocalProvider(LocalCanvas provides canvas) {
-        Inventory(
-            inventory = inventory,
-            viewers = viewers,
-            modifier = constrainedModifier
-        ) {
-            content()
-        }
+    Inventory(
+        inventory = inventory,
+        viewers = viewers,
+        modifier = constrainedModifier,
+        gridToInventoryIndex = { (x, y) ->
+            if (x !in 0 until CHEST_WIDTH || y !in 0 until size.height) null
+            else x + y * CHEST_WIDTH
+        },
+        inventoryIndexToGrid = { index ->
+            IntCoordinates(index % CHEST_WIDTH, index / CHEST_WIDTH)
+        },
+    ) {
+        content()
     }
 }

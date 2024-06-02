@@ -2,11 +2,13 @@ package com.mineinabyss.guiy.components
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
-import com.mineinabyss.guiy.components.canvases.LocalInventory
+import com.mineinabyss.guiy.inventory.GuiyCanvas
 import com.mineinabyss.guiy.layout.Layout
 import com.mineinabyss.guiy.layout.MeasureResult
+import com.mineinabyss.guiy.layout.Renderer
 import com.mineinabyss.guiy.modifiers.Modifier
 import com.mineinabyss.guiy.modifiers.sizeIn
+import com.mineinabyss.guiy.nodes.GuiyNode
 import com.mineinabyss.idofront.items.editItemMeta
 import com.mineinabyss.idofront.textcomponents.miniMsg
 import org.bukkit.Material
@@ -19,16 +21,16 @@ import org.bukkit.inventory.ItemStack
  */
 @Composable
 fun Item(itemStack: ItemStack?, modifier: Modifier = Modifier) {
-    val canvas = LocalInventory.current
     Layout(
         measurePolicy = { _, constraints ->
             MeasureResult(constraints.minWidth, constraints.minHeight) {}
         },
-        renderer = { node ->
-            val inv = canvas
-            for (x in 0 until node.width)
-                for (y in 0 until node.height)
-                    set(inv, x, y, itemStack)
+        renderer = object : Renderer {
+            override fun GuiyCanvas.render(node: GuiyNode) {
+                for (x in 0 until node.width)
+                    for (y in 0 until node.height)
+                        set(x, y, itemStack)
+            }
         },
         modifier = Modifier.sizeIn(minWidth = 1, minHeight = 1).then(modifier)
     )
@@ -48,13 +50,19 @@ fun Item(
     title: String? = null,
     amount: Int = 1,
     lore: List<String> = listOf(),
+    hideTooltip: Boolean = false,
     modifier: Modifier = Modifier,
 ) {
     val titleMM = remember(title) { title?.miniMsg() }
     val loreMM = remember(lore) { lore.map { it.miniMsg() } }
 
-    Item(ItemStack(material, amount).editItemMeta {
-        displayName(titleMM)
-        lore(loreMM)
-    }, modifier)
+    val item = remember(material, title, amount, lore, hideTooltip) {
+        ItemStack(material, amount).editItemMeta {
+            displayName(titleMM)
+            lore(loreMM)
+            isHideTooltip = hideTooltip
+        }
+    }
+
+    Item(item, modifier)
 }

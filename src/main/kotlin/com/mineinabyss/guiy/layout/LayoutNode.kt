@@ -92,6 +92,7 @@ internal class LayoutNode : Measurable, Placeable, GuiyNode {
         val offsetCanvas = (canvas ?: this.canvas)?.let { OffsetCanvas(x, y, it) }
         renderer.apply { offsetCanvas?.render(this@LayoutNode) }
         for (child in children) child.renderTo(offsetCanvas)
+        renderer.apply { offsetCanvas?.renderAfterChildren(this@LayoutNode) }
     }
 
     /**
@@ -153,4 +154,4 @@ internal class LayoutNode : Measurable, Placeable, GuiyNode {
     }
 }
 
-val EmptyRenderer = Renderer { }
+val EmptyRenderer = object : Renderer {}

@@ -3,13 +3,15 @@ package com.mineinabyss.guiy.components.canvases
 import androidx.compose.runtime.*
 import com.github.shynixn.mccoroutine.bukkit.launch
 import com.github.shynixn.mccoroutine.bukkit.minecraftDispatcher
+import com.mineinabyss.guiy.components.state.IntCoordinates
 import com.mineinabyss.guiy.guiyPlugin
-import com.mineinabyss.guiy.inventory.GuiyInventoryHolder
-import com.mineinabyss.guiy.inventory.LocalClickHandler
+import com.mineinabyss.guiy.inventory.*
 import com.mineinabyss.guiy.layout.Layout
+import com.mineinabyss.guiy.layout.Renderer
+import com.mineinabyss.guiy.modifiers.Modifier
 import com.mineinabyss.guiy.modifiers.click.ClickScope
 import com.mineinabyss.guiy.modifiers.drag.DragScope
-import com.mineinabyss.guiy.modifiers.Modifier
+import com.mineinabyss.guiy.nodes.GuiyNode
 import com.mineinabyss.guiy.nodes.InventoryCloseScope
 import com.mineinabyss.guiy.nodes.StaticMeasurePolicy
 import com.mineinabyss.idofront.time.ticks
@@ -35,6 +37,8 @@ fun Inventory(
     inventory: Inventory,
     viewers: Set<Player>,
     modifier: Modifier = Modifier,
+    gridToInventoryIndex: (IntCoordinates) -> Int?,
+    inventoryIndexToGrid: (Int) -> IntCoordinates,
     content: @Composable () -> Unit,
 ) {
     // Close inventory when it switches to a new one
@@ -49,7 +53,7 @@ fun Inventory(
     LaunchedEffect(viewers, inventory) {
         val oldViewers = inventory.viewers.toSet()
 
-        withContext(guiyPlugin.minecraftDispatcher){
+        withContext(guiyPlugin.minecraftDispatcher) {
             // Close inventory for removed viewers
             (oldViewers - viewers).forEach {
                 it.closeInventory(InventoryCloseEvent.Reason.PLUGIN)
@@ -62,11 +66,33 @@ fun Inventory(
             }
         }
     }
+    val canvas = remember { MapBackedGuiyCanvas() }
 
-    inventory.clear() //TODO check if this works
-    CompositionLocalProvider(LocalInventory provides inventory) {
+    CompositionLocalProvider(
+        LocalCanvas provides canvas,
+        LocalInventory provides inventory
+    ) {
         Layout(
             measurePolicy = StaticMeasurePolicy,
+            renderer = object : Renderer {
+                override fun GuiyCanvas.render(node: GuiyNode) {
+                    canvas.startRender()
+                }
+
+                override fun GuiyCanvas.renderAfterChildren(node: GuiyNode) {
+                    val items = canvas.getCoordinates()
+                    repeat(inventory.size) { index ->
+                        val coords = inventoryIndexToGrid(index)
+                        if (items[coords] == null) inventory.setItem(index, null)
+                    }
+                    for ((coords, item) in items) {
+                        val index = gridToInventoryIndex(coords) ?: continue
+                        if (index !in 0..<inventory.size) continue
+                        val invItem = inventory.getItem(index)
+                        if (invItem != item) inventory.setItem(index, item)
+                    }
+                }
+            },
             modifier = modifier,
             content = content,
         )

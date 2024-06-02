@@ -13,7 +13,7 @@ import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 
 @Composable
-fun MainMenu(player: Player) {
+fun CreativeMenu(player: Player) {
     val owner = LocalGuiyOwner.current
     val title = "Hello world"
     Chest(

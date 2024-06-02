@@ -2,17 +2,19 @@ package com.mineinabyss.guiy.layout
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
-import com.mineinabyss.guiy.components.state.IntSize
 import com.mineinabyss.guiy.layout.alignment.Alignment
 import com.mineinabyss.guiy.modifiers.Modifier
 
+/**
+ * A layout component that places contents in a column top-to-bottom.
+ */
 @Composable
-fun Box(
+fun Column(
     modifier: Modifier = Modifier,
-    contentAlignment: Alignment = Alignment.TopStart,
+    horizontalAlignment: Alignment.Horizontal = Alignment.Start,
     content: @Composable () -> Unit
 ) {
-    val measurePolicy = remember(contentAlignment) { BoxMeasurePolicy(contentAlignment) }
+    val measurePolicy = remember(horizontalAlignment) { ColumnMeasurePolicy(horizontalAlignment) }
     Layout(
         measurePolicy,
         modifier = modifier,
@@ -20,13 +22,15 @@ fun Box(
     )
 }
 
-private data class BoxMeasurePolicy(
-    private val alignment: Alignment,
+private data class ColumnMeasurePolicy(
+    private val horizontalAlignment: Alignment.Horizontal,
 ) : RowLikeMeasurePolicy() {
     override fun placeChildren(placeables: List<Placeable>, width: Int, height: Int): MeasureResult {
         return MeasureResult(width, height) {
+            var childY = 0
             for (child in placeables) {
-                child.placeAt(alignment.align(child.size, IntSize(width, height)))
+                child.placeAt(horizontalAlignment.align(child.height, height), childY)
+                childY += child.height
             }
         }
     }
