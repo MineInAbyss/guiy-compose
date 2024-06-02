@@ -58,7 +58,7 @@ fun Item(
 
     val item = remember(material, title, amount, lore, hideTooltip) {
         ItemStack(material, amount).editItemMeta {
-            displayName(titleMM)
+            itemName(titleMM)
             lore(loreMM)
             isHideTooltip = hideTooltip
         }
