@@ -2,9 +2,11 @@ package com.mineinabyss.guiy.modifiers.placement.padding
 
 import androidx.compose.runtime.Stable
 import com.mineinabyss.guiy.components.state.IntOffset
+import com.mineinabyss.guiy.components.state.IntSize
 import com.mineinabyss.guiy.modifiers.Constraints
 import com.mineinabyss.guiy.modifiers.LayoutChangingModifier
 import com.mineinabyss.guiy.modifiers.Modifier
+import com.mineinabyss.guiy.modifiers.offset
 import kotlin.math.max
 
 data class PaddingModifier(
@@ -19,12 +21,28 @@ data class PaddingModifier(
         )
     )
 
+    val horizontal get() = padding.start + padding.end
+    val vertical get() = padding.top + padding.bottom
+
     override fun modifyPosition(offset: IntOffset): IntOffset = offset + padding.getOffset()
 
-    override fun modifyInnerConstraints(constraints: Constraints) = constraints.copy(
-        maxWidth = constraints.maxWidth - padding.end - padding.start,
-        maxHeight = constraints.maxHeight - padding.bottom - padding.top,
+    // Shrink inside constraints by padding
+    override fun modifyInnerConstraints(constraints: Constraints) = constraints.offset(
+        horizontal = -horizontal,
+        vertical = -vertical,
     )
+
+    // Grow outside constraints by padding
+    override fun modifyLayoutConstraints(measuredSize: IntSize, constraints: Constraints): Constraints {
+        val width = (measuredSize.width + horizontal).coerceIn(constraints.minWidth, constraints.maxWidth)
+        val height = (measuredSize.height + vertical).coerceIn(constraints.minHeight, constraints.maxHeight)
+        return constraints.copy(
+            minWidth = width,
+            maxWidth = width,
+            minHeight = height,
+            maxHeight = height,
+        )
+    }
 }
 
 @Stable
@@ -38,3 +56,7 @@ fun Modifier.padding(
 @Stable
 fun Modifier.padding(horizontal: Int = 0, vertical: Int = 0) =
     padding(horizontal, horizontal, vertical, vertical)
+
+@Stable
+fun Modifier.padding(all: Int = 0) =
+    padding(all, all, all, all)

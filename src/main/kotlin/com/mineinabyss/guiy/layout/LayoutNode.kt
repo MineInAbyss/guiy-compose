@@ -2,6 +2,7 @@ package com.mineinabyss.guiy.layout
 
 import com.mineinabyss.guiy.components.state.IntCoordinates
 import com.mineinabyss.guiy.components.state.IntOffset
+import com.mineinabyss.guiy.components.state.IntSize
 import com.mineinabyss.guiy.components.state.ItemPositions
 import com.mineinabyss.guiy.inventory.ClickResult
 import com.mineinabyss.guiy.inventory.GuiyCanvas
@@ -30,15 +31,15 @@ internal class LayoutNode : Measurable, Placeable, GuiyNode {
     override var modifier: Modifier = Modifier
         set(value) {
             field = value
-            processedModifier = modifier.foldOut(mutableMapOf()) { element, acc ->
+            processedModifier = modifier.foldIn(mutableMapOf()) { acc, element ->
                 val existing = acc[element::class]
                 if (existing != null)
-                    acc[element::class] = element.unsafeMergeWith(existing)
+                    acc[element::class] = existing.unsafeMergeWith(element)
                 else
                     acc[element::class] = element
                 acc
             }
-            layoutChangingModifiers = modifier.foldOut(mutableListOf()) { element, acc ->
+            layoutChangingModifiers = modifier.foldIn(mutableListOf()) { acc, element ->
                 if (element is LayoutChangingModifier) acc.add(element)
                 acc
             }
@@ -65,10 +66,8 @@ internal class LayoutNode : Measurable, Placeable, GuiyNode {
     }
 
     override fun measure(constraints: Constraints): Placeable {
-        val (innerConstraints, layoutConstraints) = layoutChangingModifiers.fold(
-            constraints to constraints
-        ) { (inner, outer), modifier ->
-            modifier.modifyInnerConstraints(inner) to modifier.modifyLayoutConstraints(outer)
+        val innerConstraints = layoutChangingModifiers.fold(constraints) { inner, modifier ->
+            modifier.modifyInnerConstraints(inner)
         }
         val result = measurePolicy.measure(children, innerConstraints)
 
@@ -79,6 +78,9 @@ internal class LayoutNode : Measurable, Placeable, GuiyNode {
         height = result.height
         result.placer.placeChildren()
 
+        val layoutConstraints = layoutChangingModifiers.fold(constraints) { outer, modifier ->
+            modifier.modifyLayoutConstraints(IntSize(result.width, result.height), outer)
+        }
         // Returned constraints will always appear as though they are in parent's bounds
         return coercedConstraints(layoutConstraints)
     }

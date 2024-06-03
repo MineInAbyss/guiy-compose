@@ -1,8 +1,6 @@
 package com.mineinabyss.guiy.modifiers
 
 import androidx.compose.runtime.Stable
-import kotlin.math.max
-import kotlin.math.min
 import kotlin.math.roundToInt
 
 data class SizeModifier(
@@ -11,15 +9,15 @@ data class SizeModifier(
     override fun mergeWith(other: SizeModifier) = with(constraints) {
         SizeModifier(
             Constraints(
-                max(minWidth, other.constraints.minWidth),
-                min(maxWidth, other.constraints.maxWidth),
-                max(minHeight, other.constraints.minHeight),
-                min(maxHeight, other.constraints.maxHeight),
+                other.constraints.minWidth.coerceIn(minWidth, maxWidth),
+                other.constraints.maxWidth.coerceIn(minWidth, maxWidth),
+                other.constraints.minHeight.coerceIn(minHeight, maxHeight),
+                other.constraints.maxHeight.coerceIn(minHeight, maxHeight),
             )
         )
     }
 
-    override fun modifyLayoutConstraints(constraints: Constraints): Constraints {
+    override fun modifyInnerConstraints(constraints: Constraints): Constraints {
         return SizeModifier(constraints).mergeWith(this).constraints
     }
 }
@@ -29,7 +27,7 @@ data class HorizontalFillModifier(
 ) : Modifier.Element<HorizontalFillModifier>, LayoutChangingModifier {
     override fun mergeWith(other: HorizontalFillModifier) = other
 
-    override fun modifyLayoutConstraints(constraints: Constraints): Constraints {
+    override fun modifyInnerConstraints(constraints: Constraints): Constraints {
         val fillWidth = (constraints.minWidth + percent * (constraints.maxWidth - constraints.minWidth)).roundToInt()
         return constraints.copy(
             minWidth = fillWidth,
@@ -43,7 +41,7 @@ data class VerticalFillModifier(
 ) : Modifier.Element<VerticalFillModifier>, LayoutChangingModifier {
     override fun mergeWith(other: VerticalFillModifier) = other
 
-    override fun modifyLayoutConstraints(constraints: Constraints): Constraints {
+    override fun modifyInnerConstraints(constraints: Constraints): Constraints {
         val fillHeight =
             (constraints.minHeight + percent * (constraints.maxHeight - constraints.minHeight)).roundToInt()
         return constraints.copy(
@@ -78,12 +76,16 @@ fun Modifier.sizeIn(
 
 /** Sets identical min/max width and height constraints for this element. */
 @Stable
-fun Modifier.size(width: Int, height: Int) = then(sizeIn(width, width, height, height))
+fun Modifier.size(width: Int, height: Int) = sizeIn(width, width, height, height)
+
+/** Sets identical min/max width and height constraints for this element. */
+@Stable
+fun Modifier.size(size: Int) = size(size, size)
 
 /** Sets identical min/max width constraints for this element. */
 @Stable
-fun Modifier.width(width: Int) = then(sizeIn(width, width, 0, Integer.MAX_VALUE))
+fun Modifier.width(width: Int) = sizeIn(width, width, 0, Integer.MAX_VALUE)
 
 /** Sets identical min/max height constraints for this element. */
 @Stable
-fun Modifier.height(height: Int) = then(sizeIn(0, Integer.MAX_VALUE, height, height))
+fun Modifier.height(height: Int) = sizeIn(0, Integer.MAX_VALUE, height, height)
