@@ -31,9 +31,8 @@ fun PaginatedMenu(player: Player) {
         Paginated(
             items,
             page = page,
-            itemsPerPage = 9 * 5,
-            previousButton = { Item(Material.RED_CONCRETE, "Previous", modifier = Modifier.clickable { page-- }) },
             navbarPosition = NavbarPosition.START,
+            previousButton = { Item(Material.RED_CONCRETE, "Previous", modifier = Modifier.clickable { page-- }) },
             nextButton = { Item(Material.BLUE_CONCRETE, "Next", modifier = Modifier.clickable { page++ }) },
         ) { pageItems ->
             VerticalGrid {

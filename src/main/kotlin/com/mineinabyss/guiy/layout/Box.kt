@@ -3,7 +3,8 @@ package com.mineinabyss.guiy.layout
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import com.mineinabyss.guiy.components.state.IntSize
-import com.mineinabyss.guiy.layout.alignment.Alignment
+import com.mineinabyss.guiy.jetpack.Alignment
+import com.mineinabyss.guiy.jetpack.LayoutDirection
 import com.mineinabyss.guiy.modifiers.Modifier
 
 @Composable
@@ -20,13 +21,13 @@ fun Box(
     )
 }
 
-private data class BoxMeasurePolicy(
+internal data class BoxMeasurePolicy(
     private val alignment: Alignment,
-) : RowLikeMeasurePolicy() {
+) : RowColumnMeasurePolicy() {
     override fun placeChildren(placeables: List<Placeable>, width: Int, height: Int): MeasureResult {
         return MeasureResult(width, height) {
             for (child in placeables) {
-                child.placeAt(alignment.align(child.size, IntSize(width, height)))
+                child.placeAt(alignment.align(child.size, IntSize(width, height), LayoutDirection.Ltr))
             }
         }
     }

@@ -6,9 +6,9 @@ import com.mineinabyss.guiy.components.Spacer
 import com.mineinabyss.guiy.components.canvases.Chest
 import com.mineinabyss.guiy.components.state.IntOffset
 import com.mineinabyss.guiy.inventory.LocalGuiyOwner
+import com.mineinabyss.guiy.jetpack.Alignment
 import com.mineinabyss.guiy.layout.Box
 import com.mineinabyss.guiy.layout.Row
-import com.mineinabyss.guiy.layout.alignment.Alignment
 import com.mineinabyss.guiy.modifiers.Modifier
 import com.mineinabyss.guiy.modifiers.click.clickable
 import com.mineinabyss.guiy.modifiers.fillMaxSize

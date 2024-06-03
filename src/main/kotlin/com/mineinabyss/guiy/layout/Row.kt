@@ -2,7 +2,9 @@ package com.mineinabyss.guiy.layout
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
-import com.mineinabyss.guiy.layout.alignment.Alignment
+import com.mineinabyss.guiy.jetpack.Alignment
+import com.mineinabyss.guiy.jetpack.Arrangement
+import com.mineinabyss.guiy.jetpack.LayoutDirection
 import com.mineinabyss.guiy.modifiers.Modifier
 
 /**
@@ -11,10 +13,16 @@ import com.mineinabyss.guiy.modifiers.Modifier
 @Composable
 fun Row(
     modifier: Modifier = Modifier,
+    horizontalArrangement: Arrangement.Horizontal = Arrangement.Start,
     verticalAlignment: Alignment.Vertical = Alignment.Top,
     content: @Composable () -> Unit
 ) {
-    val measurePolicy = remember(verticalAlignment) { RowMeasurePolicy(verticalAlignment) }
+    val measurePolicy = remember(horizontalArrangement, verticalAlignment) {
+        RowMeasurePolicy(
+            horizontalArrangement,
+            verticalAlignment
+        )
+    }
     Layout(
         measurePolicy,
         modifier = modifier,
@@ -23,14 +31,23 @@ fun Row(
 }
 
 private data class RowMeasurePolicy(
+    private val horizontalArrangement: Arrangement.Horizontal,
     private val verticalAlignment: Alignment.Vertical,
-) : RowLikeMeasurePolicy(sumWidth = true) {
+) : RowColumnMeasurePolicy(
+    sumWidth = true,
+    arrangementSpacing = horizontalArrangement.spacing
+) {
     override fun placeChildren(placeables: List<Placeable>, width: Int, height: Int): MeasureResult {
+        val positions = IntArray(placeables.size)
+        horizontalArrangement.arrange(
+            totalSize = width,
+            sizes = placeables.map { it.width }.toIntArray(),
+            layoutDirection = LayoutDirection.Ltr,
+            outPositions = positions
+        )
         return MeasureResult(width, height) {
-            var childX = 0
-            for (child in placeables) {
-                child.placeAt(childX, verticalAlignment.align(child.height, height))
-                childX += child.width
+            placeables.forEachIndexed { index, child ->
+                child.placeAt(positions[index], verticalAlignment.align(child.height, height))
             }
         }
     }
