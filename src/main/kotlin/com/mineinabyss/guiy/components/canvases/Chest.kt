@@ -54,7 +54,8 @@ fun Chest(
     content: @Composable () -> Unit,
 ) {
     var size by remember { mutableStateOf(Size()) }
-    val constrainedModifier = modifier.sizeIn(CHEST_WIDTH, CHEST_WIDTH, MIN_CHEST_HEIGHT, MAX_CHEST_HEIGHT)
+    val constrainedModifier =
+        Modifier.sizeIn(CHEST_WIDTH, CHEST_WIDTH, MIN_CHEST_HEIGHT, MAX_CHEST_HEIGHT).then(modifier)
         .onSizeChanged { if (size != it) size = it }
 
     val holder = rememberInventoryHolder(viewers, onClose)

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package com.mineinabyss.guiy.layout.alignment
+package com.mineinabyss.guiy.jetpack
 
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
@@ -37,7 +37,7 @@ fun interface Alignment {
      * of size [space]. The returned offset can be negative or larger than `space - size`,
      * meaning that the box will be positioned partially or completely outside the area.
      */
-    fun align(size: IntSize, space: IntSize): IntOffset
+    fun align(size: IntSize, space: IntSize, layoutDirection: LayoutDirection): IntOffset
 
     /**
      * An interface to calculate the position of box of a certain width inside an available width.
@@ -52,7 +52,7 @@ fun interface Alignment {
          * `space - size` meaning that the box will be positioned partially or completely outside
          * the area.
          */
-        fun align(size: Int, space: Int): Int
+        fun align(size: Int, space: Int, layoutDirection: LayoutDirection): Int
     }
 
     /**
@@ -78,51 +78,70 @@ fun interface Alignment {
         // 2D Alignments.
         @Stable
         val TopStart: Alignment = BiasAlignment(-1f, -1f)
-
         @Stable
         val TopCenter: Alignment = BiasAlignment(0f, -1f)
-
         @Stable
         val TopEnd: Alignment = BiasAlignment(1f, -1f)
-
         @Stable
         val CenterStart: Alignment = BiasAlignment(-1f, 0f)
-
         @Stable
         val Center: Alignment = BiasAlignment(0f, 0f)
-
         @Stable
         val CenterEnd: Alignment = BiasAlignment(1f, 0f)
-
         @Stable
         val BottomStart: Alignment = BiasAlignment(-1f, 1f)
-
         @Stable
         val BottomCenter: Alignment = BiasAlignment(0f, 1f)
-
         @Stable
         val BottomEnd: Alignment = BiasAlignment(1f, 1f)
 
         // 1D Alignment.Verticals.
         @Stable
         val Top: Vertical = BiasAlignment.Vertical(-1f)
-
         @Stable
         val CenterVertically: Vertical = BiasAlignment.Vertical(0f)
-
         @Stable
         val Bottom: Vertical = BiasAlignment.Vertical(1f)
 
         // 1D Alignment.Horizontals.
         @Stable
         val Start: Horizontal = BiasAlignment.Horizontal(-1f)
-
         @Stable
         val CenterHorizontally: Horizontal = BiasAlignment.Horizontal(0f)
-
         @Stable
         val End: Horizontal = BiasAlignment.Horizontal(1f)
     }
+}
+
+/**
+ * A collection of common [Alignment]s unaware of the layout direction.
+ */
+object AbsoluteAlignment {
+    // 2D AbsoluteAlignments.
+    @Stable
+    val TopLeft: Alignment = BiasAbsoluteAlignment(-1f, -1f)
+
+    @Stable
+    val TopRight: Alignment = BiasAbsoluteAlignment(1f, -1f)
+
+    @Stable
+    val CenterLeft: Alignment = BiasAbsoluteAlignment(-1f, 0f)
+
+    @Stable
+    val CenterRight: Alignment = BiasAbsoluteAlignment(1f, 0f)
+
+    @Stable
+    val BottomLeft: Alignment = BiasAbsoluteAlignment(-1f, 1f)
+
+    @Stable
+    val BottomRight: Alignment = BiasAbsoluteAlignment(1f, 1f)
+
+    // 1D BiasAbsoluteAlignment.Horizontals.
+    @Stable
+    val Left: Alignment.Horizontal = BiasAbsoluteAlignment.Horizontal(-1f)
+
+    @Stable
+    val Right: Alignment.Horizontal = BiasAbsoluteAlignment.Horizontal(1f)
 }
 
 /**
@@ -143,11 +162,13 @@ data class BiasAlignment(
     override fun align(
         size: IntSize,
         space: IntSize,
+        layoutDirection: LayoutDirection
     ): IntOffset {
-        val centerX = (space.width - size.width) / 2.0f
-        val centerY = (space.height - size.height) / 2.0f
-        //TODO consider supporting layout directions
-        val resolvedHorizontalBias = if (true/*layoutDirection == LayoutDirection.Ltr*/) {
+        // Convert to Px first and only round at the end, to avoid rounding twice while calculating
+        // the new positions
+        val centerX = (space.width - size.width).toFloat() / 2f
+        val centerY = (space.height - size.height).toFloat() / 2f
+        val resolvedHorizontalBias = if (layoutDirection == LayoutDirection.Ltr) {
             horizontalBias
         } else {
             -1 * horizontalBias
@@ -170,11 +191,11 @@ data class BiasAlignment(
      */
     @Immutable
     data class Horizontal(private val bias: Float) : Alignment.Horizontal {
-        override fun align(size: Int, space: Int): Int {
+        override fun align(size: Int, space: Int, layoutDirection: LayoutDirection): Int {
             // Convert to Px first and only round at the end, to avoid rounding twice while
             // calculating the new positions
             val center = (space - size).toFloat() / 2f
-            val resolvedBias = if (true/*layoutDirection == LayoutDirection.Ltr*/) bias else -1 * bias
+            val resolvedBias = if (layoutDirection == LayoutDirection.Ltr) bias else -1 * bias
             return (center * (1 + resolvedBias)).roundToInt()
         }
     }
@@ -191,6 +212,62 @@ data class BiasAlignment(
     @Immutable
     data class Vertical(private val bias: Float) : Alignment.Vertical {
         override fun align(size: Int, space: Int): Int {
+            // Convert to Px first and only round at the end, to avoid rounding twice while
+            // calculating the new positions
+            val center = (space - size).toFloat() / 2f
+            return (center * (1 + bias)).roundToInt()
+        }
+    }
+}
+
+/**
+ * An [Alignment] specified by bias: for example, a bias of -1 represents alignment to the
+ * left/top, a bias of 0 will represent centering, and a bias of 1 will represent right/bottom.
+ * Any value can be specified to obtain an alignment. Inside the [-1, 1] range, the obtained
+ * alignment will position the aligned size fully inside the available space, while outside the
+ * range it will the aligned size will be positioned partially or completely outside.
+ *
+ * @see AbsoluteAlignment
+ * @see Alignment
+ */
+@Immutable
+data class BiasAbsoluteAlignment(
+    private val horizontalBias: Float,
+    private val verticalBias: Float
+) : Alignment {
+    /**
+     * Returns the position of a 2D point in a container of a given size, according to this
+     * [BiasAbsoluteAlignment]. The position will not be mirrored in Rtl context.
+     */
+    override fun align(size: IntSize, space: IntSize, layoutDirection: LayoutDirection): IntOffset {
+        // Convert to Px first and only round at the end, to avoid rounding twice while calculating
+        // the new positions
+        val remaining = IntSize(space.width - size.width, space.height - size.height)
+        val centerX = remaining.width.toFloat() / 2f
+        val centerY = remaining.height.toFloat() / 2f
+
+        val x = centerX * (1 + horizontalBias)
+        val y = centerY * (1 + verticalBias)
+        return IntOffset(x.roundToInt(), y.roundToInt())
+    }
+
+    /**
+     * An [Alignment.Horizontal] specified by bias: for example, a bias of -1 represents alignment
+     * to the left, a bias of 0 will represent centering, and a bias of 1 will represent right.
+     * Any value can be specified to obtain an alignment. Inside the [-1, 1] range, the obtained
+     * alignment will position the aligned size fully inside the available space, while outside the
+     * range it will the aligned size will be positioned partially or completely outside.
+     *
+     * @see BiasAlignment.Horizontal
+     */
+    @Immutable
+    data class Horizontal(private val bias: Float) : Alignment.Horizontal {
+        /**
+         * Returns the position of a 2D point in a container of a given size,
+         * according to this [BiasAbsoluteAlignment.Horizontal]. This position will not be
+         * mirrored in Rtl context.
+         */
+        override fun align(size: Int, space: Int, layoutDirection: LayoutDirection): Int {
             // Convert to Px first and only round at the end, to avoid rounding twice while
             // calculating the new positions
             val center = (space - size).toFloat() / 2f
