@@ -2,24 +2,23 @@
 
 # Guiy
 
-[![Java CI with Gradle](https://github.com/MineInAbyss/guiy-compose/actions/workflows/gradle-ci.yml/badge.svg)](https://github.com/MineInAbyss/guiy-compose/actions/workflows/gradle-ci.yml)
 [![Maven](https://img.shields.io/maven-metadata/v?metadataUrl=https://repo.mineinabyss.com/releases/com/mineinabyss/guiy-compose/maven-metadata.xml)](https://repo.mineinabyss.com/#/releases/com/mineinabyss/guiy-compose)
 [![Contribute](https://shields.io/badge/Contribute-e57be5?logo=github%20sponsors&style=flat&logoColor=white)](https://wiki.mineinabyss.com/contribute/)
 </div>
 
-A Spigot/PaperMC UI library built on the [Jetpack Compose](https://developer.android.com/jetpack/compose) compiler.
+A Minecraft UI library for PaperMC, built on the [Jetpack Compose](https://developer.android.com/jetpack/compose)
+compiler.
 
-If you are new to Compose, please read the link above. In short, it is a declarative UI library that makes working with
-state nice, gives easy access to coroutines, and helps write complex UI faster.
+Compose is commonly used in Android (and cross-platform) development, so many resources are available online to learn
+the basics. It makes it much easier to work with changing UI state and has built in support for Kotlin Coroutines.
 
-## Beta status
-
-We can't promise api stability yet, for the most part none of the existing elements should ever break entirely, but we
-may change some behaviour like how `Grid` organizes itself.
+> [!NOTE]
+> Guiy is in active development as we continue to try new use-cases in our plugins. We can't promise api stability yet,
+> but try to follow semver for breaking changes.
 
 ## Examples
 
-See the `guiy-example` package for a full demonstration, below are snippets.
+See the `guiy-example` package for a full demonstration of project setup and different features.
 
 ### Entry
 
@@ -65,23 +64,31 @@ We use a similar modifier system to Jetpack Compose.
 ```kotlin
 // Entry to modifiers, though you are encouraged to pass a modifier parameter into your composables.
 Modifier
-    // Set the size of an element (can use min/max constraints too)
-    .size(width = 2, height = 2)
-    // Place at an absolute offset
-    .at(x = 1, y = 5)
+    // Set the width of an element (can use min/max constraints, or .size to set width and height)
+    .width(3)
+    // Fill based on parent constraints like Jetpack
+    .fillmaxHeight()
+    // Padding in # of blocks
+    .padding(vertical = 1)
+    // Place at an offset
+    .offset(x = 1, y = 5)
     // Do actions on click
     .clickable { doSomething() }
 ```
 
 ### Alignment
 
+Guiy provides Row, Column, and Box components based on Jetpack's, these come with Arrangement and Alignment too. We also
+provide our components like Vertical/Horizontal Grids optimized for common Minecraft uses.
+
 ```kotlin
-// A horizontal group of 10 items
-Row {
-    repeat(10) {
+// A horizontal row of 10 items, with 1 space between each.
+Row(horizontalArrangement = Arrangement.spacedBy(1)) {
+    repeat(4) {
         Item(...)
     }
 }
+
 // Same but vertical
 Column { ... }
 
@@ -91,8 +98,8 @@ Column {
     Row { ... }
 }
 
-// Items aligned left to right, top to bottom, wrapped to be smaller than width.
-Grid(Modifier.width(3)) {
+// Items aligned left to right, top to bottom, wrapped to be smaller than width, useful for pages of items!
+VerticalGrid(Modifier.width(3)) {
     repeat(7) {
         Item(...)
     }
@@ -164,14 +171,12 @@ pluginManagement {
 
 ### Server setup
 
-Guiy does not package the Kotlin runtime in itself, it uses our library idofront to load shared dependencies in an
-isolated way.
+Guiy does not package the Kotlin runtime, it depends on our helper plugin Idofront using Paper's isolated dependency
+system.
 
 - [Download](https://github.com/MineInAbyss/guiy-compose/releases/latest) and install Guiy into your plugin folder.
 - [Download](https://github.com/MineInAbyss/Idofront/releases/latest) Idofront, a required dependency.
 - Depend on Guiy in a [paper-plugin](https://docs.papermc.io/paper/dev/getting-started/paper-plugins), this will give you access to Guiy and any libraries in Idofront in an isolated manner.
-
-There is currently no support for shading guiy.
 
 ## Thanks
 
