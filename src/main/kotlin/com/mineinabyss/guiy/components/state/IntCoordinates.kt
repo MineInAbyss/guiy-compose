@@ -11,6 +11,8 @@ value class IntCoordinates(val pair: Long) {
     constructor(x: Int, y: Int) : this((x.toLong() shl 32) or y.toLong())
 
     override fun toString(): String = "($x, $y)"
+
+    operator fun plus(other: IntCoordinates) = IntCoordinates(x + other.x, y + other.y)
 }
 
 typealias IntOffset = IntCoordinates

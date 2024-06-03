@@ -24,7 +24,7 @@ fun Column(
 
 private data class ColumnMeasurePolicy(
     private val horizontalAlignment: Alignment.Horizontal,
-) : RowLikeMeasurePolicy() {
+) : RowLikeMeasurePolicy(sumHeight = true) {
     override fun placeChildren(placeables: List<Placeable>, width: Int, height: Int): MeasureResult {
         return MeasureResult(width, height) {
             var childY = 0

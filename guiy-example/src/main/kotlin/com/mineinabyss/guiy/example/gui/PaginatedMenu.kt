@@ -4,6 +4,7 @@ import androidx.compose.runtime.*
 import com.mineinabyss.guiy.components.Item
 import com.mineinabyss.guiy.components.VerticalGrid
 import com.mineinabyss.guiy.components.canvases.Chest
+import com.mineinabyss.guiy.components.lists.NavbarPosition
 import com.mineinabyss.guiy.components.lists.Paginated
 import com.mineinabyss.guiy.inventory.LocalGuiyOwner
 import com.mineinabyss.guiy.modifiers.Modifier
@@ -32,6 +33,7 @@ fun PaginatedMenu(player: Player) {
             page = page,
             itemsPerPage = 9 * 5,
             previousButton = { Item(Material.RED_CONCRETE, "Previous", modifier = Modifier.clickable { page-- }) },
+            navbarPosition = NavbarPosition.START,
             nextButton = { Item(Material.BLUE_CONCRETE, "Next", modifier = Modifier.clickable { page++ }) },
         ) { pageItems ->
             VerticalGrid {

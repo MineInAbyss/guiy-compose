@@ -9,8 +9,12 @@ import com.mineinabyss.guiy.inventory.LocalGuiyOwner
 import com.mineinabyss.guiy.layout.Box
 import com.mineinabyss.guiy.layout.Row
 import com.mineinabyss.guiy.layout.alignment.Alignment
-import com.mineinabyss.guiy.modifiers.*
+import com.mineinabyss.guiy.modifiers.Modifier
 import com.mineinabyss.guiy.modifiers.click.clickable
+import com.mineinabyss.guiy.modifiers.fillMaxSize
+import com.mineinabyss.guiy.modifiers.height
+import com.mineinabyss.guiy.modifiers.placement.absolute.at
+import com.mineinabyss.guiy.modifiers.width
 import org.bukkit.Material
 import org.bukkit.entity.Player
 

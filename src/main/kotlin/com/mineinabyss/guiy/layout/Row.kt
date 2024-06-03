@@ -24,7 +24,7 @@ fun Row(
 
 private data class RowMeasurePolicy(
     private val verticalAlignment: Alignment.Vertical,
-) : RowLikeMeasurePolicy() {
+) : RowLikeMeasurePolicy(sumWidth = true) {
     override fun placeChildren(placeables: List<Placeable>, width: Int, height: Int): MeasureResult {
         return MeasureResult(width, height) {
             var childX = 0
