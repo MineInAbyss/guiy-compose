@@ -15,21 +15,20 @@ fun CreativeItem(
 ) {
     Item(itemStack, modifier.clickable {
         // Mimic all vanilla interactions
-        val shiftClick = clickType == ClickType.SHIFT_LEFT || clickType == ClickType.SHIFT_RIGHT
         val result: ItemStack? = when {
-            (shiftClick || clickType == ClickType.MIDDLE) && cursor == null -> itemStack?.clone()
-                ?.apply { amount = maxStackSize }
+            (clickType.isShiftClick || clickType == ClickType.MIDDLE) && cursor == null ->
+                itemStack?.asQuantity(itemStack.maxStackSize)
 
             clickType == ClickType.MIDDLE -> return@clickable
 
-            (clickType == ClickType.SHIFT_LEFT && cursor != null && cursor.isSimilar(itemStack)) ->
-                cursor.clone().apply { amount = maxStackSize }
+            clickType == ClickType.SHIFT_LEFT && cursor != null && cursor.isSimilar(itemStack) ->
+                cursor.asQuantity(cursor.maxStackSize)
 
-            cursor == null -> itemStack?.clone()?.apply { amount = 1 }
+            cursor == null -> itemStack?.clone()?.asOne()
 
-            clickType == ClickType.RIGHT || clickType == ClickType.SHIFT_RIGHT -> cursor.clone().subtract()
+            clickType.isRightClick -> cursor.clone().subtract()
 
-            (clickType == ClickType.LEFT || clickType == ClickType.SHIFT_LEFT) && !cursor.isSimilar(itemStack) -> null
+            clickType.isLeftClick && !cursor.isSimilar(itemStack) -> null
 
             else -> cursor.clone().add()
         }

@@ -9,6 +9,7 @@ import com.mineinabyss.guiy.layout.Column
 import com.mineinabyss.guiy.layout.Row
 import com.mineinabyss.guiy.layout.Size
 import com.mineinabyss.guiy.modifiers.*
+import com.mineinabyss.idofront.items.editItemMeta
 import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
 
@@ -19,6 +20,11 @@ fun <T> Paginated(
     nextButton: @Composable () -> Unit,
     previousButton: @Composable () -> Unit,
     navbarPosition: NavbarPosition = NavbarPosition.BOTTOM,
+    navbarBackground: ItemStack? = remember {
+        ItemStack(Material.GRAY_STAINED_GLASS_PANE).editItemMeta {
+            isHideTooltip = true
+        }
+    },
     content: @Composable (page: List<T>) -> Unit,
 ) {
     var size by remember { mutableStateOf(Size(0, 0)) }
@@ -33,7 +39,7 @@ fun <T> Paginated(
         NavbarLayout(
             position = navbarPosition,
             navbar = {
-                NavbarButtons(navbarPosition) {
+                NavbarButtons(navbarPosition, navbarBackground) {
                     if (page > 0) previousButton()
                     else Spacer(1, 1)
                     if (end < items.size) nextButton()
@@ -54,7 +60,7 @@ fun <T> Paginated(
 @Composable
 private inline fun NavbarButtons(
     navbarPosition: NavbarPosition,
-    background: ItemStack = ItemStack(Material.BLACK_STAINED_GLASS),
+    background: ItemStack?,
     crossinline content: @Composable () -> Unit
 ) {
     val navbarSize =
@@ -62,7 +68,9 @@ private inline fun NavbarButtons(
         else Modifier.fillMaxWidth().height(1)
 
     Box(modifier = navbarSize) {
-        Item(background, modifier = Modifier.fillMaxSize())
+        if (background != null)
+            Item(background, modifier = Modifier.fillMaxSize())
+
         if (navbarPosition.isVertical())
             Column(Modifier.fillMaxHeight(), verticalArrangement = Arrangement.SpaceAround) { content() }
         else
