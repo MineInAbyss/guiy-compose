@@ -58,7 +58,7 @@ fun <T> Paginated(
 }
 
 @Composable
-private inline fun NavbarButtons(
+inline fun NavbarButtons(
     navbarPosition: NavbarPosition,
     background: ItemStack?,
     crossinline content: @Composable () -> Unit
