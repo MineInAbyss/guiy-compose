@@ -8,7 +8,7 @@ import org.bukkit.command.Command
 import org.bukkit.command.CommandSender
 import org.bukkit.command.TabCompleter
 
-class GuiyCommands(val plugin: GuiyExamplePlugin) : IdofrontCommandExecutor(), TabCompleter {
+class GuiyCommands(plugin: GuiyExamplePlugin) : IdofrontCommandExecutor(), TabCompleter {
     override val commands = commands(plugin) {
         "guiyexample" {
             "arrangement" {
