@@ -51,7 +51,7 @@ fun Modifier.padding(
     end: Int = 0,
     top: Int = 0,
     bottom: Int = 0,
-) = then(PaddingModifier(PaddingValues(start, end, bottom, top)))
+) = then(PaddingModifier(PaddingValues(start, end, top, bottom)))
 
 @Stable
 fun Modifier.padding(horizontal: Int = 0, vertical: Int = 0) =

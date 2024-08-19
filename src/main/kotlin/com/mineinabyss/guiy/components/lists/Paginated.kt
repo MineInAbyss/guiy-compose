@@ -3,12 +3,14 @@ package com.mineinabyss.guiy.components.lists
 import androidx.compose.runtime.*
 import com.mineinabyss.guiy.components.Item
 import com.mineinabyss.guiy.components.Spacer
+import com.mineinabyss.guiy.jetpack.Alignment
 import com.mineinabyss.guiy.jetpack.Arrangement
 import com.mineinabyss.guiy.layout.Box
 import com.mineinabyss.guiy.layout.Column
 import com.mineinabyss.guiy.layout.Row
 import com.mineinabyss.guiy.layout.Size
 import com.mineinabyss.guiy.modifiers.*
+import com.mineinabyss.guiy.modifiers.placement.padding.padding
 import com.mineinabyss.idofront.items.editItemMeta
 import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
@@ -61,7 +63,7 @@ fun <T> Paginated(
 inline fun NavbarButtons(
     navbarPosition: NavbarPosition,
     background: ItemStack?,
-    crossinline content: @Composable () -> Unit
+    crossinline content: @Composable () -> Unit,
 ) {
     val navbarSize =
         if (navbarPosition.isVertical()) Modifier.fillMaxHeight().width(1)
@@ -93,28 +95,32 @@ fun NavbarLayout(
     content: @Composable () -> Unit,
 ) {
     when (position) {
-        NavbarPosition.START ->
-            Row {
-                navbar()
-                content()
-            }
+        NavbarPosition.START -> Row {
+            navbar()
+            content()
+        }
 
-        NavbarPosition.END ->
-            Row {
+        NavbarPosition.END -> Box {
+            Box(Modifier.padding(end = 1)) {
                 content()
+            }
+            Box(Modifier.fillMaxWidth(), contentAlignment = Alignment.TopEnd) {
                 navbar()
             }
+        }
 
-        NavbarPosition.TOP ->
-            Column {
-                navbar()
-                content()
-            }
+        NavbarPosition.TOP -> Column {
+            navbar()
+            content()
+        }
 
-        NavbarPosition.BOTTOM ->
-            Column {
+        NavbarPosition.BOTTOM -> Box {
+            Box(Modifier.padding(bottom = 1)) {
                 content()
+            }
+            Box(Modifier.fillMaxHeight(), contentAlignment = Alignment.BottomStart) {
                 navbar()
             }
+        }
     }
 }
