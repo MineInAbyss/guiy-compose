@@ -11,12 +11,15 @@ import com.mineinabyss.idofront.items.editItemMeta
 import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
 
+enum class ScrollDirection {
+    VERTICAL, HORIZONTAL;
+}
+
 @Composable
 fun <T> Scrollable(
     items: List<T>,
-    startLine: Int,
-    itemsPerLine: Int,
-    totalLines: Int,
+    line: Int,
+    scrollDirection: ScrollDirection,
     nextButton: @Composable () -> Unit,
     previousButton: @Composable () -> Unit,
     navbarPosition: NavbarPosition = NavbarPosition.BOTTOM,
@@ -28,9 +31,11 @@ fun <T> Scrollable(
     content: @Composable (page: List<T>) -> Unit,
 ) {
     var size by remember { mutableStateOf(Size(0, 0)) }
+    val itemsPerLine = if (scrollDirection == ScrollDirection.VERTICAL) size.width else size.height
+    val totalLines = if (scrollDirection == ScrollDirection.VERTICAL) size.height else size.width
     Box(Modifier.fillMaxSize()) {
-        val start = startLine * itemsPerLine
-        val end = (startLine + 1) * itemsPerLine * totalLines
+        val start = line * itemsPerLine
+        val end = (line + 1) * itemsPerLine * totalLines
         val pageItems = remember(start, end) {
             if (start < 0) emptyList()
             else items.subList(start, end.coerceAtMost(items.size))
@@ -39,10 +44,10 @@ fun <T> Scrollable(
             position = navbarPosition,
             navbar = {
                 NavbarButtons(navbarPosition, navbarBackground) {
-                    if (startLine > 0) previousButton()
-                    //else Spacer(1, 1)
+                    if (line > 0) previousButton()
+                    else Spacer(1, 1)
                     if (end < items.size) nextButton()
-                    //else Spacer(1, 1)
+                    else Spacer(1, 1)
                 }
             },
             content = {
