@@ -15,6 +15,11 @@ import com.mineinabyss.idofront.items.editItemMeta
 import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
 
+/**
+ * A paginated list of items, with buttons to go to the next and previous pages.
+ *
+ * Content must set a size or fillMaxSize Modifier to be visible.
+ */
 @Composable
 fun <T> Paginated(
     items: List<T>,
@@ -49,7 +54,7 @@ fun <T> Paginated(
                 }
             },
             content = {
-                Box(Modifier.fillMaxSize().onSizeChanged {
+                Box(Modifier.onSizeChanged {
                     size = it
                 }) {
                     content(pageItems)

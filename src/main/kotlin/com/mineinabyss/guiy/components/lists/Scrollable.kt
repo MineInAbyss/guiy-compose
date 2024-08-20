@@ -15,6 +15,11 @@ enum class ScrollDirection {
     VERTICAL, HORIZONTAL;
 }
 
+/**
+ * A scrollable list of items, with buttons to go to the next and previous lines.
+ *
+ * Content must set a size or fillMaxSize Modifier to be visible.
+ */
 @Composable
 fun <T> Scrollable(
     items: List<T>,
@@ -35,7 +40,7 @@ fun <T> Scrollable(
     val totalLines = if (scrollDirection == ScrollDirection.VERTICAL) size.height else size.width
     Box(Modifier.fillMaxSize()) {
         val start = line * itemsPerLine
-        val end = (line + 1) * itemsPerLine * totalLines
+        val end = start + (itemsPerLine * totalLines)
         val pageItems = remember(start, end) {
             if (start < 0) emptyList()
             else items.subList(start, end.coerceAtMost(items.size))
@@ -51,7 +56,7 @@ fun <T> Scrollable(
                 }
             },
             content = {
-                Box(Modifier.fillMaxSize().onSizeChanged {
+                Box(Modifier.onSizeChanged {
                     size = it
                 }) {
                     content(pageItems)

@@ -20,7 +20,7 @@ fun ScrollingMenu(player: Player) {
     val owner = LocalGuiyOwner.current
     Chest(
         setOf(player),
-        "Pagination example",
+        "Scrolling example",
         onClose = { owner.exit() },
         modifier = Modifier.fillMaxSize()
     ) {
@@ -37,7 +37,7 @@ fun ScrollingMenu(player: Player) {
             previousButton = { Item(Material.RED_CONCRETE, "Previous", modifier = Modifier.clickable { line-- }) },
             nextButton = { Item(Material.BLUE_CONCRETE, "Next", modifier = Modifier.clickable { line++ }) },
         ) { pageItems ->
-            VerticalGrid {
+            VerticalGrid(Modifier.fillMaxSize()) {
                 pageItems.forEach { item ->
                     Item(item)
                 }
