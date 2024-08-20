@@ -33,6 +33,7 @@ fun <T> Scrollable(
             isHideTooltip = true
         }
     },
+    alwaysShowButtons: Boolean = false,
     content: @Composable (page: List<T>) -> Unit,
 ) {
     var size by remember { mutableStateOf(Size(0, 0)) }
@@ -49,9 +50,9 @@ fun <T> Scrollable(
             position = navbarPosition,
             navbar = {
                 NavbarButtons(navbarPosition, navbarBackground) {
-                    if (line > 0) previousButton()
+                    if (alwaysShowButtons || line > 0) previousButton()
                     else Spacer(1, 1)
-                    if (end < items.size) nextButton()
+                    if (alwaysShowButtons || end < items.size) nextButton()
                     else Spacer(1, 1)
                 }
             },
