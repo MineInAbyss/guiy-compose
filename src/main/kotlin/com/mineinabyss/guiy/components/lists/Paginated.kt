@@ -39,7 +39,7 @@ fun <T> Paginated(
     Box(Modifier.fillMaxSize()) {
         val start = page * itemsPerPage
         val end = (page + 1) * itemsPerPage
-        val pageItems = remember(start, end) {
+        val pageItems = remember(items, start, end) {
             if (start < 0) emptyList()
             else items.subList(start, end.coerceAtMost(items.size))
         }

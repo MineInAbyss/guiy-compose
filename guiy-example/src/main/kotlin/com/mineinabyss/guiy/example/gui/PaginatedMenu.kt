@@ -24,9 +24,9 @@ fun PaginatedMenu(player: Player) {
         onClose = { owner.exit() },
         modifier = Modifier.fillMaxSize()
     ) {
-        val items = remember {
+        var items by remember {
             val materials = Material.entries
-            (1..100).map { ItemStack(materials[it]) }
+            mutableStateOf((1..100).map { ItemStack(materials[it]) })
         }
         var page by remember { mutableStateOf(0) }
         Paginated(
@@ -38,7 +38,7 @@ fun PaginatedMenu(player: Player) {
         ) { pageItems ->
             HorizontalGrid(Modifier.size(4, 5)) {
                 pageItems.forEach { item ->
-                    Item(item)
+                    Item(item, modifier = Modifier.clickable { items = items - item })
                 }
             }
         }

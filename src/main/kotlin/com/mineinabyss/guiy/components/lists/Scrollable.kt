@@ -41,7 +41,7 @@ fun <T> Scrollable(
     Box(Modifier.fillMaxSize()) {
         val start = line * itemsPerLine
         val end = start + (itemsPerLine * totalLines)
-        val pageItems = remember(start, end) {
+        val pageItems = remember(items, start, end) {
             if (start < 0) emptyList()
             else items.subList(start, end.coerceAtMost(items.size))
         }
