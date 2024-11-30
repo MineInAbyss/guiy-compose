@@ -6,11 +6,12 @@
 [![Contribute](https://shields.io/badge/Contribute-e57be5?logo=github%20sponsors&style=flat&logoColor=white)](https://wiki.mineinabyss.com/contribute/)
 </div>
 
-A Minecraft UI library for PaperMC, built on the [Jetpack Compose](https://developer.android.com/jetpack/compose)
-compiler.
+A Minecraft UI library for PaperMC, built on the Compose compiler.
 
-Compose is commonly used in Android (and cross-platform) development, so many resources are available online to learn
-the basics. It makes it much easier to work with changing UI state and has built in support for Kotlin Coroutines.
+While [Jetpack Compose](https://developer.android.com/jetpack/compose) is a commonly used UI toolkit in Android development,
+*the Compose compiler is just a tool to dynamically [manage trees](https://arunkumar.dev/jetpack-compose-for-non-ui-tree-construction-and-code-generation/)*.
+Guiy implements its own layouts, modifiers, and rendering specifically for Minecraft chest UI.
+This means you can work with state exactly as you would with Jetpack Compose, but without any overhead from Android, and with concepts native to Minecraft.
 
 > [!NOTE]
 > Guiy is in active development as we continue to try new use-cases in our plugins. We can't promise api stability yet,
