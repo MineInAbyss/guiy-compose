@@ -3,6 +3,7 @@ package com.mineinabyss.guiy.components.lists
 import androidx.compose.runtime.*
 import com.mineinabyss.guiy.components.Item
 import com.mineinabyss.guiy.components.Spacer
+import com.mineinabyss.guiy.components.VerticalGrid
 import com.mineinabyss.guiy.jetpack.Alignment
 import com.mineinabyss.guiy.jetpack.Arrangement
 import com.mineinabyss.guiy.layout.Box
@@ -35,7 +36,9 @@ fun <T> Paginated(
     content: @Composable (page: List<T>) -> Unit,
 ) {
     var size by remember { mutableStateOf(Size(0, 0)) }
+    var clearSize by remember { mutableStateOf(Size(0, 0)) }
     val itemsPerPage = size.width * size.height
+
     Box(Modifier.fillMaxSize()) {
         val start = page * itemsPerPage
         val end = (page + 1) * itemsPerPage
@@ -43,6 +46,23 @@ fun <T> Paginated(
             if (start < 0) emptyList()
             else items.subList(start, end.coerceAtMost(items.size))
         }
+
+        // Extract original size of contents
+        Box(Modifier.onSizeChanged{
+            size = it
+        }) {
+            content(pageItems)
+        }
+
+        // Clear out the previous Box
+        Box(Modifier.onSizeChanged{
+            clearSize = it
+        }.fillMaxSize()) {
+            VerticalGrid(){
+                MutableList(clearSize.width * clearSize.height) {Item(null)}
+            }
+        }
+
         NavbarLayout(
             position = navbarPosition,
             navbar = {
@@ -54,9 +74,8 @@ fun <T> Paginated(
                 }
             },
             content = {
-                Box(Modifier.onSizeChanged {
-                    size = it
-                }) {
+                // Actually render the correct amount of items into a box that can fit them including offsets
+                Box(Modifier.fillMaxSize()) {
                     content(pageItems)
                 }
             }

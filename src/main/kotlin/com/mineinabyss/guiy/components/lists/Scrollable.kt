@@ -1,12 +1,12 @@
 package com.mineinabyss.guiy.components.lists
 
 import androidx.compose.runtime.*
+import com.mineinabyss.guiy.components.Item
 import com.mineinabyss.guiy.components.Spacer
+import com.mineinabyss.guiy.components.VerticalGrid
 import com.mineinabyss.guiy.layout.Box
 import com.mineinabyss.guiy.layout.Size
-import com.mineinabyss.guiy.modifiers.Modifier
-import com.mineinabyss.guiy.modifiers.fillMaxSize
-import com.mineinabyss.guiy.modifiers.onSizeChanged
+import com.mineinabyss.guiy.modifiers.*
 import com.mineinabyss.idofront.items.editItemMeta
 import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
@@ -36,15 +36,35 @@ fun <T> Scrollable(
     content: @Composable (page: List<T>) -> Unit,
 ) {
     var size by remember { mutableStateOf(Size(0, 0)) }
+    var clearSize by remember { mutableStateOf(Size(0, 0)) }
+
     val itemsPerLine = if (scrollDirection == ScrollDirection.VERTICAL) size.width else size.height
     val totalLines = if (scrollDirection == ScrollDirection.VERTICAL) size.height else size.width
-    Box(Modifier.fillMaxSize()) {
+
+    Box(Modifier.fillMaxSize().onSizeChanged {println("Exterior box size: $it")}) {
         val start = line * itemsPerLine
         val end = start + (itemsPerLine * totalLines)
         val pageItems = remember(items, start, end) {
             if (start < 0) emptyList()
             else items.subList(start, end.coerceAtMost(items.size))
         }
+
+        // Extract original size of contents
+        Box(Modifier.onSizeChanged{
+            size = it
+        }) {
+            content(pageItems)
+        }
+
+        // Clear out the previous Box
+        Box(Modifier.onSizeChanged{
+            clearSize = it
+        }.fillMaxSize()) {
+            VerticalGrid(){
+                MutableList(clearSize.width * clearSize.height) {Item(null)}
+            }
+        }
+
         NavbarLayout(
             position = navbarPosition,
             navbar = {
@@ -56,12 +76,12 @@ fun <T> Scrollable(
                 }
             },
             content = {
-                Box(Modifier.onSizeChanged {
-                    size = it
-                }) {
+                // Actually render the correct amount of items into a box that can fit them including offsets
+                Box(Modifier.fillMaxSize()) {
                     content(pageItems)
                 }
             }
+
         )
     }
 }
