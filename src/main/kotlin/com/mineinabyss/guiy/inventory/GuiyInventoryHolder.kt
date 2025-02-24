@@ -22,6 +22,8 @@ abstract class GuiyInventoryHolder : InventoryHolder {
 
     abstract fun onClose(player: Player)
 
+    abstract fun forceClose(player: Player)
+
     fun close() {
         inventory.viewers.forEach { it.closeInventory(InventoryCloseEvent.Reason.PLUGIN) }
     }

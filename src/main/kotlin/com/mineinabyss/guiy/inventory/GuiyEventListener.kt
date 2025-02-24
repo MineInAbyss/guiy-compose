@@ -34,6 +34,8 @@ class GuiyEventListener : Listener {
 
         if (reason != InventoryCloseEvent.Reason.PLUGIN) {
             guiyHolder.onClose(player as Player)
+        } else {
+            guiyHolder.forceClose(player as Player)
         }
     }
 

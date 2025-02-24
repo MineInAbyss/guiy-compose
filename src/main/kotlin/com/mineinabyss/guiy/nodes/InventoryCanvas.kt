@@ -1,10 +1,13 @@
 package com.mineinabyss.guiy.nodes
 
+import androidx.compose.runtime.Stable
 import com.mineinabyss.guiy.layout.MeasurePolicy
 import com.mineinabyss.guiy.layout.MeasureResult
 
+@Stable
 interface InventoryCloseScope {
     fun reopen()
+    fun exit()
 }
 
 val StaticMeasurePolicy = MeasurePolicy { measurables, constraints ->

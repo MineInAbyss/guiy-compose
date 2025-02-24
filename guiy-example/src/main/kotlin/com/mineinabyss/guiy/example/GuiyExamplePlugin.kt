@@ -10,7 +10,7 @@ class GuiyExamplePlugin : JavaPlugin() {
         "guiyexample" {
             "arrangement" {
                 playerExecutes {
-                    guiy { ArrangementMenu(player) }
+                    guiy { ArrangementMenu() }
                 }
             }
             "animated" {
@@ -20,22 +20,22 @@ class GuiyExamplePlugin : JavaPlugin() {
             }
             "creative" {
                 playerExecutes {
-                    guiy { CreativeMenu(player) }
+                    guiy { CreativeMenu() }
                 }
             }
             "cursor" {
                 playerExecutes {
-                    guiy { Cursor(player) }
+                    guiy { Cursor() }
                 }
             }
             "pagination" {
                 playerExecutes {
-                    guiy { PaginatedMenu(player) }
+                    guiy { PaginatedMenu() }
                 }
             }
             "scrolling" {
                 playerExecutes {
-                    guiy { ScrollingMenu(player) }
+                    guiy { ScrollingMenu() }
                 }
             }
         }

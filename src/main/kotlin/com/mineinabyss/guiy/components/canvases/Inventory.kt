@@ -105,10 +105,11 @@ inline fun rememberInventoryHolder(
     crossinline onClose: InventoryCloseScope.(Player) -> Unit = {},
 ): GuiyInventoryHolder {
     val clickHandler = LocalClickHandler.current
+    val owner = LocalGuiyOwner.current
     return remember(clickHandler) {
         object : GuiyInventoryHolder() {
             override fun processClick(scope: ClickScope, event: Cancellable) {
-                val clickResult = clickHandler.processClick(scope)
+                clickHandler.processClick(scope)
             }
 
             override fun processDrag(scope: DragScope) {
@@ -122,11 +123,22 @@ inline fun rememberInventoryHolder(
                         viewers.filter { it.openInventory.topInventory != inventory }
                             .forEach { it.openInventory(inventory) }
                     }
+
+                    override fun exit() {
+                        owner.exit()
+                    }
                 }
                 guiyPlugin.launch {
                     delay(1.ticks)
                     onClose.invoke(scope, player)
+                    if (player.openInventory.topInventory != inventory) {
+                        owner.removeViewers(player)
+                    }
                 }
+            }
+
+            override fun forceClose(player: Player) {
+                owner.removeViewers(player)
             }
         }
     }

@@ -2,20 +2,21 @@ package com.mineinabyss.guiy.inventory
 
 import androidx.compose.runtime.*
 import androidx.compose.runtime.snapshots.Snapshot
+import com.github.shynixn.mccoroutine.bukkit.asyncDispatcher
+import com.mineinabyss.guiy.guiyPlugin
 import com.mineinabyss.guiy.layout.LayoutNode
-import com.mineinabyss.guiy.modifiers.click.ClickScope
 import com.mineinabyss.guiy.modifiers.Constraints
+import com.mineinabyss.guiy.modifiers.click.ClickScope
 import com.mineinabyss.guiy.modifiers.drag.DragScope
 import com.mineinabyss.guiy.nodes.GuiyNodeApplier
 import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
+import org.bukkit.entity.Player
 import kotlin.coroutines.CoroutineContext
-
-val LocalClickHandler: ProvidableCompositionLocal<ClickHandler> =
-    staticCompositionLocalOf { error("No provider for local click handler") }
-val LocalCanvas: ProvidableCompositionLocal<GuiyCanvas?> =
-    staticCompositionLocalOf { null }
-val LocalGuiyOwner: ProvidableCompositionLocal<GuiyOwner> =
-    staticCompositionLocalOf { error("No provider for GuiyOwner") }
+import kotlin.reflect.KType
+import kotlin.reflect.typeOf
 
 data class ClickResult(
     val cancelBukkitEvent: Boolean? = null,
@@ -32,10 +33,17 @@ interface ClickHandler {
 }
 
 @GuiyUIScopeMarker
-class GuiyOwner : CoroutineScope {
+class GuiyOwner(
+    initialViewers: Set<Player> = setOf(),
+) : CoroutineScope {
     var hasFrameWaiters = false
     val clock = BroadcastFrameClock { hasFrameWaiters = true }
-    val composeScope = CoroutineScope(Dispatchers.Default) + clock
+    val composeScope = CoroutineScope(guiyPlugin.asyncDispatcher) + clock
+    private val _viewers: MutableStateFlow<Set<Player>> = MutableStateFlow(initialViewers)
+    val viewers = _viewers.asStateFlow()
+
+    //    val mainThreadScope = CoroutineScope(guiyPlugin.minecraftDispatcher) + SupervisorJob()
+    private val viewModels = mutableMapOf<KType, GuiyViewModel>()
     override val coroutineContext: CoroutineContext = composeScope.coroutineContext
 
     private val rootNode = LayoutNode()
@@ -57,15 +65,29 @@ class GuiyOwner : CoroutineScope {
 
     var exitScheduled = false
 
+    fun removeViewers(vararg viewers: Player) {
+        _viewers.update { it - viewers }
+        if(_viewers.value.isEmpty()) {
+            exit()
+        }
+    }
+
     fun exit() {
         exitScheduled = true
+    }
+
+    fun <T> getViewModel(type: KType): T? {
+        return viewModels[type] as? T
+    }
+
+    fun addViewModel(type: KType, viewModel: GuiyViewModel) {
+        viewModels[type] = viewModel
     }
 
     fun start(content: @Composable () -> Unit) {
         !running || return
         running = true
 
-        GuiyScopeManager.scopes += composeScope
         launch {
             recomposer.runRecomposeAndApplyChanges()
         }
@@ -86,7 +108,9 @@ class GuiyOwner : CoroutineScope {
             recomposer.close()
             snapshotHandle.dispose()
             composition.dispose()
+            viewModels.values.forEach { it.close() }
             composeScope.cancel()
+//            mainThreadScope.cancel()
         }
     }
 
@@ -116,9 +140,10 @@ class GuiyOwner : CoroutineScope {
 }
 
 fun guiy(
-    content: @Composable () -> Unit
+    vararg initialViewers: Player,
+    content: @Composable () -> Unit,
 ): GuiyOwner {
-    return GuiyOwner().apply {
+    return GuiyOwner(initialViewers.toSet()).apply {
         start {
             GuiyCompositionLocal(this) {
                 content()

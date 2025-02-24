@@ -10,7 +10,6 @@ import org.bukkit.entity.Player
 
 @Composable
 fun AnimatedTitle(player: Player) {
-    val owner = LocalGuiyOwner.current
     var seconds by remember { mutableStateOf(0) }
     LaunchedEffect(Unit) {
         while (true) {
@@ -19,9 +18,7 @@ fun AnimatedTitle(player: Player) {
         }
     }
     Chest(
-        setOf(player),
-        "<red>${seconds}s have passed!",
-        onClose = { owner.exit() },
+        title = "<red>${seconds}s have passed!",
         modifier = Modifier.fillMaxHeight()
     ) {
     }

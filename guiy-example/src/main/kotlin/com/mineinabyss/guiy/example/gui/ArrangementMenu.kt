@@ -3,7 +3,6 @@ package com.mineinabyss.guiy.example.gui
 import androidx.compose.runtime.Composable
 import com.mineinabyss.guiy.components.Item
 import com.mineinabyss.guiy.components.canvases.Chest
-import com.mineinabyss.guiy.inventory.LocalGuiyOwner
 import com.mineinabyss.guiy.jetpack.Arrangement
 import com.mineinabyss.guiy.layout.Column
 import com.mineinabyss.guiy.layout.Row
@@ -11,15 +10,11 @@ import com.mineinabyss.guiy.modifiers.Modifier
 import com.mineinabyss.guiy.modifiers.fillMaxSize
 import com.mineinabyss.guiy.modifiers.fillMaxWidth
 import org.bukkit.Material
-import org.bukkit.entity.Player
 
 @Composable
-fun ArrangementMenu(player: Player) {
-    val owner = LocalGuiyOwner.current
+fun ArrangementMenu() {
     Chest(
-        setOf(player),
         "Arrangement example",
-        onClose = { owner.exit() },
         modifier = Modifier.fillMaxSize()
     ) {
         Column {

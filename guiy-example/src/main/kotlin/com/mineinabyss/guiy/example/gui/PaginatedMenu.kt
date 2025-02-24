@@ -6,22 +6,17 @@ import com.mineinabyss.guiy.components.Item
 import com.mineinabyss.guiy.components.canvases.Chest
 import com.mineinabyss.guiy.components.lists.NavbarPosition
 import com.mineinabyss.guiy.components.lists.Paginated
-import com.mineinabyss.guiy.inventory.LocalGuiyOwner
 import com.mineinabyss.guiy.modifiers.Modifier
 import com.mineinabyss.guiy.modifiers.click.clickable
 import com.mineinabyss.guiy.modifiers.fillMaxSize
 import com.mineinabyss.guiy.modifiers.size
 import org.bukkit.Material
-import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 
 @Composable
-fun PaginatedMenu(player: Player) {
-    val owner = LocalGuiyOwner.current
+fun PaginatedMenu() {
     Chest(
-        setOf(player),
         "Pagination example",
-        onClose = { owner.exit() },
         modifier = Modifier.fillMaxSize()
     ) {
         var items by remember {
