@@ -1,6 +1,7 @@
 package com.mineinabyss.guiy.components.canvases
 
 import androidx.compose.runtime.*
+import com.mineinabyss.guiy.components.rememberMiniMsg
 import com.mineinabyss.guiy.components.state.IntCoordinates
 import com.mineinabyss.guiy.inventory.LocalGuiyOwner
 import com.mineinabyss.guiy.layout.Layout
@@ -33,7 +34,8 @@ fun Chest(
     onClose: (InventoryCloseScope.(player: Player) -> Unit) = { exit() },
     content: @Composable () -> Unit,
 ) {
-    Chest(title.miniMsg(), modifier, onClose, content)
+    val titleMM = rememberMiniMsg(title)
+    Chest(titleMM, modifier, onClose, content)
 }
 
 /**
@@ -74,7 +76,7 @@ fun Chest(
 
     val inventory: Inventory = remember(size) {
         Bukkit.createInventory(holder, CHEST_WIDTH * size.height, title).also {
-            holder.activeInventory = it
+            holder.setActiveInventory(it)
         }
     }
 

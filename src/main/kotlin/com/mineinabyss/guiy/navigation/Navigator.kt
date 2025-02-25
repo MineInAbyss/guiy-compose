@@ -8,7 +8,6 @@ import com.github.shynixn.mccoroutine.bukkit.launch
 import com.mineinabyss.guiy.guiyPlugin
 import org.bukkit.entity.Player
 
-
 class Navigator<T>(val default: () -> T) {
     private val screen: T? get() = screens.lastOrNull()
     private val screens = mutableStateListOf<T>()
