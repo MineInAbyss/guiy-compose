@@ -1,7 +1,6 @@
 package com.mineinabyss.guiy.components.canvases
 
 import androidx.compose.runtime.*
-import com.github.shynixn.mccoroutine.bukkit.launch
 import com.github.shynixn.mccoroutine.bukkit.minecraftDispatcher
 import com.mineinabyss.guiy.components.state.IntCoordinates
 import com.mineinabyss.guiy.guiyPlugin
@@ -11,13 +10,12 @@ import com.mineinabyss.guiy.inventory.LocalGuiyOwner
 import com.mineinabyss.guiy.inventory.MapBackedGuiyCanvas
 import com.mineinabyss.guiy.layout.Layout
 import com.mineinabyss.guiy.layout.Renderer
+import com.mineinabyss.guiy.layout.StaticMeasurePolicy
 import com.mineinabyss.guiy.modifiers.Modifier
 import com.mineinabyss.guiy.nodes.GuiyNode
-import com.mineinabyss.guiy.layout.StaticMeasurePolicy
 import com.mineinabyss.idofront.entities.title
 import kotlinx.coroutines.withContext
 import net.kyori.adventure.text.Component
-import org.bukkit.entity.Player
 import org.bukkit.event.inventory.InventoryCloseEvent
 import org.bukkit.inventory.Inventory
 
@@ -42,8 +40,8 @@ fun Inventory(
 ) {
     val viewers by LocalGuiyOwner.current.viewers.collectAsState()
 
-    // This just sends a packet, doesn't need to be on sync thread
-    LaunchedEffect(title) {
+    // Update title
+    LaunchedEffect(title, viewers) {
         if (title != null) inventory.viewers.forEach { it.openInventory.title(title) }
     }
 
@@ -64,6 +62,7 @@ fun Inventory(
             }
         }
     }
+
     val canvas = remember { MapBackedGuiyCanvas() }
 
     CompositionLocalProvider(

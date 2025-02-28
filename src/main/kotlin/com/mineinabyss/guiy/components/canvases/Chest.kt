@@ -3,18 +3,17 @@ package com.mineinabyss.guiy.components.canvases
 import androidx.compose.runtime.*
 import com.mineinabyss.guiy.components.rememberMiniMsg
 import com.mineinabyss.guiy.components.state.IntCoordinates
+import com.mineinabyss.guiy.inventory.GuiyInventory
 import com.mineinabyss.guiy.inventory.GuiyInventoryHolder
-import com.mineinabyss.guiy.inventory.LocalGuiyOwner
+import com.mineinabyss.guiy.inventory.InventoryCloseScope
 import com.mineinabyss.guiy.layout.Layout
 import com.mineinabyss.guiy.layout.Size
+import com.mineinabyss.guiy.layout.StaticMeasurePolicy
 import com.mineinabyss.guiy.modifiers.Modifier
 import com.mineinabyss.guiy.modifiers.onSizeChanged
 import com.mineinabyss.guiy.modifiers.sizeIn
-import com.mineinabyss.guiy.inventory.InventoryCloseScope
-import com.mineinabyss.guiy.layout.StaticMeasurePolicy
 import net.kyori.adventure.text.Component
 import org.bukkit.Bukkit
-import org.bukkit.entity.Player
 import org.bukkit.inventory.Inventory
 
 const val CHEST_WIDTH = 9
@@ -30,7 +29,7 @@ const val MAX_CHEST_HEIGHT = 6
 fun Chest(
     title: String,
     modifier: Modifier = Modifier,
-    onClose: (InventoryCloseScope.(player: Player) -> Unit) = { exit() },
+    onClose: InventoryCloseScope.() -> Unit = { exit() },
     content: @Composable () -> Unit,
 ) {
     val titleMM = rememberMiniMsg(title)
@@ -50,7 +49,7 @@ fun Chest(
 fun Chest(
     title: Component,
     modifier: Modifier = Modifier,
-    onClose: (InventoryCloseScope.(player: Player) -> Unit) = {},
+    onClose: InventoryCloseScope.() -> Unit = { exit() },
     content: @Composable () -> Unit,
 ) {
     val holder: GuiyInventoryHolder = LocalInventoryHolder.current
@@ -58,10 +57,6 @@ fun Chest(
     val constrainedModifier =
         Modifier.sizeIn(CHEST_WIDTH, CHEST_WIDTH, MIN_CHEST_HEIGHT, MAX_CHEST_HEIGHT).then(modifier)
             .onSizeChanged { if (size != it) size = it }
-
-    val viewers by LocalGuiyOwner.current.viewers.collectAsState()
-
-    // Create new inventory when any appropriate value changes
 
     // Draw nothing if empty
     if (size == Size()) {
@@ -74,11 +69,10 @@ fun Chest(
 
     val inventory: Inventory = remember(size) {
         Bukkit.createInventory(holder, CHEST_WIDTH * size.height, title).also {
-            holder.setActiveInventory(it)
         }
     }
+    holder.setActiveInventory(GuiyInventory(inventory, onClose))
 
-    //TODO handle sending correct title when player list changes
     Inventory(
         inventory = inventory,
         title = title,

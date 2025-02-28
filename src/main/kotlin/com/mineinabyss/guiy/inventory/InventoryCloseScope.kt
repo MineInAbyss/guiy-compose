@@ -1,9 +1,10 @@
 package com.mineinabyss.guiy.inventory
 
 import androidx.compose.runtime.Stable
+import org.bukkit.entity.Player
 
 @Stable
 interface InventoryCloseScope {
-    fun reopen()
+    val player: Player
     fun exit()
 }

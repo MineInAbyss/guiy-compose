@@ -6,6 +6,7 @@ import com.mineinabyss.guiy.components.rememberMiniMsg
 import com.mineinabyss.guiy.components.state.IntCoordinates
 import com.mineinabyss.guiy.guiyPlugin
 import com.mineinabyss.guiy.inventory.CurrentPlayer
+import com.mineinabyss.guiy.inventory.GuiyInventory
 import com.mineinabyss.guiy.inventory.GuiyInventoryHolder
 import com.mineinabyss.guiy.inventory.InventoryCloseScope
 import com.mineinabyss.guiy.layout.Box
@@ -17,7 +18,6 @@ import com.mineinabyss.idofront.textcomponents.toPlainText
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterNotNull
 import org.bukkit.Bukkit
-import org.bukkit.entity.Player
 import org.bukkit.event.inventory.InventoryType
 import org.bukkit.inventory.Inventory
 
@@ -25,7 +25,7 @@ import org.bukkit.inventory.Inventory
 fun Anvil(
     title: String,
     onTextChanged: (String) -> Unit,
-    onClose: (InventoryCloseScope.(player: Player) -> Unit) = {},
+    onClose: InventoryCloseScope.() -> Unit = { exit() },
     onSubmit: (String) -> Unit = {},
     inputLeft: @Composable () -> Unit = { InvisibleItem() },
     inputRight: @Composable () -> Unit = { InvisibleItem() },
@@ -34,10 +34,12 @@ fun Anvil(
     val holder: GuiyInventoryHolder = LocalInventoryHolder.current
     val player = CurrentPlayer
     val titleMM = rememberMiniMsg(title)
-    val inventory: Inventory =
-        remember(holder) { Bukkit.getServer().createInventory(holder, InventoryType.ANVIL, titleMM) }
-    holder.setActiveInventory(inventory)
+    val inventory: Inventory = remember(holder) {
+        Bukkit.getServer().createInventory(holder, InventoryType.ANVIL, titleMM)
+    }
+    holder.setActiveInventory(GuiyInventory(inventory, onClose))
 
+    // Track updates to anvil text via packets
     var playerViewText by remember(inventory) { mutableStateOf("") }
     LaunchedEffect(player) {
         guiyPlugin.anvilPacketFlow.filter { it?.second == player }.filterNotNull().collect {
@@ -48,7 +50,7 @@ fun Anvil(
         }
     }
 
-    val constrainedModifier = Modifier.Companion.size(width = 3, height = 1)
+    val constrainedModifier = Modifier.size(width = 3, height = 1)
 
     Inventory(
         inventory,
@@ -57,13 +59,13 @@ fun Anvil(
         gridToInventoryIndex = { it.x },
         inventoryIndexToGrid = { IntCoordinates(it, 0) }) {
         Row {
-            Box(Modifier.Companion.size(1)) {
+            Box(Modifier.size(1)) {
                 inputLeft()
             }
-            Box(Modifier.Companion.size(1)) {
+            Box(Modifier.size(1)) {
                 inputRight()
             }
-            Box(Modifier.Companion.size(1).clickable { onSubmit(playerViewText) }) {
+            Box(Modifier.size(1).clickable { onSubmit(playerViewText) }) {
                 output()
             }
         }

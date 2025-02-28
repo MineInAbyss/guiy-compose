@@ -33,13 +33,11 @@ fun ProvideInventoryHolder(content: @Composable () -> Unit) {
 }
 
 @Composable
-fun rememberInventoryHolder(
-    onClose: InventoryCloseScope.(Player) -> Unit = {},
-): GuiyInventoryHolder {
+fun rememberInventoryHolder(): GuiyInventoryHolder {
     val clickHandler = LocalClickHandler.current
     val owner = LocalGuiyOwner.current
     val viewers by owner.viewers.collectAsState()
-    return remember(clickHandler, onClose) {
+    return remember(clickHandler, viewers) {
         object : GuiyInventoryHolder() {
             override fun processClick(scope: ClickScope, event: Cancellable) {
                 clickHandler.processClick(scope)
@@ -50,22 +48,20 @@ fun rememberInventoryHolder(
             }
 
             override fun onClose(player: Player) {
+                val inventory = activeInventory.value ?: return
                 val scope = object : InventoryCloseScope {
-                    override fun reopen() {
-                        guiyPlugin.launch {
-                            delay(1.ticks)
-                            //TODO don't think this reference updates properly in the remember block
-                            viewers.filter { it.openInventory.topInventory != inventory }
-                                .forEach { it.openInventory(inventory) }
-                        }
-                    }
+                    override val player = player
 
                     override fun exit() {
                         owner.exit()
                     }
                 }
-                onClose.invoke(scope, player)
-                closeIfNoLongerViewing(player)
+                inventory.onClose.invoke(scope)
+                if (!owner.exitScheduled) guiyPlugin.launch {
+                    delay(1.ticks)
+                    viewers.filter { it.openInventory.topInventory != inventory }
+                        .forEach { it.openInventory(inventory.inventory) }
+                }
             }
 
             override fun closeIfNoLongerViewing(player: Player) {

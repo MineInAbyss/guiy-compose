@@ -12,7 +12,7 @@ import net.kyori.adventure.text.Component
  * Text with invisible item, use [LocalItemTheme] to choose the invisible item based on your resourcepack.
  */
 @Composable
-fun Text(name: String, vararg lore: String, hideTooltip: Boolean = false, modifier: Modifier = Modifier.Companion) {
+fun Text(name: String, vararg lore: String, hideTooltip: Boolean = false, modifier: Modifier = Modifier) {
     val mmName = rememberMiniMsg(name)
     val mmLore = rememberMiniMsg(*lore).toTypedArray()
     Text(mmName, lore = mmLore, hideTooltip, modifier)
