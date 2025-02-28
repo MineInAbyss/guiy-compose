@@ -1,7 +1,7 @@
 pluginManagement {
     repositories {
-        google()
         gradlePluginPortal()
+        google()
         maven("https://repo.mineinabyss.com/releases")
         maven("https://repo.mineinabyss.com/snapshots")
         maven("https://maven.pkg.jetbrains.space/public/p/compose/dev")

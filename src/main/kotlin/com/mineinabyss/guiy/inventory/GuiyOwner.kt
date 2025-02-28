@@ -2,13 +2,17 @@ package com.mineinabyss.guiy.inventory
 
 import androidx.compose.runtime.*
 import androidx.compose.runtime.snapshots.Snapshot
-import com.github.shynixn.mccoroutine.bukkit.asyncDispatcher
+import com.github.shynixn.mccoroutine.bukkit.minecraftDispatcher
+import com.mineinabyss.guiy.components.canvases.LocalInventoryHolder
+import com.mineinabyss.guiy.components.canvases.ProvideInventoryHolder
+import com.mineinabyss.guiy.components.canvases.rememberInventoryHolder
 import com.mineinabyss.guiy.guiyPlugin
 import com.mineinabyss.guiy.layout.LayoutNode
 import com.mineinabyss.guiy.modifiers.Constraints
 import com.mineinabyss.guiy.modifiers.click.ClickScope
 import com.mineinabyss.guiy.modifiers.drag.DragScope
 import com.mineinabyss.guiy.nodes.GuiyNodeApplier
+import com.mineinabyss.guiy.viewmodel.GuiyViewModel
 import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -16,7 +20,6 @@ import kotlinx.coroutines.flow.update
 import org.bukkit.entity.Player
 import kotlin.coroutines.CoroutineContext
 import kotlin.reflect.KType
-import kotlin.reflect.typeOf
 
 data class ClickResult(
     val cancelBukkitEvent: Boolean? = null,
@@ -38,7 +41,7 @@ class GuiyOwner(
 ) : CoroutineScope {
     var hasFrameWaiters = false
     val clock = BroadcastFrameClock { hasFrameWaiters = true }
-    val composeScope = CoroutineScope(guiyPlugin.asyncDispatcher) + clock
+    val composeScope = CoroutineScope(guiyPlugin.minecraftDispatcher + Dispatchers.Default) + clock
     private val _viewers: MutableStateFlow<Set<Player>> = MutableStateFlow(initialViewers)
     val viewers = _viewers.asStateFlow()
 
@@ -67,7 +70,7 @@ class GuiyOwner(
 
     fun removeViewers(vararg viewers: Player) {
         _viewers.update { it - viewers }
-        if(_viewers.value.isEmpty()) {
+        if (_viewers.value.isEmpty()) {
             exit()
         }
     }
@@ -117,23 +120,28 @@ class GuiyOwner(
     private fun setContent(content: @Composable () -> Unit) {
         hasFrameWaiters = true
         composition.setContent {
-            CompositionLocalProvider(LocalClickHandler provides object : ClickHandler {
-                override fun processClick(scope: ClickScope): ClickResult {
-                    val slot = scope.slot
-                    val width = rootNode.width
-                    return rootNode.children.fold(ClickResult()) { acc, node ->
-                        val w = node.width
-                        val x = if (w == 0) 0 else slot % width
-                        val y = if (w == 0) 0 else slot / width
-                        acc.mergeWith(rootNode.processClick(scope, x, y))
+            CompositionLocalProvider(
+                LocalGuiyOwner provides this,
+                LocalClickHandler provides object : ClickHandler {
+                    override fun processClick(scope: ClickScope): ClickResult {
+                        val slot = scope.slot
+                        val width = rootNode.width
+                        return rootNode.children.fold(ClickResult()) { acc, node ->
+                            val w = node.width
+                            val x = if (w == 0) 0 else slot % width
+                            val y = if (w == 0) 0 else slot / width
+                            acc.mergeWith(rootNode.processClick(scope, x, y))
+                        }
                     }
-                }
 
-                override fun processDrag(scope: DragScope) {
-                    rootNode.processDrag(scope)
+                    override fun processDrag(scope: DragScope) {
+                        rootNode.processDrag(scope)
+                    }
+                }) {
+                // A default inventory holder for most usecases
+                ProvideInventoryHolder {
+                    content()
                 }
-            }) {
-                content()
             }
         }
     }
@@ -145,18 +153,7 @@ fun guiy(
 ): GuiyOwner {
     return GuiyOwner(initialViewers.toSet()).apply {
         start {
-            GuiyCompositionLocal(this) {
-                content()
-            }
+            content()
         }
-    }
-}
-
-@Composable
-fun GuiyCompositionLocal(owner: GuiyOwner, content: @Composable () -> Unit) {
-    CompositionLocalProvider(
-        LocalGuiyOwner provides owner
-    ) {
-        content()
     }
 }

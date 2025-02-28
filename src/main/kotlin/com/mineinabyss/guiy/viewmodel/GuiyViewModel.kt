@@ -1,9 +1,10 @@
-package com.mineinabyss.guiy.inventory
+package com.mineinabyss.guiy.viewmodel
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import com.github.shynixn.mccoroutine.bukkit.minecraftDispatcher
 import com.mineinabyss.guiy.guiyPlugin
+import com.mineinabyss.guiy.inventory.LocalGuiyOwner
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel

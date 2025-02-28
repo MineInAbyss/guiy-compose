@@ -5,13 +5,18 @@ import com.github.shynixn.mccoroutine.bukkit.launch
 import com.github.shynixn.mccoroutine.bukkit.minecraftDispatcher
 import com.mineinabyss.guiy.components.state.IntCoordinates
 import com.mineinabyss.guiy.guiyPlugin
-import com.mineinabyss.guiy.inventory.*
+import com.mineinabyss.guiy.inventory.GuiyCanvas
+import com.mineinabyss.guiy.inventory.LocalCanvas
+import com.mineinabyss.guiy.inventory.LocalGuiyOwner
+import com.mineinabyss.guiy.inventory.MapBackedGuiyCanvas
 import com.mineinabyss.guiy.layout.Layout
 import com.mineinabyss.guiy.layout.Renderer
 import com.mineinabyss.guiy.modifiers.Modifier
 import com.mineinabyss.guiy.nodes.GuiyNode
-import com.mineinabyss.guiy.nodes.StaticMeasurePolicy
+import com.mineinabyss.guiy.layout.StaticMeasurePolicy
+import com.mineinabyss.idofront.entities.title
 import kotlinx.coroutines.withContext
+import net.kyori.adventure.text.Component
 import org.bukkit.entity.Player
 import org.bukkit.event.inventory.InventoryCloseEvent
 import org.bukkit.inventory.Inventory
@@ -29,20 +34,19 @@ val LocalInventory: ProvidableCompositionLocal<Inventory> =
 @Composable
 fun Inventory(
     inventory: Inventory,
-    viewers: Set<Player>,
+    title: Component? = null,
     modifier: Modifier = Modifier,
     gridToInventoryIndex: (IntCoordinates) -> Int?,
     inventoryIndexToGrid: (Int) -> IntCoordinates,
     content: @Composable () -> Unit,
 ) {
-    // Close inventory when it switches to a new one
-    DisposableEffect(inventory) {
-        onDispose {
-            guiyPlugin.launch {
-                inventory.close()
-            }
-        }
+    val viewers by LocalGuiyOwner.current.viewers.collectAsState()
+
+    // This just sends a packet, doesn't need to be on sync thread
+    LaunchedEffect(title) {
+        if (title != null) inventory.viewers.forEach { it.openInventory.title(title) }
     }
+
     // Manage opening inventory for new viewers or when inventory changes
     LaunchedEffect(viewers, inventory) {
         val oldViewers = inventory.viewers.toSet()

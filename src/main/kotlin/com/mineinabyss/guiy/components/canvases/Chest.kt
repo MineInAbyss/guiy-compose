@@ -3,16 +3,15 @@ package com.mineinabyss.guiy.components.canvases
 import androidx.compose.runtime.*
 import com.mineinabyss.guiy.components.rememberMiniMsg
 import com.mineinabyss.guiy.components.state.IntCoordinates
+import com.mineinabyss.guiy.inventory.GuiyInventoryHolder
 import com.mineinabyss.guiy.inventory.LocalGuiyOwner
 import com.mineinabyss.guiy.layout.Layout
 import com.mineinabyss.guiy.layout.Size
 import com.mineinabyss.guiy.modifiers.Modifier
 import com.mineinabyss.guiy.modifiers.onSizeChanged
 import com.mineinabyss.guiy.modifiers.sizeIn
-import com.mineinabyss.guiy.nodes.InventoryCloseScope
-import com.mineinabyss.guiy.nodes.StaticMeasurePolicy
-import com.mineinabyss.idofront.entities.title
-import com.mineinabyss.idofront.textcomponents.miniMsg
+import com.mineinabyss.guiy.inventory.InventoryCloseScope
+import com.mineinabyss.guiy.layout.StaticMeasurePolicy
 import net.kyori.adventure.text.Component
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
@@ -54,14 +53,13 @@ fun Chest(
     onClose: (InventoryCloseScope.(player: Player) -> Unit) = {},
     content: @Composable () -> Unit,
 ) {
+    val holder: GuiyInventoryHolder = LocalInventoryHolder.current
     var size by remember { mutableStateOf(Size()) }
     val constrainedModifier =
         Modifier.sizeIn(CHEST_WIDTH, CHEST_WIDTH, MIN_CHEST_HEIGHT, MAX_CHEST_HEIGHT).then(modifier)
-        .onSizeChanged { if (size != it) size = it }
+            .onSizeChanged { if (size != it) size = it }
 
-    val owner = LocalGuiyOwner.current
-    val viewers by owner.viewers.collectAsState()
-    val holder = rememberInventoryHolder(viewers, onClose)
+    val viewers by LocalGuiyOwner.current.viewers.collectAsState()
 
     // Create new inventory when any appropriate value changes
 
@@ -80,15 +78,10 @@ fun Chest(
         }
     }
 
-    LaunchedEffect(title) {
-        // This just sends a packet, doesn't need to be on sync thread
-        inventory.viewers.forEach { it.openInventory.title(title) }
-    }
-
     //TODO handle sending correct title when player list changes
     Inventory(
         inventory = inventory,
-        viewers = viewers,
+        title = title,
         modifier = constrainedModifier,
         gridToInventoryIndex = { (x, y) ->
             if (x !in 0 until CHEST_WIDTH || y !in 0 until size.height) null
@@ -101,3 +94,4 @@ fun Chest(
         content()
     }
 }
+

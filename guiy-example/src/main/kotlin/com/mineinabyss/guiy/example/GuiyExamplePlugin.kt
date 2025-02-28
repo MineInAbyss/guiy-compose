@@ -10,32 +10,37 @@ class GuiyExamplePlugin : JavaPlugin() {
         "guiyexample" {
             "arrangement" {
                 playerExecutes {
-                    guiy { ArrangementMenu() }
+                    guiy(player) { ArrangementMenu() }
                 }
             }
             "animated" {
                 playerExecutes {
-                    guiy { AnimatedTitle(player) }
+                    guiy(player) { AnimatedTitle() }
                 }
             }
             "creative" {
                 playerExecutes {
-                    guiy { CreativeMenu() }
+                    guiy(player) { CreativeMenu() }
                 }
             }
             "cursor" {
                 playerExecutes {
-                    guiy { Cursor() }
+                    guiy(player) { Cursor() }
                 }
             }
             "pagination" {
                 playerExecutes {
-                    guiy { PaginatedMenu() }
+                    guiy(player) { PaginatedMenu() }
                 }
             }
             "scrolling" {
                 playerExecutes {
-                    guiy { ScrollingMenu() }
+                    guiy(player) { ScrollingMenu() }
+                }
+            }
+            "anvil" {
+                playerExecutes {
+                    guiy(player) { AnvilGUI() }
                 }
             }
         }

@@ -1,28 +1,45 @@
 package com.mineinabyss.guiy.components.canvases
 
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import com.github.shynixn.mccoroutine.bukkit.launch
 import com.mineinabyss.guiy.guiyPlugin
 import com.mineinabyss.guiy.inventory.GuiyInventoryHolder
+import com.mineinabyss.guiy.inventory.InventoryCloseScope
 import com.mineinabyss.guiy.inventory.LocalClickHandler
 import com.mineinabyss.guiy.inventory.LocalGuiyOwner
 import com.mineinabyss.guiy.modifiers.click.ClickScope
 import com.mineinabyss.guiy.modifiers.drag.DragScope
-import com.mineinabyss.guiy.nodes.InventoryCloseScope
 import com.mineinabyss.idofront.time.ticks
 import kotlinx.coroutines.delay
 import org.bukkit.entity.Player
 import org.bukkit.event.Cancellable
 
+val LocalInventoryHolder = compositionLocalOf<GuiyInventoryHolder> { error("No local inventory holder defined") }
+
 @Composable
-inline fun rememberInventoryHolder(
-    viewers: Set<Player>,
-    crossinline onClose: InventoryCloseScope.(Player) -> Unit = {},
+fun ProvideInventoryHolder(content: @Composable () -> Unit) {
+    val holder = rememberInventoryHolder()
+
+    // Close inventory when disposing
+    DisposableEffect(holder) {
+        onDispose {
+            guiyPlugin.launch { holder.inventory.close() }
+        }
+    }
+
+    CompositionLocalProvider(LocalInventoryHolder provides holder) {
+        content()
+    }
+}
+
+@Composable
+fun rememberInventoryHolder(
+    onClose: InventoryCloseScope.(Player) -> Unit = {},
 ): GuiyInventoryHolder {
     val clickHandler = LocalClickHandler.current
     val owner = LocalGuiyOwner.current
-    return remember(clickHandler) {
+    val viewers by owner.viewers.collectAsState()
+    return remember(clickHandler, onClose) {
         object : GuiyInventoryHolder() {
             override fun processClick(scope: ClickScope, event: Cancellable) {
                 clickHandler.processClick(scope)
@@ -35,9 +52,12 @@ inline fun rememberInventoryHolder(
             override fun onClose(player: Player) {
                 val scope = object : InventoryCloseScope {
                     override fun reopen() {
-                        //TODO don't think this reference updates properly in the remember block
-                        viewers.filter { it.openInventory.topInventory != inventory }
-                            .forEach { it.openInventory(inventory) }
+                        guiyPlugin.launch {
+                            delay(1.ticks)
+                            //TODO don't think this reference updates properly in the remember block
+                            viewers.filter { it.openInventory.topInventory != inventory }
+                                .forEach { it.openInventory(inventory) }
+                        }
                     }
 
                     override fun exit() {
