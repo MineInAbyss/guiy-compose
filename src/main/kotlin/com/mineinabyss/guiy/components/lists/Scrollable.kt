@@ -5,6 +5,7 @@ import com.mineinabyss.guiy.components.Spacer
 import com.mineinabyss.guiy.layout.Box
 import com.mineinabyss.guiy.layout.Size
 import com.mineinabyss.guiy.modifiers.Modifier
+import com.mineinabyss.guiy.modifiers.click.clickable
 import com.mineinabyss.guiy.modifiers.fillMaxSize
 import com.mineinabyss.guiy.modifiers.onSizeChanged
 import com.mineinabyss.idofront.items.editItemMeta
@@ -24,6 +25,7 @@ enum class ScrollDirection {
 fun <T> Scrollable(
     items: List<T>,
     line: Int,
+    onLineChange: (line: Int) -> Unit,
     scrollDirection: ScrollDirection,
     nextButton: @Composable () -> Unit,
     previousButton: @Composable () -> Unit,
@@ -38,20 +40,26 @@ fun <T> Scrollable(
     var size by remember { mutableStateOf(Size(0, 0)) }
     val itemsPerLine = if (scrollDirection == ScrollDirection.VERTICAL) size.width else size.height
     val totalLines = if (scrollDirection == ScrollDirection.VERTICAL) size.height else size.width
+    val lineCount = if(itemsPerLine == 0) 1 else (-((-items.size).floorDiv(itemsPerLine))).coerceAtLeast(1)
+    val coercedLine = line.coerceIn(0, lineCount - 1)
     Box(Modifier.fillMaxSize()) {
-        val start = line * itemsPerLine
+        val start = coercedLine * itemsPerLine
         val end = start + (itemsPerLine * totalLines)
         val pageItems = remember(items, start, end) {
-            if (start < 0) emptyList()
+            if (start < 0 || start >= items.size) emptyList()
             else items.subList(start, end.coerceAtMost(items.size))
         }
         NavbarLayout(
             position = navbarPosition,
             navbar = {
                 NavbarButtons(navbarPosition, navbarBackground) {
-                    if (line > 0) previousButton()
+                    if (coercedLine > 0) Box(Modifier.clickable { onLineChange(coercedLine - 1) }) {
+                        previousButton()
+                    }
                     else Spacer(1, 1)
-                    if (end < items.size) nextButton()
+                    if (end < items.size) Box(Modifier.clickable { onLineChange(coercedLine + 1) }) {
+                        nextButton()
+                    }
                     else Spacer(1, 1)
                 }
             },

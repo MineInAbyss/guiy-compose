@@ -21,15 +21,16 @@ fun PaginatedMenu() {
     ) {
         var items by remember {
             val materials = Material.entries
-            mutableStateOf((1..100).map { ItemStack(materials[it]) })
+            mutableStateOf((1..103).map { ItemStack(materials[it]) })
         }
         var page by remember { mutableStateOf(0) }
         Paginated(
             items,
             page = page,
+            onPageChange = { page = it },
             navbarPosition = NavbarPosition.END,
-            previousButton = { Item(Material.RED_CONCRETE, "Previous", modifier = Modifier.clickable { page-- }) },
-            nextButton = { Item(Material.BLUE_CONCRETE, "Next", modifier = Modifier.clickable { page++ }) },
+            previousButton = { Item(Material.RED_CONCRETE, "Previous") },
+            nextButton = { Item(Material.BLUE_CONCRETE, "Next") },
         ) { pageItems ->
             HorizontalGrid(Modifier.size(4, 5)) {
                 pageItems.forEach { item ->

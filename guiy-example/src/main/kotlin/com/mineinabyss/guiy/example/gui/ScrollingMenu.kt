@@ -27,10 +27,11 @@ fun ScrollingMenu() {
         Scrollable(
             items,
             line = line,
+            onLineChange = { line = it },
             scrollDirection = ScrollDirection.VERTICAL,
             navbarPosition = NavbarPosition.END,
-            previousButton = { Item(Material.RED_CONCRETE, "Previous", modifier = Modifier.clickable { line-- }) },
-            nextButton = { Item(Material.BLUE_CONCRETE, "Next", modifier = Modifier.clickable { line++ }) },
+            previousButton = { Item(Material.RED_CONCRETE, "Previous") },
+            nextButton = { Item(Material.BLUE_CONCRETE, "Next") },
         ) { pageItems ->
             VerticalGrid(Modifier.fillMaxSize()) {
                 pageItems.forEach { item ->
