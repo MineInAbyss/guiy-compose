@@ -37,7 +37,6 @@ fun Anvil(
     val inventory: Inventory = remember(holder) {
         Bukkit.getServer().createInventory(holder, InventoryType.ANVIL, titleMM)
     }
-    holder.setActiveInventory(GuiyInventory(inventory, onClose))
 
     // Track updates to anvil text via packets
     var playerViewText by remember(inventory) { mutableStateOf("") }
@@ -54,6 +53,7 @@ fun Anvil(
 
     Inventory(
         inventory,
+        onClose = onClose,
         title = titleMM,
         modifier = constrainedModifier,
         gridToInventoryIndex = { it.x },

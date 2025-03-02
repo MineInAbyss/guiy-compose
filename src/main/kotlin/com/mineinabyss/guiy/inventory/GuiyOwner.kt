@@ -3,9 +3,7 @@ package com.mineinabyss.guiy.inventory
 import androidx.compose.runtime.*
 import androidx.compose.runtime.snapshots.Snapshot
 import com.github.shynixn.mccoroutine.bukkit.minecraftDispatcher
-import com.mineinabyss.guiy.components.canvases.LocalInventoryHolder
-import com.mineinabyss.guiy.components.canvases.ProvideInventoryHolder
-import com.mineinabyss.guiy.components.canvases.rememberInventoryHolder
+import com.mineinabyss.guiy.components.canvases.InventoryHolder
 import com.mineinabyss.guiy.guiyPlugin
 import com.mineinabyss.guiy.layout.LayoutNode
 import com.mineinabyss.guiy.modifiers.Constraints
@@ -22,11 +20,11 @@ import kotlin.coroutines.CoroutineContext
 import kotlin.reflect.KType
 
 data class ClickResult(
-    val cancelBukkitEvent: Boolean? = null,
+    val clickConsumed: Boolean? = null,
 ) {
     fun mergeWith(other: ClickResult) = ClickResult(
         // Prioritize true > false > null
-        cancelBukkitEvent = (cancelBukkitEvent ?: other.cancelBukkitEvent)?.or(other.cancelBukkitEvent ?: false)
+        clickConsumed = (clickConsumed ?: other.clickConsumed)?.or(other.clickConsumed == true)
     )
 }
 
@@ -130,7 +128,9 @@ class GuiyOwner(
                             val w = node.width
                             val x = if (w == 0) 0 else slot % width
                             val y = if (w == 0) 0 else slot / width
-                            acc.mergeWith(rootNode.processClick(scope, x, y))
+                            val processed = rootNode.processClick(scope, x, y)
+                            if (processed.clickConsumed == true) return processed
+                            acc.mergeWith(processed)
                         }
                     }
 
@@ -139,7 +139,7 @@ class GuiyOwner(
                     }
                 }) {
                 // A default inventory holder for most usecases
-                ProvideInventoryHolder {
+                InventoryHolder {
                     content()
                 }
             }

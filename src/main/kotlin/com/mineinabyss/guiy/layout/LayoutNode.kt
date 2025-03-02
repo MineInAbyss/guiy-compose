@@ -7,7 +7,10 @@ import com.mineinabyss.guiy.components.state.ItemPositions
 import com.mineinabyss.guiy.inventory.ClickResult
 import com.mineinabyss.guiy.inventory.GuiyCanvas
 import com.mineinabyss.guiy.inventory.OffsetCanvas
-import com.mineinabyss.guiy.modifiers.*
+import com.mineinabyss.guiy.modifiers.Constraints
+import com.mineinabyss.guiy.modifiers.LayoutChangingModifier
+import com.mineinabyss.guiy.modifiers.Modifier
+import com.mineinabyss.guiy.modifiers.OnSizeChangedModifier
 import com.mineinabyss.guiy.modifiers.click.ClickModifier
 import com.mineinabyss.guiy.modifiers.click.ClickScope
 import com.mineinabyss.guiy.modifiers.drag.DragModifier
@@ -100,20 +103,25 @@ internal class LayoutNode : Measurable, Placeable, GuiyNode {
         renderer.apply { offsetCanvas?.renderAfterChildren(this@LayoutNode) }
     }
 
-    /**
-     * @return Whether no elements were clickable or any element requested the bukkit click event to be cancelled.
-     */
     fun processClick(scope: ClickScope, x: Int, y: Int): ClickResult {
-        val cancelClickEvent = get<ClickModifier>()?.run {
-            onClick.invoke(scope)
-            cancelClickEvent
-        }
-        return children
+        val childResult = children
             .filter { x in it.x until (it.x + it.width) && y in it.y until (it.y + it.height) }
-            .fold(ClickResult(cancelClickEvent)) { acc, it ->
-                acc.mergeWith(it.processClick(scope, x - it.x, y - it.y))
+            .foldRight(ClickResult()) { it, acc ->
+                val processed = it.processClick(scope, x - it.x, y - it.y)
+                if (processed.clickConsumed == true) {
+                    return processed
+                }
+                acc.mergeWith(processed)
             }
+
+        if (childResult.clickConsumed != true) get<ClickModifier>()?.run {
+            onClick.invoke(scope)
+            if (consumeClick) return ClickResult(true)
+        }
+
+        return childResult
     }
+
 
     data class DragInfo(
         val dragModifier: DragModifier,

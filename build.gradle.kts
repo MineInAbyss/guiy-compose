@@ -32,7 +32,6 @@ dependencies {
     compileOnly(idofrontLibs.kotlinx.coroutines)
     compileOnly(idofrontLibs.minecraft.mccoroutine)
     compileOnly(idofrontLibs.kotlin.reflect)
-    compileOnly(idofrontLibs.minecraft.anvilgui)
 
     // Shaded
     api(compose.runtime) {

@@ -2,6 +2,7 @@ package com.mineinabyss.guiy.components.canvases
 
 import androidx.compose.runtime.*
 import com.github.shynixn.mccoroutine.bukkit.launch
+import com.github.shynixn.mccoroutine.bukkit.minecraftDispatcher
 import com.mineinabyss.guiy.guiyPlugin
 import com.mineinabyss.guiy.inventory.GuiyInventoryHolder
 import com.mineinabyss.guiy.inventory.InventoryCloseScope
@@ -11,19 +12,40 @@ import com.mineinabyss.guiy.modifiers.click.ClickScope
 import com.mineinabyss.guiy.modifiers.drag.DragScope
 import com.mineinabyss.idofront.time.ticks
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.withContext
 import org.bukkit.entity.Player
 import org.bukkit.event.Cancellable
+import org.bukkit.event.inventory.InventoryCloseEvent
 
 val LocalInventoryHolder = compositionLocalOf<GuiyInventoryHolder> { error("No local inventory holder defined") }
 
 @Composable
-fun ProvideInventoryHolder(content: @Composable () -> Unit) {
+fun InventoryHolder(content: @Composable () -> Unit) {
     val holder = rememberInventoryHolder()
-
     // Close inventory when disposing
     DisposableEffect(holder) {
         onDispose {
             guiyPlugin.launch { holder.inventory.close() }
+        }
+    }
+    val viewers by LocalGuiyOwner.current.viewers.collectAsState()
+    val inventory = holder.activeInventory.collectAsState().value
+
+    // Manage opening inventory for new viewers or when inventory changes
+    LaunchedEffect(viewers, inventory) {
+        val oldViewers = inventory?.inventory?.viewers?.toSet() ?: return@LaunchedEffect
+
+        withContext(guiyPlugin.minecraftDispatcher) {
+            // Close inventory for removed viewers
+            (oldViewers - viewers).forEach {
+                it.closeInventory(InventoryCloseEvent.Reason.PLUGIN)
+            }
+
+            // Open inventory for new viewers
+            (viewers - oldViewers).forEach {
+                it.closeInventory(InventoryCloseEvent.Reason.PLUGIN)
+                it.openInventory(inventory.inventory)
+            }
         }
     }
 

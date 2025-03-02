@@ -1,22 +1,18 @@
 package com.mineinabyss.guiy.components.canvases
 
 import androidx.compose.runtime.*
-import com.github.shynixn.mccoroutine.bukkit.minecraftDispatcher
 import com.mineinabyss.guiy.components.state.IntCoordinates
 import com.mineinabyss.guiy.guiyPlugin
-import com.mineinabyss.guiy.inventory.GuiyCanvas
-import com.mineinabyss.guiy.inventory.LocalCanvas
-import com.mineinabyss.guiy.inventory.LocalGuiyOwner
-import com.mineinabyss.guiy.inventory.MapBackedGuiyCanvas
+import com.mineinabyss.guiy.inventory.*
 import com.mineinabyss.guiy.layout.Layout
 import com.mineinabyss.guiy.layout.Renderer
 import com.mineinabyss.guiy.layout.StaticMeasurePolicy
 import com.mineinabyss.guiy.modifiers.Modifier
+import com.mineinabyss.guiy.modifiers.click.clickable
 import com.mineinabyss.guiy.nodes.GuiyNode
 import com.mineinabyss.idofront.entities.title
-import kotlinx.coroutines.withContext
+import com.mineinabyss.idofront.messaging.injectedLogger
 import net.kyori.adventure.text.Component
-import org.bukkit.event.inventory.InventoryCloseEvent
 import org.bukkit.inventory.Inventory
 
 val LocalInventory: ProvidableCompositionLocal<Inventory> =
@@ -32,38 +28,32 @@ val LocalInventory: ProvidableCompositionLocal<Inventory> =
 @Composable
 fun Inventory(
     inventory: Inventory,
+    onClose: InventoryCloseScope.() -> Unit,
     title: Component? = null,
     modifier: Modifier = Modifier,
     gridToInventoryIndex: (IntCoordinates) -> Int?,
     inventoryIndexToGrid: (Int) -> IntCoordinates,
     content: @Composable () -> Unit,
 ) {
-    val viewers by LocalGuiyOwner.current.viewers.collectAsState()
+    val holder: GuiyInventoryHolder = LocalInventoryHolder.current
 
     // Update title
-    LaunchedEffect(title, viewers) {
+    LaunchedEffect(title) {
         if (title != null) inventory.viewers.forEach { it.openInventory.title(title) }
     }
 
-    // Manage opening inventory for new viewers or when inventory changes
-    LaunchedEffect(viewers, inventory) {
-        val oldViewers = inventory.viewers.toSet()
+    val canvas = remember { MapBackedGuiyCanvas() }
 
-        withContext(guiyPlugin.minecraftDispatcher) {
-            // Close inventory for removed viewers
-            (oldViewers - viewers).forEach {
-                it.closeInventory(InventoryCloseEvent.Reason.PLUGIN)
-            }
+    val existingInventory = runCatching { LocalInventory.current }.getOrNull()
 
-            // Open inventory for new viewers
-            (viewers - oldViewers).forEach {
-                it.closeInventory(InventoryCloseEvent.Reason.PLUGIN)
-                it.openInventory(inventory)
+    if (existingInventory != null) {
+        SideEffect {
+            guiyPlugin.injectedLogger().e {
+                "Creating inventory $inventory inside other inventory ($existingInventory), Guiy does not support this yet."
             }
         }
+        return
     }
-
-    val canvas = remember { MapBackedGuiyCanvas() }
 
     CompositionLocalProvider(
         LocalCanvas provides canvas,
@@ -73,6 +63,8 @@ fun Inventory(
             measurePolicy = StaticMeasurePolicy,
             renderer = object : Renderer {
                 override fun GuiyCanvas.render(node: GuiyNode) {
+                    // The last inventory to render sets this state so holder can choose which inventory to open
+                    holder.setActiveInventory(GuiyInventory(inventory, onClose))
                     canvas.startRender()
                 }
 
@@ -90,7 +82,8 @@ fun Inventory(
                     }
                 }
             },
-            modifier = modifier,
+            // Consume click so only the visible inventory can process clicks
+            modifier = modifier.clickable(consumeClick = true) { },
             content = content,
         )
     }
