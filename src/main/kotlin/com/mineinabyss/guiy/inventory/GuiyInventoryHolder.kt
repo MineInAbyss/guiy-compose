@@ -20,6 +20,10 @@ abstract class GuiyInventoryHolder : InventoryHolder {
 
     fun setActiveInventory(inventory: GuiyInventory) = _activeInventory.update { inventory }
 
+    fun closeIfActive(inventory: Inventory) = _activeInventory.update {
+        if(it?.inventory == inventory) null else it
+    }
+
     abstract fun processClick(scope: ClickScope, event: Cancellable)
     abstract fun processDrag(scope: DragScope)
 

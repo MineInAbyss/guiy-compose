@@ -25,7 +25,7 @@ import org.bukkit.inventory.Inventory
 fun Anvil(
     title: String,
     onTextChanged: (String) -> Unit,
-    onClose: InventoryCloseScope.() -> Unit = { exit() },
+    onClose: InventoryCloseScope.() -> Unit = { back() },
     onSubmit: (String) -> Unit = {},
     inputLeft: @Composable () -> Unit = { InvisibleItem() },
     inputRight: @Composable () -> Unit = { InvisibleItem() },

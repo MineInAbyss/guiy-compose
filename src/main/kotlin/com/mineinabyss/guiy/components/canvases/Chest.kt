@@ -28,7 +28,7 @@ const val MAX_CHEST_HEIGHT = 6
 fun Chest(
     title: String,
     modifier: Modifier = Modifier,
-    onClose: InventoryCloseScope.() -> Unit = { exit() },
+    onClose: InventoryCloseScope.() -> Unit = { back() },
     content: @Composable () -> Unit,
 ) {
     val titleMM = rememberMiniMsg(title)
@@ -48,7 +48,7 @@ fun Chest(
 fun Chest(
     title: Component,
     modifier: Modifier = Modifier,
-    onClose: InventoryCloseScope.() -> Unit = { exit() },
+    onClose: InventoryCloseScope.() -> Unit = { back() },
     content: @Composable () -> Unit,
 ) {
     val holder: GuiyInventoryHolder = LocalInventoryHolder.current

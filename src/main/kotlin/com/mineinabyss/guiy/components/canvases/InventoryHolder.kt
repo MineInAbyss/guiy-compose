@@ -10,6 +10,7 @@ import com.mineinabyss.guiy.inventory.LocalClickHandler
 import com.mineinabyss.guiy.inventory.LocalGuiyOwner
 import com.mineinabyss.guiy.modifiers.click.ClickScope
 import com.mineinabyss.guiy.modifiers.drag.DragScope
+import com.mineinabyss.guiy.navigation.LocalBackGestureDispatcher
 import com.mineinabyss.idofront.time.ticks
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
@@ -58,6 +59,7 @@ fun InventoryHolder(content: @Composable () -> Unit) {
 fun rememberInventoryHolder(): GuiyInventoryHolder {
     val clickHandler = LocalClickHandler.current
     val owner = LocalGuiyOwner.current
+    val backDispatcher = LocalBackGestureDispatcher.current
     val viewers by owner.viewers.collectAsState()
     return remember(clickHandler, viewers) {
         object : GuiyInventoryHolder() {
@@ -76,6 +78,10 @@ fun rememberInventoryHolder(): GuiyInventoryHolder {
 
                     override fun exit() {
                         owner.exit()
+                    }
+
+                    override fun back() {
+                        backDispatcher?.onBack() ?: exit()
                     }
                 }
                 inventory.onClose.invoke(scope)

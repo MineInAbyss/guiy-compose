@@ -7,4 +7,5 @@ import org.bukkit.entity.Player
 interface InventoryCloseScope {
     val player: Player
     fun exit()
+    fun back()
 }

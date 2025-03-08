@@ -9,6 +9,8 @@ import com.mineinabyss.guiy.layout.LayoutNode
 import com.mineinabyss.guiy.modifiers.Constraints
 import com.mineinabyss.guiy.modifiers.click.ClickScope
 import com.mineinabyss.guiy.modifiers.drag.DragScope
+import com.mineinabyss.guiy.navigation.BackGestureDispatcher
+import com.mineinabyss.guiy.navigation.LocalBackGestureDispatcher
 import com.mineinabyss.guiy.nodes.GuiyNodeApplier
 import com.mineinabyss.guiy.viewmodel.GuiyViewModel
 import kotlinx.coroutines.*
@@ -120,6 +122,7 @@ class GuiyOwner(
         composition.setContent {
             CompositionLocalProvider(
                 LocalGuiyOwner provides this,
+                LocalBackGestureDispatcher provides BackGestureDispatcher(),
                 LocalClickHandler provides object : ClickHandler {
                     override fun processClick(scope: ClickScope): ClickResult {
                         val slot = scope.slot
