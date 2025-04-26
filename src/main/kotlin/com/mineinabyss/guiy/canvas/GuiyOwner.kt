@@ -8,7 +8,6 @@ import com.mineinabyss.guiy.guiyPlugin
 import com.mineinabyss.guiy.layout.LayoutNode
 import com.mineinabyss.guiy.modifiers.Constraints
 import com.mineinabyss.guiy.modifiers.click.ClickScope
-import com.mineinabyss.guiy.modifiers.drag.DragScope
 import com.mineinabyss.guiy.navigation.BackGestureDispatcher
 import com.mineinabyss.guiy.navigation.LocalBackGestureDispatcher
 import com.mineinabyss.guiy.nodes.GuiyNodeApplier
@@ -32,7 +31,6 @@ data class ClickResult(
 
 interface ClickHandler {
     fun processClick(scope: ClickScope): ClickResult
-    fun processDrag(scope: DragScope)
 }
 
 @GuiyUIScopeMarker
@@ -126,20 +124,11 @@ class GuiyOwner(
                 LocalBackGestureDispatcher provides BackGestureDispatcher(),
                 LocalClickHandler provides object : ClickHandler {
                     override fun processClick(scope: ClickScope): ClickResult {
-                        val slot = scope.slot
-                        val width = rootNode.width
                         return rootNode.children.fold(ClickResult()) { acc, node ->
-                            val w = node.width
-                            val x = if (w == 0) 0 else slot % width
-                            val y = if (w == 0) 0 else slot / width
-                            val processed = rootNode.processClick(scope, x, y)
+                            val processed = rootNode.processClick(scope)
                             if (processed.clickConsumed == true) return processed
                             acc.mergeWith(processed)
                         }
-                    }
-
-                    override fun processDrag(scope: DragScope) {
-                        rootNode.processDrag(scope)
                     }
                 }) {
                 // A default inventory holder for most usecases

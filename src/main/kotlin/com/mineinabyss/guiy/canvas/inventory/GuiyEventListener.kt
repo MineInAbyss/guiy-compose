@@ -1,5 +1,6 @@
 package com.mineinabyss.guiy.canvas.inventory
 
+import com.mineinabyss.guiy.components.state.IntCoordinates
 import com.mineinabyss.guiy.modifiers.click.ClickScope
 import org.bukkit.Material
 import org.bukkit.entity.Player
@@ -23,7 +24,7 @@ class GuiyEventListener : Listener {
         isCancelled = true
 
         val scope = ClickScope(
-            click, slot, cursor.takeIf { it.type != Material.AIR }, whoClicked
+            click, slot, whoClicked
         )
         guiyHolder.processClick(scope, this)
     }
@@ -49,7 +50,7 @@ class GuiyEventListener : Listener {
         if (newItems.size == 1 && inGuiy.size == 1) {
             isCancelled = true
             val clicked = inGuiy.entries.first()
-            val scope = ClickScope(LEFT, clicked.key, cursor?.takeIf { it.type != Material.AIR }, whoClicked)
+            val scope = ClickScope(LEFT, clicked.key, whoClicked)
             guiyHolder.processClick(scope, this)
         } else if (inGuiy.isNotEmpty()) {
             isCancelled = true
