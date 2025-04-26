@@ -1,4 +1,4 @@
-package com.mineinabyss.guiy.inventory
+package com.mineinabyss.guiy.canvas.inventory
 
 import androidx.compose.runtime.Immutable
 import org.bukkit.inventory.Inventory

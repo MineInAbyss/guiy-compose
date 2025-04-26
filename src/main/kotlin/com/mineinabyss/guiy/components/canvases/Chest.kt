@@ -3,8 +3,8 @@ package com.mineinabyss.guiy.components.canvases
 import androidx.compose.runtime.*
 import com.mineinabyss.guiy.components.rememberMiniMsg
 import com.mineinabyss.guiy.components.state.IntCoordinates
-import com.mineinabyss.guiy.inventory.GuiyInventoryHolder
-import com.mineinabyss.guiy.inventory.InventoryCloseScope
+import com.mineinabyss.guiy.canvas.inventory.GuiyInventoryHolder
+import com.mineinabyss.guiy.canvas.inventory.InventoryCloseScope
 import com.mineinabyss.guiy.layout.Layout
 import com.mineinabyss.guiy.layout.Size
 import com.mineinabyss.guiy.layout.StaticMeasurePolicy

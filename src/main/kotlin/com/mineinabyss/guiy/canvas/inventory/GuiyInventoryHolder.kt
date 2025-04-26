@@ -1,4 +1,4 @@
-package com.mineinabyss.guiy.inventory
+package com.mineinabyss.guiy.canvas.inventory
 
 import com.mineinabyss.guiy.modifiers.click.ClickScope
 import com.mineinabyss.guiy.modifiers.drag.DragScope

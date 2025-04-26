@@ -1,22 +1,16 @@
 package com.mineinabyss.guiy.layout
 
-import com.mineinabyss.guiy.components.state.IntCoordinates
+import com.mineinabyss.guiy.canvas.GuiyCanvas
+import com.mineinabyss.guiy.canvas.ClickResult
 import com.mineinabyss.guiy.components.state.IntOffset
 import com.mineinabyss.guiy.components.state.IntSize
-import com.mineinabyss.guiy.components.state.ItemPositions
-import com.mineinabyss.guiy.inventory.ClickResult
-import com.mineinabyss.guiy.inventory.GuiyCanvas
-import com.mineinabyss.guiy.inventory.OffsetCanvas
 import com.mineinabyss.guiy.modifiers.Constraints
 import com.mineinabyss.guiy.modifiers.LayoutChangingModifier
 import com.mineinabyss.guiy.modifiers.Modifier
 import com.mineinabyss.guiy.modifiers.OnSizeChangedModifier
 import com.mineinabyss.guiy.modifiers.click.ClickModifier
 import com.mineinabyss.guiy.modifiers.click.ClickScope
-import com.mineinabyss.guiy.modifiers.drag.DragModifier
-import com.mineinabyss.guiy.modifiers.drag.DragScope
 import com.mineinabyss.guiy.nodes.GuiyNode
-import org.bukkit.inventory.ItemStack
 import kotlin.reflect.KClass
 
 /**
@@ -25,12 +19,11 @@ import kotlin.reflect.KClass
  *  You can configure stuff through [measurePolicy], [placer], and the [modifier], but things creates some problems
  *  when trying to make your own composable nodes that interact with this Layout node.
  */
-internal class LayoutNode : Measurable, Placeable, GuiyNode {
+class LayoutNode : Measurable, Placeable, GuiyNode {
     override var measurePolicy: MeasurePolicy = ChildMeasurePolicy
     override var renderer: Renderer = EmptyRenderer
-    override var canvas: GuiyCanvas? = null
+    override var guiyCanvas: GuiyCanvas? = null
 
-    val children = mutableListOf<LayoutNode>()
     override var modifier: Modifier = Modifier
         set(value) {
             field = value
@@ -55,6 +48,7 @@ internal class LayoutNode : Measurable, Placeable, GuiyNode {
     }
 
     var parent: LayoutNode? = null
+    val children = mutableListOf<LayoutNode>()
 
     override var width: Int = 0
     override var height: Int = 0
@@ -96,10 +90,10 @@ internal class LayoutNode : Measurable, Placeable, GuiyNode {
         this.y = offset.y
     }
 
-    override fun renderTo(canvas: GuiyCanvas?) {
-        val offsetCanvas = (canvas ?: this.canvas)?.let { OffsetCanvas(x, y, it) }
+    override fun renderTo(guiyCanvas: GuiyCanvas?) {
+        val offsetCanvas = (guiyCanvas ?: this.guiyCanvas)?.subCanvas(x, y)
         renderer.apply { offsetCanvas?.render(this@LayoutNode) }
-        for (child in children) child.renderTo(offsetCanvas)
+        children.forEach { it.renderTo(offsetCanvas) }
         renderer.apply { offsetCanvas?.renderAfterChildren(this@LayoutNode) }
     }
 
@@ -122,38 +116,6 @@ internal class LayoutNode : Measurable, Placeable, GuiyNode {
         return childResult
     }
 
-
-    data class DragInfo(
-        val dragModifier: DragModifier,
-        val itemMap: ItemPositions = ItemPositions(),
-    )
-
-    fun buildDragMap(coords: IntCoordinates, item: ItemStack, dragMap: MutableMap<GuiyNode, DragInfo>): Boolean {
-        val (iX, iY) = coords
-        if (iX !in 0 until width || iY !in 0 until height) return false
-        val dragModifier = get<DragModifier>()
-        if (dragModifier != null) {
-            val drag = dragMap.getOrPut(this) { DragInfo(dragModifier) }
-            dragMap[this] = drag.copy(itemMap = drag.itemMap.plus(iX, iY, item))
-            return true
-        }
-        return children.any { child ->
-            //TODO ensure this offset is still correct in x,y
-            val newCoords = IntCoordinates(iX - x + child.x, iY - x + child.x)
-            child.buildDragMap(newCoords, item, dragMap)
-        }
-    }
-
-    fun processDrag(scope: DragScope) {
-        val dragMap = mutableMapOf<GuiyNode, DragInfo>()
-        scope.updatedItems.items.forEach { (coords, item) ->
-            buildDragMap(coords, item, dragMap)
-        }
-        dragMap.forEach { (_, info) ->
-            info.dragModifier.onDrag.invoke(scope.copy(updatedItems = info.itemMap))
-        }
-    }
-
     override fun toString() = children.joinToString(prefix = "LayoutNode(", postfix = ")")
 
     internal companion object {
@@ -167,4 +129,7 @@ internal class LayoutNode : Measurable, Placeable, GuiyNode {
     }
 }
 
-val EmptyRenderer = object : Renderer {}
+val EmptyRenderer = object : Renderer {
+    override fun GuiyCanvas.render(node: GuiyNode) {}
+    override fun GuiyCanvas.renderAfterChildren(node: GuiyNode) {}
+}

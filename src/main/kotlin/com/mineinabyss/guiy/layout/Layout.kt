@@ -2,7 +2,7 @@ package com.mineinabyss.guiy.layout
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ComposeNode
-import com.mineinabyss.guiy.inventory.LocalCanvas
+import com.mineinabyss.guiy.canvas.LocalCanvas
 import com.mineinabyss.guiy.modifiers.Modifier
 import com.mineinabyss.guiy.nodes.GuiyNode
 import com.mineinabyss.guiy.nodes.GuiyNodeApplier
@@ -23,8 +23,7 @@ inline fun Layout(
         update = {
             set(measurePolicy) { this.measurePolicy = it }
             set(renderer) { this.renderer = it }
-            //TODO dunno if this works
-            set(canvas) { this.canvas = it}
+            set(canvas) { this.guiyCanvas = it }
             set(modifier) { this.modifier = it }
         },
         content = content,

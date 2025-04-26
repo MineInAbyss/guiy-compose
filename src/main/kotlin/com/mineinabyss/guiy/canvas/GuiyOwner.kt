@@ -1,4 +1,4 @@
-package com.mineinabyss.guiy.inventory
+package com.mineinabyss.guiy.canvas
 
 import androidx.compose.runtime.*
 import androidx.compose.runtime.snapshots.Snapshot
@@ -42,6 +42,7 @@ class GuiyOwner(
     var hasFrameWaiters = false
     val clock = BroadcastFrameClock { hasFrameWaiters = true }
     val composeScope = CoroutineScope(guiyPlugin.minecraftDispatcher + Dispatchers.Default) + clock
+
     private val _viewers: MutableStateFlow<Set<Player>> = MutableStateFlow(initialViewers)
     val viewers = _viewers.asStateFlow()
 
@@ -138,7 +139,8 @@ class GuiyOwner(
                     }
 
                     override fun processDrag(scope: DragScope) {
-                        rootNode.processDrag(scope)
+                        //todo
+//                        rootNode.processDrag(scope)
                     }
                 }) {
                 // A default inventory holder for most usecases

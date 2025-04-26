@@ -1,8 +1,6 @@
-package com.mineinabyss.guiy.inventory
+package com.mineinabyss.guiy.canvas.inventory
 
 import com.mineinabyss.guiy.modifiers.click.ClickScope
-import com.mineinabyss.idofront.nms.aliases.NMSPlayer
-import com.mineinabyss.idofront.nms.aliases.toNMS
 import org.bukkit.Material
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
@@ -11,7 +9,6 @@ import org.bukkit.event.inventory.ClickType.*
 import org.bukkit.event.inventory.InventoryClickEvent
 import org.bukkit.event.inventory.InventoryCloseEvent
 import org.bukkit.event.inventory.InventoryDragEvent
-import org.bukkit.event.inventory.PrepareAnvilEvent
 
 class GuiyEventListener : Listener {
     @EventHandler
