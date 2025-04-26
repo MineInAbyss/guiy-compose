@@ -2,15 +2,20 @@ package com.mineinabyss.guiy.layout
 
 import com.mineinabyss.guiy.canvas.GuiyCanvas
 import com.mineinabyss.guiy.canvas.ClickResult
-import com.mineinabyss.guiy.components.state.IntOffset
-import com.mineinabyss.guiy.components.state.IntSize
+import com.mineinabyss.guiy.components.inventory.state.IntCoordinates
+import com.mineinabyss.guiy.components.inventory.state.IntOffset
+import com.mineinabyss.guiy.components.inventory.state.IntSize
+import com.mineinabyss.guiy.components.inventory.state.ItemPositions
 import com.mineinabyss.guiy.modifiers.Constraints
 import com.mineinabyss.guiy.modifiers.LayoutChangingModifier
 import com.mineinabyss.guiy.modifiers.Modifier
 import com.mineinabyss.guiy.modifiers.OnSizeChangedModifier
 import com.mineinabyss.guiy.modifiers.click.ClickModifier
 import com.mineinabyss.guiy.modifiers.click.ClickScope
+import com.mineinabyss.guiy.modifiers.drag.DragModifier
+import com.mineinabyss.guiy.modifiers.drag.DragScope
 import com.mineinabyss.guiy.nodes.GuiyNode
+import org.bukkit.inventory.ItemStack
 import kotlin.reflect.KClass
 
 /**
@@ -97,6 +102,7 @@ class LayoutNode : Measurable, Placeable, GuiyNode {
         renderer.apply { offsetCanvas?.renderAfterChildren(this@LayoutNode) }
     }
 
+    //TODO: This expects an inventory canvas
     fun processClick(scope: ClickScope, x: Int, y: Int): ClickResult {
         val childResult = children
             .filter { x in it.x until (it.x + it.width) && y in it.y until (it.y + it.height) }
@@ -114,6 +120,38 @@ class LayoutNode : Measurable, Placeable, GuiyNode {
         }
 
         return childResult
+    }
+
+    data class DragInfo(
+        val dragModifier: DragModifier,
+        val itemMap: ItemPositions = ItemPositions(),
+    )
+
+    fun buildDragMap(coords: IntCoordinates, item: ItemStack, dragMap: MutableMap<GuiyNode, DragInfo>): Boolean {
+        val (iX, iY) = coords
+        if (iX !in 0 until width || iY !in 0 until height) return false
+        val dragModifier = get<DragModifier>()
+        if (dragModifier != null) {
+            val drag = dragMap.getOrPut(this) { DragInfo(dragModifier) }
+            dragMap[this] = drag.copy(itemMap = drag.itemMap.plus(iX, iY, item))
+            return true
+        }
+        return children.any { child ->
+            //TODO ensure this offset is still correct in x,y
+            val newCoords = IntCoordinates(iX - x + child.x, iY - x + child.x)
+            child.buildDragMap(newCoords, item, dragMap)
+        }
+    }
+
+    //TODO: This expects an inventory canvas
+    fun processDrag(scope: DragScope) {
+        val dragMap = mutableMapOf<GuiyNode, DragInfo>()
+        scope.updatedItems.items.forEach { (coords, item) ->
+            buildDragMap(coords, item, dragMap)
+        }
+        dragMap.forEach { (_, info) ->
+            info.dragModifier.onDrag.invoke(scope.copy(updatedItems = info.itemMap))
+        }
     }
 
     override fun toString() = children.joinToString(prefix = "LayoutNode(", postfix = ")")

@@ -139,8 +139,7 @@ class GuiyOwner(
                     }
 
                     override fun processDrag(scope: DragScope) {
-                        //todo
-//                        rootNode.processDrag(scope)
+                        rootNode.processDrag(scope)
                     }
                 }) {
                 // A default inventory holder for most usecases
