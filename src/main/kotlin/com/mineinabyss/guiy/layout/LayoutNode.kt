@@ -22,7 +22,7 @@ import kotlin.reflect.KClass
 class LayoutNode : Measurable, Placeable, GuiyNode {
     override var measurePolicy: MeasurePolicy = ChildMeasurePolicy
     override var renderer: Renderer = EmptyRenderer
-    override var guiyCanvas: GuiyCanvas? = null
+    override var canvas: GuiyCanvas? = null
 
     override var modifier: Modifier = Modifier
         set(value) {
@@ -91,7 +91,7 @@ class LayoutNode : Measurable, Placeable, GuiyNode {
     }
 
     override fun renderTo(guiyCanvas: GuiyCanvas?) {
-        val offsetCanvas = (guiyCanvas ?: this.guiyCanvas)?.subCanvas(x, y)
+        val offsetCanvas = (guiyCanvas ?: this.canvas)?.subCanvas(x, y)
         renderer.apply { offsetCanvas?.render(this@LayoutNode) }
         children.forEach { it.renderTo(offsetCanvas) }
         renderer.apply { offsetCanvas?.renderAfterChildren(this@LayoutNode) }
@@ -129,7 +129,4 @@ class LayoutNode : Measurable, Placeable, GuiyNode {
     }
 }
 
-val EmptyRenderer = object : Renderer {
-    override fun GuiyCanvas.render(node: GuiyNode) {}
-    override fun GuiyCanvas.renderAfterChildren(node: GuiyNode) {}
-}
+val EmptyRenderer = object : Renderer {}

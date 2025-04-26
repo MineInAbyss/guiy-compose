@@ -10,7 +10,7 @@ interface GuiyNode {
     var measurePolicy: MeasurePolicy
     var modifier: Modifier
     var renderer: Renderer
-    var guiyCanvas: GuiyCanvas?
+    var canvas: GuiyCanvas?
     var width: Int
     var height: Int
     var x: Int

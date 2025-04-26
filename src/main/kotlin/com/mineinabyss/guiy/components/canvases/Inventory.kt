@@ -20,7 +20,7 @@ import net.kyori.adventure.text.Component
 import org.bukkit.inventory.Inventory
 
 val LocalInventory: ProvidableCompositionLocal<Inventory> =
-    compositionLocalOf { error("No local canvas defined") }
+    compositionLocalOf { error("No local inventory defined") }
 
 /**
  * A layout composable that handles opening and closing an inventory for a set of players.

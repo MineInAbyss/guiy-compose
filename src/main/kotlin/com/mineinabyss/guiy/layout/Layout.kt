@@ -23,7 +23,7 @@ inline fun Layout(
         update = {
             set(measurePolicy) { this.measurePolicy = it }
             set(renderer) { this.renderer = it }
-            set(canvas) { this.guiyCanvas = it }
+            set(canvas) { this.canvas = it }
             set(modifier) { this.modifier = it }
         },
         content = content,
