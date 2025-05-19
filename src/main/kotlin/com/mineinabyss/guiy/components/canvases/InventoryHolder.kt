@@ -4,12 +4,11 @@ import androidx.compose.runtime.*
 import com.github.shynixn.mccoroutine.bukkit.launch
 import com.github.shynixn.mccoroutine.bukkit.minecraftDispatcher
 import com.mineinabyss.guiy.guiyPlugin
-import com.mineinabyss.guiy.inventory.GuiyInventoryHolder
-import com.mineinabyss.guiy.inventory.InventoryCloseScope
-import com.mineinabyss.guiy.inventory.LocalClickHandler
-import com.mineinabyss.guiy.inventory.LocalGuiyOwner
+import com.mineinabyss.guiy.canvas.inventory.GuiyInventoryHolder
+import com.mineinabyss.guiy.canvas.inventory.InventoryCloseScope
+import com.mineinabyss.guiy.canvas.LocalClickHandler
+import com.mineinabyss.guiy.canvas.LocalGuiyOwner
 import com.mineinabyss.guiy.modifiers.click.ClickScope
-import com.mineinabyss.guiy.modifiers.drag.DragScope
 import com.mineinabyss.guiy.navigation.LocalBackGestureDispatcher
 import com.mineinabyss.idofront.time.ticks
 import kotlinx.coroutines.delay
@@ -65,10 +64,6 @@ fun rememberInventoryHolder(): GuiyInventoryHolder {
         object : GuiyInventoryHolder() {
             override fun processClick(scope: ClickScope, event: Cancellable) {
                 clickHandler.processClick(scope)
-            }
-
-            override fun processDrag(scope: DragScope) {
-                clickHandler.processDrag(scope)
             }
 
             override fun onClose(player: Player) {

@@ -1,14 +1,13 @@
 package com.mineinabyss.guiy
 
-import com.mineinabyss.guiy.inventory.GuiyEventListener
-import com.mineinabyss.guiy.inventory.GuiyInventoryHolder
-import com.mineinabyss.guiy.inventory.GuiyScopeManager
+import com.mineinabyss.guiy.canvas.inventory.GuiyEventListener
+import com.mineinabyss.guiy.canvas.inventory.GuiyInventoryHolder
+import com.mineinabyss.guiy.canvas.GuiyScopeManager
 import com.mineinabyss.idofront.nms.interceptServerbound
 import com.mineinabyss.idofront.plugin.listeners
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
-import net.minecraft.network.Connection
 import net.minecraft.network.protocol.game.ServerboundRenameItemPacket
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player

@@ -5,10 +5,9 @@ import com.mineinabyss.guiy.components.items.InvisibleItem
 import com.mineinabyss.guiy.components.rememberMiniMsg
 import com.mineinabyss.guiy.components.state.IntCoordinates
 import com.mineinabyss.guiy.guiyPlugin
-import com.mineinabyss.guiy.inventory.CurrentPlayer
-import com.mineinabyss.guiy.inventory.GuiyInventory
-import com.mineinabyss.guiy.inventory.GuiyInventoryHolder
-import com.mineinabyss.guiy.inventory.InventoryCloseScope
+import com.mineinabyss.guiy.canvas.CurrentPlayer
+import com.mineinabyss.guiy.canvas.inventory.GuiyInventoryHolder
+import com.mineinabyss.guiy.canvas.inventory.InventoryCloseScope
 import com.mineinabyss.guiy.layout.Box
 import com.mineinabyss.guiy.layout.Row
 import com.mineinabyss.guiy.modifiers.Modifier

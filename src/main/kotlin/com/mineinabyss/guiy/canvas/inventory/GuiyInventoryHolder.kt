@@ -1,7 +1,6 @@
-package com.mineinabyss.guiy.inventory
+package com.mineinabyss.guiy.canvas.inventory
 
 import com.mineinabyss.guiy.modifiers.click.ClickScope
-import com.mineinabyss.guiy.modifiers.drag.DragScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -25,7 +24,6 @@ abstract class GuiyInventoryHolder : InventoryHolder {
     }
 
     abstract fun processClick(scope: ClickScope, event: Cancellable)
-    abstract fun processDrag(scope: DragScope)
 
     abstract fun onClose(player: Player)
 
