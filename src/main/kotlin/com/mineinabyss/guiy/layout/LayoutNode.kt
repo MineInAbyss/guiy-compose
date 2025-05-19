@@ -20,7 +20,7 @@ import kotlin.reflect.KClass
  *  You can configure stuff through [measurePolicy], [placer], and the [modifier], but things creates some problems
  *  when trying to make your own composable nodes that interact with this Layout node.
  */
-class LayoutNode : Measurable, Placeable, GuiyNode, ClickHandler {
+internal class LayoutNode : Measurable, Placeable, GuiyNode, ClickHandler {
     override var measurePolicy: MeasurePolicy = ChildMeasurePolicy
     override var renderer: Renderer = EmptyRenderer
     override var canvas: GuiyCanvas? = null
