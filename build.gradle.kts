@@ -1,5 +1,3 @@
-val idofrontVersion: String by project
-
 plugins {
     alias(idofrontLibs.plugins.mia.kotlin.jvm)
     alias(idofrontLibs.plugins.mia.papermc)
