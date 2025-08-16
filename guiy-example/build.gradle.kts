@@ -1,11 +1,11 @@
 val idofrontVersion: String by project
 
 plugins {
-    alias(idofrontLibs.plugins.mia.kotlin.jvm)
-    alias(idofrontLibs.plugins.mia.papermc)
-    alias(idofrontLibs.plugins.mia.copyjar)
-    alias(idofrontLibs.plugins.jetbrainsCompose)
-    alias(idofrontLibs.plugins.compose.compiler)
+    id(idofrontLibs.plugins.mia.kotlin.jvm.get().pluginId)
+    id(idofrontLibs.plugins.mia.papermc.get().pluginId)
+    id(idofrontLibs.plugins.mia.copyjar.get().pluginId)
+    id(idofrontLibs.plugins.jetbrainsCompose.get().pluginId)
+    id(idofrontLibs.plugins.compose.compiler.get().pluginId)
 }
 
 dependencies {

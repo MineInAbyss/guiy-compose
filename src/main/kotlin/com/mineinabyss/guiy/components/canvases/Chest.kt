@@ -9,7 +9,7 @@ import com.mineinabyss.guiy.modifiers.onSizeChanged
 import com.mineinabyss.guiy.modifiers.sizeIn
 import com.mineinabyss.guiy.nodes.InventoryCloseScope
 import com.mineinabyss.guiy.nodes.StaticMeasurePolicy
-import com.mineinabyss.idofront.entities.title
+import com.mineinabyss.idofront.nms.entities.title
 import com.mineinabyss.idofront.textcomponents.miniMsg
 import net.kyori.adventure.text.Component
 import org.bukkit.Bukkit
