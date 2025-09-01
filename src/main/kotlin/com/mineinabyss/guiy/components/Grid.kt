@@ -5,6 +5,7 @@ import com.mineinabyss.guiy.layout.Layout
 import com.mineinabyss.guiy.layout.MeasurePolicy
 import com.mineinabyss.guiy.layout.MeasureResult
 import com.mineinabyss.guiy.modifiers.Modifier
+import kotlin.math.ceil
 
 /**
  * A grid layout component that finds the largest child size, and then places children in a grid based on this size.
@@ -47,22 +48,19 @@ fun gridMeasurePolicy(vertical: Boolean) = MeasurePolicy { measurables, constrai
         constraints.minWidth,
         constraints.minHeight
     ) {}
-
     // Get width and height divisible by cellWidth, cellHeight
     val itemsPerLine =
         if (vertical) constraints.maxWidth / cellWidth
         else constraints.maxHeight / cellHeight
-
     val (width, height) = if (vertical) {
         val w = itemsPerLine * cellWidth
-        val h = ((placeables.size / itemsPerLine) + 1) * cellHeight
+        val h = (ceil(placeables.size / itemsPerLine.toFloat()).toInt()) * cellHeight
         w to h
     } else {
-        val w = ((placeables.size / itemsPerLine) + 1) * cellWidth
+        val w = (ceil(placeables.size / itemsPerLine.toFloat()).toInt())  * cellWidth
         val h = itemsPerLine * cellHeight
         w to h
     }
-
     MeasureResult(width, height) {
         var placeAtX = 0
         var placeAtY = 0

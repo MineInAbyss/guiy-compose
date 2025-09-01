@@ -24,7 +24,7 @@ inline fun Layout(
             set(measurePolicy) { this.measurePolicy = it }
             set(renderer) { this.renderer = it }
             //TODO dunno if this works
-            set(canvas) { this.canvas = it}
+            set(canvas) { this.canvas = it }
             set(modifier) { this.modifier = it }
         },
         content = content,
