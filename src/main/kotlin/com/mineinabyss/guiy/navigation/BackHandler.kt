@@ -19,16 +19,18 @@ class BackGestureDispatcher {
     fun onBack() {
         activeListener?.invoke()
     }
+
+    fun hasActiveListeners() = listeners.isNotEmpty()
 }
 
-val LocalBackGestureDispatcher = staticCompositionLocalOf<BackGestureDispatcher?> { null }
+val LocalBackGestureDispatcher = staticCompositionLocalOf<BackGestureDispatcher> { error("No Back Dispatcher provided.") }
 
 /**
  * A listener to back events (usually a menu being closed with `esc`).
  */
 @Composable
 fun BackHandler(onBack: () -> Unit) {
-    val dispatcher = LocalBackGestureDispatcher.current ?: return
+    val dispatcher = LocalBackGestureDispatcher.current
     DisposableEffect(dispatcher) {
         dispatcher.addListener(onBack)
         onDispose {

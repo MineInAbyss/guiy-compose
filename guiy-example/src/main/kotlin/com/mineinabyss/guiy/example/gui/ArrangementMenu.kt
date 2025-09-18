@@ -15,7 +15,7 @@ import org.bukkit.Material
 fun ArrangementMenu() {
     Chest(
         "Arrangement example",
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier.fillMaxSize(),
     ) {
         Column {
             val modifier = Modifier.fillMaxWidth()

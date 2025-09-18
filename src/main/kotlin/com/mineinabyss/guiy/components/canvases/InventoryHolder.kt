@@ -3,11 +3,11 @@ package com.mineinabyss.guiy.components.canvases
 import androidx.compose.runtime.*
 import com.github.shynixn.mccoroutine.bukkit.launch
 import com.github.shynixn.mccoroutine.bukkit.minecraftDispatcher
-import com.mineinabyss.guiy.guiyPlugin
-import com.mineinabyss.guiy.canvas.inventory.GuiyInventoryHolder
-import com.mineinabyss.guiy.canvas.inventory.InventoryCloseScope
 import com.mineinabyss.guiy.canvas.LocalClickHandler
 import com.mineinabyss.guiy.canvas.LocalGuiyOwner
+import com.mineinabyss.guiy.canvas.inventory.GuiyInventoryHolder
+import com.mineinabyss.guiy.canvas.inventory.InventoryCloseScope
+import com.mineinabyss.guiy.guiyPlugin
 import com.mineinabyss.guiy.modifiers.click.ClickScope
 import com.mineinabyss.guiy.navigation.LocalBackGestureDispatcher
 import com.mineinabyss.idofront.time.ticks
@@ -76,7 +76,9 @@ fun rememberInventoryHolder(): GuiyInventoryHolder {
                     }
 
                     override fun back() {
-                        backDispatcher?.onBack() ?: exit()
+                        if (backDispatcher.hasActiveListeners()) {
+                            backDispatcher.onBack()
+                        } else exit()
                     }
                 }
                 inventory.onClose.invoke(scope)
