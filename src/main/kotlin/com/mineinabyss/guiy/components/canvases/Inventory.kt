@@ -1,25 +1,22 @@
 package com.mineinabyss.guiy.components.canvases
 
 import androidx.compose.runtime.*
-import com.github.shynixn.mccoroutine.bukkit.launch
-import com.github.shynixn.mccoroutine.bukkit.minecraftDispatcher
 import com.mineinabyss.guiy.components.state.IntCoordinates
 import com.mineinabyss.guiy.guiyPlugin
-import com.mineinabyss.guiy.inventory.*
+import com.mineinabyss.guiy.canvas.*
+import com.mineinabyss.guiy.canvas.GuiyCanvas
+import com.mineinabyss.guiy.canvas.inventory.GuiyInventory
+import com.mineinabyss.guiy.canvas.inventory.GuiyInventoryHolder
+import com.mineinabyss.guiy.canvas.inventory.InventoryCloseScope
 import com.mineinabyss.guiy.layout.Layout
 import com.mineinabyss.guiy.layout.Renderer
+import com.mineinabyss.guiy.layout.StaticMeasurePolicy
 import com.mineinabyss.guiy.modifiers.Modifier
-import com.mineinabyss.guiy.modifiers.click.ClickScope
-import com.mineinabyss.guiy.modifiers.drag.DragScope
+import com.mineinabyss.guiy.modifiers.click.clickable
 import com.mineinabyss.guiy.nodes.GuiyNode
-import com.mineinabyss.guiy.nodes.InventoryCloseScope
-import com.mineinabyss.guiy.nodes.StaticMeasurePolicy
-import com.mineinabyss.idofront.time.ticks
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.withContext
-import org.bukkit.entity.Player
-import org.bukkit.event.Cancellable
-import org.bukkit.event.inventory.InventoryCloseEvent
+import com.mineinabyss.idofront.messaging.injectedLogger
+import com.mineinabyss.idofront.nms.entities.title
+import net.kyori.adventure.text.Component
 import org.bukkit.inventory.Inventory
 
 val LocalInventory: ProvidableCompositionLocal<Inventory> =
@@ -35,38 +32,32 @@ val LocalInventory: ProvidableCompositionLocal<Inventory> =
 @Composable
 fun Inventory(
     inventory: Inventory,
-    viewers: Set<Player>,
+    onClose: InventoryCloseScope.() -> Unit,
+    title: Component? = null,
     modifier: Modifier = Modifier,
     gridToInventoryIndex: (IntCoordinates) -> Int?,
     inventoryIndexToGrid: (Int) -> IntCoordinates,
     content: @Composable () -> Unit,
 ) {
-    // Close inventory when it switches to a new one
-    DisposableEffect(inventory) {
-        onDispose {
-            guiyPlugin.launch {
-                inventory.close()
+    val holder: GuiyInventoryHolder = LocalInventoryHolder.current
+
+    // Update title
+    LaunchedEffect(title) {
+        if (title != null) inventory.viewers.forEach { it.openInventory.title(title) }
+    }
+
+    val canvas = remember { InventoryCanvas() }
+
+    val existingInventory = runCatching { LocalInventory.current }.getOrNull()
+
+    if (existingInventory != null) {
+        SideEffect {
+            guiyPlugin.injectedLogger().e {
+                "Creating inventory $inventory inside other inventory ($existingInventory), Guiy does not support this yet."
             }
         }
+        return
     }
-    // Manage opening inventory for new viewers or when inventory changes
-    LaunchedEffect(viewers, inventory) {
-        val oldViewers = inventory.viewers.toSet()
-
-        withContext(guiyPlugin.minecraftDispatcher) {
-            // Close inventory for removed viewers
-            (oldViewers - viewers).forEach {
-                it.closeInventory(InventoryCloseEvent.Reason.PLUGIN)
-            }
-
-            // Open inventory for new viewers
-            (viewers - oldViewers).forEach {
-                it.closeInventory(InventoryCloseEvent.Reason.PLUGIN)
-                it.openInventory(inventory)
-            }
-        }
-    }
-    val canvas = remember { MapBackedGuiyCanvas() }
 
     CompositionLocalProvider(
         LocalCanvas provides canvas,
@@ -76,11 +67,13 @@ fun Inventory(
             measurePolicy = StaticMeasurePolicy,
             renderer = object : Renderer {
                 override fun GuiyCanvas.render(node: GuiyNode) {
-                    canvas.startRender()
+                    // The last inventory to render sets this state so holder can choose which inventory to open
+                    holder.setActiveInventory(GuiyInventory(inventory, onClose))
+                    canvas.clear()
                 }
 
                 override fun GuiyCanvas.renderAfterChildren(node: GuiyNode) {
-                    val items = canvas.getCoordinates()
+                    val items = canvas.contents()
                     repeat(inventory.size) { index ->
                         val coords = inventoryIndexToGrid(index)
                         if (items[coords] == null) inventory.setItem(index, null)
@@ -93,41 +86,9 @@ fun Inventory(
                     }
                 }
             },
-            modifier = modifier,
+            // Consume click so only the visible inventory can process clicks
+            modifier = modifier.clickable(consumeClick = true) { },
             content = content,
         )
-    }
-}
-
-@Composable
-inline fun rememberInventoryHolder(
-    viewers: Set<Player>,
-    crossinline onClose: InventoryCloseScope.(Player) -> Unit = {},
-): GuiyInventoryHolder {
-    val clickHandler = LocalClickHandler.current
-    return remember(clickHandler) {
-        object : GuiyInventoryHolder() {
-            override fun processClick(scope: ClickScope, event: Cancellable) {
-                val clickResult = clickHandler.processClick(scope)
-            }
-
-            override fun processDrag(scope: DragScope) {
-                clickHandler.processDrag(scope)
-            }
-
-            override fun onClose(player: Player) {
-                val scope = object : InventoryCloseScope {
-                    override fun reopen() {
-                        //TODO don't think this reference updates properly in the remember block
-                        viewers.filter { it.openInventory.topInventory != inventory }
-                            .forEach { it.openInventory(inventory) }
-                    }
-                }
-                guiyPlugin.launch {
-                    delay(1.ticks)
-                    onClose.invoke(scope, player)
-                }
-            }
-        }
     }
 }

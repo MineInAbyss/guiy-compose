@@ -4,13 +4,13 @@ import com.mineinabyss.guiy.modifiers.Modifier
 
 open class ClickModifier(
     val merged: Boolean = false,
-    val cancelClickEvent: Boolean,
+    val consumeClick: Boolean,
     val onClick: (ClickScope.() -> Unit),
 //    val allowClick: (ClickScope.() -> Boolean)
 ) : Modifier.Element<ClickModifier> {
     override fun mergeWith(other: ClickModifier) = ClickModifier(
         merged = true,
-        cancelClickEvent = cancelClickEvent || other.cancelClickEvent,
+        consumeClick = consumeClick || other.consumeClick,
         onClick = {
             if (!other.merged)
                 onClick()
@@ -25,13 +25,13 @@ open class ClickModifier(
 }
 
 fun Modifier.clickable(
-    cancelClickEvent: Boolean = true,
+    consumeClick: Boolean = false,
 //    allowClick: ClickScope.() -> Boolean = { true },
     onClick: ClickScope.() -> Unit
 ) =
     then(
         ClickModifier(
-            cancelClickEvent = cancelClickEvent,
+            consumeClick = consumeClick,
             onClick = onClick, /*allowClick = allowClick*/
         )
     )

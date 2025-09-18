@@ -1,11 +1,4 @@
-package com.mineinabyss.guiy.nodes
-
-import com.mineinabyss.guiy.layout.MeasurePolicy
-import com.mineinabyss.guiy.layout.MeasureResult
-
-interface InventoryCloseScope {
-    fun reopen()
-}
+package com.mineinabyss.guiy.layout
 
 val StaticMeasurePolicy = MeasurePolicy { measurables, constraints ->
     val noMinConstraints = constraints.copy(minWidth = 0, minHeight = 0)

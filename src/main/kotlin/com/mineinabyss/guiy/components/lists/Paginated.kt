@@ -10,6 +10,7 @@ import com.mineinabyss.guiy.layout.Column
 import com.mineinabyss.guiy.layout.Row
 import com.mineinabyss.guiy.layout.Size
 import com.mineinabyss.guiy.modifiers.*
+import com.mineinabyss.guiy.modifiers.click.clickable
 import com.mineinabyss.guiy.modifiers.placement.padding.padding
 import com.mineinabyss.idofront.items.editItemMeta
 import org.bukkit.Material
@@ -24,6 +25,7 @@ import org.bukkit.inventory.ItemStack
 fun <T> Paginated(
     items: List<T>,
     page: Int,
+    onPageChange: (page: Int) -> Unit,
     nextButton: @Composable () -> Unit,
     previousButton: @Composable () -> Unit,
     navbarPosition: NavbarPosition = NavbarPosition.BOTTOM,
@@ -36,20 +38,26 @@ fun <T> Paginated(
 ) {
     var size by remember { mutableStateOf(Size(0, 0)) }
     val itemsPerPage = size.width * size.height
+    val pageCount = if (itemsPerPage == 0) 1 else (-((-items.size).floorDiv(itemsPerPage))).coerceAtLeast(1)
+    val coercedPage = page.coerceIn(0, pageCount - 1)
     Box(Modifier.fillMaxSize()) {
-        val start = page * itemsPerPage
-        val end = (page + 1) * itemsPerPage
+        val start = coercedPage * itemsPerPage
+        val end = (coercedPage + 1) * itemsPerPage
         val pageItems = remember(items, start, end) {
-            if (start < 0) emptyList()
+            if (start < 0 || start >= items.size) emptyList()
             else items.subList(start, end.coerceAtMost(items.size))
         }
         NavbarLayout(
             position = navbarPosition,
             navbar = {
                 NavbarButtons(navbarPosition, navbarBackground) {
-                    if (page > 0) previousButton()
+                    if (coercedPage > 0) Box(Modifier.clickable { onPageChange(coercedPage - 1) }) {
+                        previousButton()
+                    }
                     else Spacer(1, 1)
-                    if (end < items.size) nextButton()
+                    if (end < items.size) Box(Modifier.clickable { onPageChange(coercedPage + 1) }) {
+                        nextButton()
+                    }
                     else Spacer(1, 1)
                 }
             },

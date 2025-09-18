@@ -24,8 +24,8 @@ See the `guiy-example` package for a full demonstration of project setup and dif
 ### Entry
 
 ```kotlin
-guiy {
-    ExampleMenu(player)
+guiy(player) {
+    ExampleMenu()
 }
 ```
 
@@ -33,10 +33,9 @@ guiy {
 
 ```kotlin
 @Composable
-fun ExampleMenu(player: Player) {
-    val owner = LocalGuiyOwner.current
+fun ExampleMenu() {
     // Guiy will dynamically update players, title, or height if you use a state.
-    Chest(setOf(player), title = "Example", height = 4, onClose = { owner.exit() /*owner.reopen()*/ }) {
+    Chest(title = "Example", height = 4, onClose = { exit() /*reopen()*/ }) {
         ToggleButton()
     }
 }

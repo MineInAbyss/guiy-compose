@@ -1,6 +1,7 @@
 plugins {
     alias(idofrontLibs.plugins.mia.kotlin.jvm)
     alias(idofrontLibs.plugins.mia.papermc)
+    alias(idofrontLibs.plugins.mia.nms)
     alias(idofrontLibs.plugins.mia.copyjar)
     alias(idofrontLibs.plugins.mia.publication)
     alias(idofrontLibs.plugins.mia.autoversion)
@@ -31,7 +32,6 @@ dependencies {
     compileOnly(idofrontLibs.kotlinx.coroutines)
     compileOnly(idofrontLibs.minecraft.mccoroutine)
     compileOnly(idofrontLibs.kotlin.reflect)
-    compileOnly(idofrontLibs.minecraft.anvilgui)
 
     // Shaded
     api(compose.runtime) {

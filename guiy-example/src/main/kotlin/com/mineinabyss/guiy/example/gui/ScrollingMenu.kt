@@ -7,21 +7,16 @@ import com.mineinabyss.guiy.components.canvases.Chest
 import com.mineinabyss.guiy.components.lists.NavbarPosition
 import com.mineinabyss.guiy.components.lists.ScrollDirection
 import com.mineinabyss.guiy.components.lists.Scrollable
-import com.mineinabyss.guiy.inventory.LocalGuiyOwner
 import com.mineinabyss.guiy.modifiers.Modifier
 import com.mineinabyss.guiy.modifiers.click.clickable
 import com.mineinabyss.guiy.modifiers.fillMaxSize
 import org.bukkit.Material
-import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 
 @Composable
-fun ScrollingMenu(player: Player) {
-    val owner = LocalGuiyOwner.current
+fun ScrollingMenu() {
     Chest(
-        setOf(player),
         "Scrolling example",
-        onClose = { owner.exit() },
         modifier = Modifier.fillMaxSize()
     ) {
         val items = remember {
@@ -32,10 +27,11 @@ fun ScrollingMenu(player: Player) {
         Scrollable(
             items,
             line = line,
+            onLineChange = { line = it },
             scrollDirection = ScrollDirection.VERTICAL,
             navbarPosition = NavbarPosition.END,
-            previousButton = { Item(Material.RED_CONCRETE, "Previous", modifier = Modifier.clickable { line-- }) },
-            nextButton = { Item(Material.BLUE_CONCRETE, "Next", modifier = Modifier.clickable { line++ }) },
+            previousButton = { Item(Material.RED_CONCRETE, "Previous") },
+            nextButton = { Item(Material.BLUE_CONCRETE, "Next") },
         ) { pageItems ->
             VerticalGrid(Modifier.fillMaxSize()) {
                 pageItems.forEach { item ->
