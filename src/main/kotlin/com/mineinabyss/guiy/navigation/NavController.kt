@@ -14,6 +14,11 @@ class NavController() : GuiyViewModel() {
 
     fun popBackStack() = screens.update { it.dropLast(1) }
 
+    /**
+     * @return The previous navigation entry in te back stack, or null if there is no previous entry.
+      */
+    fun getPreviousBackStackEntry() = screens.value.getOrNull(screens.value.lastIndex)
+
     fun navigate(route: NavRoute) = screens.update { it + route }
 
     fun <T: Any> navigate(route: T) = navigate(NavRoute.of(route))

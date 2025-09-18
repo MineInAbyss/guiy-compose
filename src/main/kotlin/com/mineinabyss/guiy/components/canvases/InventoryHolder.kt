@@ -82,11 +82,8 @@ fun rememberInventoryHolder(): GuiyInventoryHolder {
                     }
                 }
                 inventory.onClose.invoke(scope)
-                if (!owner.exitScheduled) guiyPlugin.launch {
-                    delay(1.ticks)
-                    viewers.filter { it.openInventory.topInventory != inventory }
-                        .forEach { it.openInventory(inventory.inventory) }
-                }
+                //TODO handle both switching from one Inventory to another, as well as when current inventory closed
+                // and no inventory is swapped to. Maybe notify GuiyOwner to retry opening inventory?
             }
 
             override fun closeIfNoLongerViewing(player: Player) {

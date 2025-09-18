@@ -2,9 +2,7 @@ package com.mineinabyss.guiy.canvas
 
 import androidx.compose.runtime.*
 import androidx.compose.runtime.snapshots.Snapshot
-import com.github.shynixn.mccoroutine.bukkit.minecraftDispatcher
 import com.mineinabyss.guiy.components.canvases.InventoryHolder
-import com.mineinabyss.guiy.guiyPlugin
 import com.mineinabyss.guiy.layout.LayoutNode
 import com.mineinabyss.guiy.modifiers.Constraints
 import com.mineinabyss.guiy.modifiers.click.ClickScope
@@ -12,26 +10,16 @@ import com.mineinabyss.guiy.navigation.BackGestureDispatcher
 import com.mineinabyss.guiy.navigation.LocalBackGestureDispatcher
 import com.mineinabyss.guiy.nodes.GuiyNodeApplier
 import com.mineinabyss.guiy.viewmodel.GuiyViewModel
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import org.bukkit.entity.Player
 import kotlin.coroutines.CoroutineContext
 import kotlin.reflect.KType
-
-data class ClickResult(
-    val clickConsumed: Boolean? = null,
-) {
-    fun mergeWith(other: ClickResult) = ClickResult(
-        // Prioritize true > false > null
-        clickConsumed = (clickConsumed ?: other.clickConsumed)?.or(other.clickConsumed == true)
-    )
-}
-
-interface ClickHandler {
-    fun processClick(scope: ClickScope): ClickResult
-}
 
 @GuiyUIScopeMarker
 class GuiyOwner(
@@ -39,7 +27,11 @@ class GuiyOwner(
 ) : CoroutineScope {
     var hasFrameWaiters = false
     val clock = BroadcastFrameClock { hasFrameWaiters = true }
-    val composeScope = CoroutineScope(guiyPlugin.minecraftDispatcher + Dispatchers.Default) + clock
+
+    // We use our own GuiyUIDispatcher which acts like an Dispatchers.Main.immediate
+    // Immediate is important for compose to correctly finish recompositions in one cycle (it does operations that will yield several times otherwise.)
+    //TODO come up with a test that breaks when not using an immediate style dispatcher.
+    val composeScope = CoroutineScope(GuiyUIDispatcher.Main + clock)
 
     private val _viewers: MutableStateFlow<Set<Player>> = MutableStateFlow(initialViewers)
     val viewers = _viewers.asStateFlow()
@@ -55,6 +47,7 @@ class GuiyOwner(
     private val composition = Composition(GuiyNodeApplier(rootNode), recomposer)
 
     var applyScheduled = false
+    //FIXME I think this will set applyScheduled to true for ALL GuiyOwner instances when any of them update?
     val snapshotHandle = Snapshot.registerGlobalWriteObserver {
         if (!applyScheduled) {
             applyScheduled = true
@@ -67,6 +60,7 @@ class GuiyOwner(
 
     var exitScheduled = false
 
+    /** Stops sending UI updates to these Players. If no players remain, the composition automatically exits. */
     fun removeViewers(vararg viewers: Player) {
         _viewers.update { it - viewers }
         if (_viewers.value.isEmpty()) {
@@ -78,6 +72,53 @@ class GuiyOwner(
         exitScheduled = true
     }
 
+    fun start(content: @Composable () -> Unit) {
+        !running || return // Prevent starting twice
+        running = true
+
+        launch {
+            recomposer.runRecomposeAndApplyChanges()
+        }
+
+        // TODO we want better detection of when a player closes an inventory in a way we didn't track,
+        //  ex. when a plugin closes it for them, they disconnect, or any other edge cases.
+        //  This gets complicated as we might be managing multiple Inventory instances (ex. moving player from Chest -> Anvil, or in the future, dialogs)
+        // In the meantime, we just remove offline players from viewers to prevent creeping new snapshots in most cases.
+        launch {
+            while (!exitScheduled) {
+                _viewers.value.forEach {
+                    if (!it.isOnline) removeViewers(it)
+                }
+                delay(1000)
+            }
+        }
+
+        launch {
+            setContent(content)
+            while (!exitScheduled) {
+                if (hasFrameWaiters) {
+                    hasFrameWaiters = false
+                    //FIXME I believe this should be called every iteration but we get odd behavior if placed
+                    // below this block. Read up on it and try to mimic Mosaic's updated approach in the future.
+                    clock.sendFrame(System.nanoTime()) // Send current time (for calculating dT in compose animations)
+                    rootNode.measure(Constraints())
+                    rootNode.render()
+                }
+                // UI is independent of the main thread in Minecraft, however since this is still sending updates
+                // as packets over the network, and inventory updates will instantly send update packets, we don't want
+                // to hammer any connection, so we keep this reasonably high.
+                delay(10)
+            }
+            // FIXME handle exiting correctly when while loop errors, i.e. by switching to a try/finally.
+            running = false
+            recomposer.close()
+            snapshotHandle.dispose()
+            composition.dispose()
+            viewModels.values.forEach { it.close() }
+            composeScope.cancel()
+        }
+    }
+
     fun <T> getViewModel(type: KType): T? {
         return viewModels[type] as? T
     }
@@ -86,35 +127,6 @@ class GuiyOwner(
         viewModels[type] = viewModel
     }
 
-    fun start(content: @Composable () -> Unit) {
-        !running || return
-        running = true
-
-        launch {
-            recomposer.runRecomposeAndApplyChanges()
-        }
-
-        launch {
-            setContent(content)
-            while (!exitScheduled) {
-                //            Bukkit.getScheduler().scheduleSyncRepeatingTask(guiyPlugin, {
-                if (hasFrameWaiters) {
-                    hasFrameWaiters = false
-                    clock.sendFrame(System.nanoTime()) // Frame time value is not used by Compose runtime.
-                    rootNode.measure(Constraints())
-                    rootNode.render()
-                }
-                delay(50)
-            }
-            running = false
-            recomposer.close()
-            snapshotHandle.dispose()
-            composition.dispose()
-            viewModels.values.forEach { it.close() }
-            composeScope.cancel()
-//            mainThreadScope.cancel()
-        }
-    }
 
     private fun setContent(content: @Composable () -> Unit) {
         hasFrameWaiters = true

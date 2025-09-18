@@ -2,8 +2,7 @@ package com.mineinabyss.guiy.viewmodel
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
-import com.github.shynixn.mccoroutine.bukkit.minecraftDispatcher
-import com.mineinabyss.guiy.guiyPlugin
+import com.mineinabyss.guiy.canvas.GuiyUIDispatcher
 import com.mineinabyss.guiy.canvas.LocalGuiyOwner
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.SupervisorJob
@@ -11,7 +10,7 @@ import kotlinx.coroutines.cancel
 import kotlin.reflect.typeOf
 
 abstract class GuiyViewModel {
-    val viewModelScope = CoroutineScope(guiyPlugin.minecraftDispatcher + SupervisorJob())
+    val viewModelScope = CoroutineScope(GuiyUIDispatcher.Main + SupervisorJob())
 //    fun <T: AutoCloseable> getClosable(key: String) : T? {
 //
 //    }

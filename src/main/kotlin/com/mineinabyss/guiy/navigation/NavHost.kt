@@ -3,14 +3,18 @@ package com.mineinabyss.guiy.navigation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
+import com.mineinabyss.guiy.canvas.GuiyOwner
+import com.mineinabyss.guiy.canvas.LocalGuiyOwner
 
 @Composable
 fun <T: Any> NavHost(
     navController: NavController,
     startDestination: T,
+    onEmptyBackStack: (owner: GuiyOwner) -> Unit = { it.exit() },
     builder: NavGraphBuilder.() -> Unit,
 ) {
-    BackHandler { navController.popBackStack() }
+    val owner = LocalGuiyOwner.current
+    BackHandler { if (navController.getPreviousBackStackEntry() == null) onEmptyBackStack(owner) else navController.popBackStack() }
     val graph = remember(builder, navController, startDestination) {
         NavGraphBuilder().apply(builder).build(NavRoute.of(startDestination))
     }
