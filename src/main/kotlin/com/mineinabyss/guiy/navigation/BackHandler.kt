@@ -6,6 +6,7 @@ import androidx.compose.runtime.staticCompositionLocalOf
 
 class BackGestureDispatcher {
     val listeners = mutableListOf<() -> Unit>()
+    //FIXME I think this gets messed up if an earlier listener gets removed, then re-added by composition changes?
     val activeListener get() = listeners.lastOrNull()
 
     fun addListener(listener: () -> Unit) {

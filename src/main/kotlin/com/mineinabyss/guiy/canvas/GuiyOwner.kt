@@ -3,6 +3,7 @@ package com.mineinabyss.guiy.canvas
 import androidx.compose.runtime.*
 import androidx.compose.runtime.snapshots.Snapshot
 import com.mineinabyss.guiy.components.canvases.InventoryHolder
+import com.mineinabyss.guiy.guiyPlugin
 import com.mineinabyss.guiy.layout.LayoutNode
 import com.mineinabyss.guiy.modifiers.Constraints
 import com.mineinabyss.guiy.modifiers.click.ClickScope
@@ -10,21 +11,18 @@ import com.mineinabyss.guiy.navigation.BackGestureDispatcher
 import com.mineinabyss.guiy.navigation.LocalBackGestureDispatcher
 import com.mineinabyss.guiy.nodes.GuiyNodeApplier
 import com.mineinabyss.guiy.viewmodel.GuiyViewModel
+import com.mineinabyss.idofront.messaging.injectedLogger
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.bukkit.entity.Player
 import kotlin.coroutines.CoroutineContext
 import kotlin.reflect.KType
 
 @GuiyUIScopeMarker
-class GuiyOwner(
-    initialViewers: Set<Player> = setOf(),
-) : CoroutineScope {
+class GuiyOwner : CoroutineScope {
+    val logger = guiyPlugin.injectedLogger()
     var hasFrameWaiters = false
     val clock = BroadcastFrameClock { hasFrameWaiters = true }
 
@@ -32,9 +30,6 @@ class GuiyOwner(
     // Immediate is important for compose to correctly finish recompositions in one cycle (it does operations that will yield several times otherwise.)
     //TODO come up with a test that breaks when not using an immediate style dispatcher.
     val composeScope = CoroutineScope(GuiyUIDispatcher.Main + clock)
-
-    private val _viewers: MutableStateFlow<Set<Player>> = MutableStateFlow(initialViewers)
-    val viewers = _viewers.asStateFlow()
 
     //    val mainThreadScope = CoroutineScope(guiyPlugin.minecraftDispatcher) + SupervisorJob()
     private val viewModels = mutableMapOf<KType, GuiyViewModel>()
@@ -47,6 +42,7 @@ class GuiyOwner(
     private val composition = Composition(GuiyNodeApplier(rootNode), recomposer)
 
     var applyScheduled = false
+
     //FIXME I think this will set applyScheduled to true for ALL GuiyOwner instances when any of them update?
     val snapshotHandle = Snapshot.registerGlobalWriteObserver {
         if (!applyScheduled) {
@@ -60,19 +56,14 @@ class GuiyOwner(
 
     var exitScheduled = false
 
-    /** Stops sending UI updates to these Players. If no players remain, the composition automatically exits. */
-    fun removeViewers(vararg viewers: Player) {
-        _viewers.update { it - viewers }
-        if (_viewers.value.isEmpty()) {
-            exit()
-        }
-    }
-
     fun exit() {
         exitScheduled = true
     }
 
-    fun start(content: @Composable () -> Unit) {
+    fun start(
+        initialViewers: Set<Player> = setOf(),
+        content: @Composable () -> Unit,
+    ) {
         !running || return // Prevent starting twice
         running = true
 
@@ -80,21 +71,8 @@ class GuiyOwner(
             recomposer.runRecomposeAndApplyChanges()
         }
 
-        // TODO we want better detection of when a player closes an inventory in a way we didn't track,
-        //  ex. when a plugin closes it for them, they disconnect, or any other edge cases.
-        //  This gets complicated as we might be managing multiple Inventory instances (ex. moving player from Chest -> Anvil, or in the future, dialogs)
-        // In the meantime, we just remove offline players from viewers to prevent creeping new snapshots in most cases.
         launch {
-            while (!exitScheduled) {
-                _viewers.value.forEach {
-                    if (!it.isOnline) removeViewers(it)
-                }
-                delay(1000)
-            }
-        }
-
-        launch {
-            setContent(content)
+            setContent(initialViewers, content)
             while (!exitScheduled) {
                 if (hasFrameWaiters) {
                     hasFrameWaiters = false
@@ -109,6 +87,7 @@ class GuiyOwner(
                 // to hammer any connection, so we keep this reasonably high.
                 delay(10)
             }
+            logger.d { "Exiting Guiy menu ${this@GuiyOwner}" }
             // FIXME handle exiting correctly when while loop errors, i.e. by switching to a try/finally.
             running = false
             recomposer.close()
@@ -128,7 +107,10 @@ class GuiyOwner(
     }
 
 
-    private fun setContent(content: @Composable () -> Unit) {
+    private fun setContent(
+        initialViewers: Set<Player> = setOf(),
+        content: @Composable () -> Unit,
+    ) {
         hasFrameWaiters = true
         composition.setContent {
             CompositionLocalProvider(
@@ -144,7 +126,13 @@ class GuiyOwner(
                     }
                 }) {
                 // A default inventory holder for most usecases
-                InventoryHolder {
+                InventoryHolder(
+                    initialViewers,
+                    onViewersChange = {
+                        logger.v { "Viewers changed to $it" }
+                        if (it.isEmpty()) exit()
+                    }
+                ) {
                     content()
                 }
             }
@@ -156,8 +144,8 @@ fun guiy(
     vararg initialViewers: Player,
     content: @Composable () -> Unit,
 ): GuiyOwner {
-    return GuiyOwner(initialViewers.toSet()).apply {
-        start {
+    return GuiyOwner().apply {
+        start(initialViewers.toSet()) {
             content()
         }
     }

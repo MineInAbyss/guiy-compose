@@ -1,7 +1,7 @@
 package com.mineinabyss.guiy.example
 
-import com.mineinabyss.guiy.example.gui.*
 import com.mineinabyss.guiy.canvas.guiy
+import com.mineinabyss.guiy.example.gui.*
 import com.mineinabyss.idofront.commands.brigadier.commands
 import org.bukkit.plugin.java.JavaPlugin
 
@@ -16,6 +16,11 @@ class GuiyExamplePlugin : JavaPlugin() {
             "animated" {
                 playerExecutes {
                     guiy(player) { AnimatedTitle() }
+                }
+            }
+            "autoReopen" {
+                playerExecutes {
+                    guiy(player) { AutoReopen() }
                 }
             }
             "creative" {
