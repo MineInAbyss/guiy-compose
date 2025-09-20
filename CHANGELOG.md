@@ -17,6 +17,7 @@ This project does NOT adhere to [Semantic Versioning](https://semver.org/spec/v2
   - These also provide a `viewModelScope` for correctly collecting state in sync with UI updates.
   - In the future, we plan to integrate with something like Koin for proper DI. Please note that currently ViewModels are tied to the composition as a whole, with an API for registering them per-screen coming later.
   - NOTE: Android's ViewModels do a lot under the hood, our goal is not to match behaviour perfectly but to provide enough functionality to follow architecture best practices.
+- Some new composition locals, including `LocalGuiyOwner` and `CurrentPlayer` getter for getting the first viewer for a running guiy instance.
 
 ### Changed
 - `onClose` doesn't require a `reopen` call anymore, instead reopening on its own. Call `exit` explicitly to exit (the default behaviour.)
