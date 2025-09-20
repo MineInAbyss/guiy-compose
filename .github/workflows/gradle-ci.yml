@@ -2,6 +2,8 @@ name: Java CI with Gradle
 
 on:
   pull_request:
+    paths-ignore:
+      - '**.md'
 
 concurrency:
   cancel-in-progress: true
