@@ -12,7 +12,6 @@ import com.mineinabyss.guiy.modifiers.Modifier
 import com.mineinabyss.guiy.modifiers.onSizeChanged
 import com.mineinabyss.guiy.modifiers.sizeIn
 import net.kyori.adventure.text.Component
-import org.bukkit.Bukkit
 import org.bukkit.inventory.Inventory
 
 const val CHEST_WIDTH = 9
@@ -67,7 +66,7 @@ fun Chest(
     }
 
     val inventory: Inventory = remember(size) {
-        Bukkit.createInventory(holder, CHEST_WIDTH * size.height, title)
+        holder.getOrCreateInventory(size.height, title)
     }
 
     Inventory(

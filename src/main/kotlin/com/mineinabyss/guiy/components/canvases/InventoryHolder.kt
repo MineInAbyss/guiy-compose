@@ -10,6 +10,7 @@ import com.mineinabyss.guiy.canvas.inventory.InventoryCloseScope
 import com.mineinabyss.guiy.guiyPlugin
 import com.mineinabyss.guiy.modifiers.click.ClickScope
 import com.mineinabyss.guiy.navigation.LocalBackGestureDispatcher
+import com.mineinabyss.idofront.nms.entities.title
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
 import org.bukkit.entity.Player
@@ -72,6 +73,8 @@ fun InventoryHolder(
             (viewers - oldViewers).forEach {
                 holder.openInventoryFor(it)
             }
+
+            if (inventory.title != null) viewers.forEach { it.openInventory.title(inventory.title) }
         }
     }
 

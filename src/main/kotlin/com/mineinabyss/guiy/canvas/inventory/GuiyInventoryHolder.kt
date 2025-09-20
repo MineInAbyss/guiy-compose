@@ -4,10 +4,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.Snapshot
+import com.mineinabyss.guiy.components.canvases.CHEST_WIDTH
 import com.mineinabyss.guiy.modifiers.click.ClickScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import net.kyori.adventure.text.Component
+import org.bukkit.Bukkit
 import org.bukkit.entity.HumanEntity
 import org.bukkit.entity.Player
 import org.bukkit.event.Cancellable
@@ -27,6 +30,15 @@ abstract class GuiyInventoryHolder(initialViewers: Set<Player>) : InventoryHolde
 
     private val _viewers: MutableStateFlow<Set<Player>> = MutableStateFlow(initialViewers)
     val viewers = _viewers.asStateFlow()
+
+    val inventoryCache = arrayOfNulls<Inventory?>(6)
+
+    fun getOrCreateInventory(height: Int, title: Component): Inventory {
+        inventoryCache[height - 1]?.let { return it }
+        val inv = Bukkit.createInventory(this, CHEST_WIDTH * height, title)
+        inventoryCache[height - 1] = inv
+        return inv
+    }
 
     /**
      * A bukkit method for getting the inventory. Will error if nothing has rendered to an inventory but some bukkit
