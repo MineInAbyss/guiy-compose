@@ -1,13 +1,13 @@
 package com.mineinabyss.guiy.components.canvases
 
 import androidx.compose.runtime.*
+import com.mineinabyss.guiy.canvas.CurrentPlayer
+import com.mineinabyss.guiy.canvas.inventory.GuiyInventoryHolder
+import com.mineinabyss.guiy.canvas.inventory.InventoryCloseScope
 import com.mineinabyss.guiy.components.items.InvisibleItem
 import com.mineinabyss.guiy.components.rememberMiniMsg
 import com.mineinabyss.guiy.components.state.IntCoordinates
 import com.mineinabyss.guiy.guiyPlugin
-import com.mineinabyss.guiy.canvas.CurrentPlayer
-import com.mineinabyss.guiy.canvas.inventory.GuiyInventoryHolder
-import com.mineinabyss.guiy.canvas.inventory.InventoryCloseScope
 import com.mineinabyss.guiy.layout.Box
 import com.mineinabyss.guiy.layout.Row
 import com.mineinabyss.guiy.modifiers.Modifier
@@ -41,8 +41,7 @@ fun Anvil(
     var playerViewText by remember(inventory) { mutableStateOf("") }
     LaunchedEffect(player) {
         guiyPlugin.anvilPacketFlow.filter { it?.second == player }.filterNotNull().collect {
-            val text = if (it.first.isNotEmpty()) it.first
-            else inventory.getItem(0)?.effectiveName()?.toPlainText() ?: ""
+            val text = it.first.ifEmpty { inventory.getItem(0)?.effectiveName()?.toPlainText() ?: "" }
             playerViewText = text
             onTextChanged(text)
         }

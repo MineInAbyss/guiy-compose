@@ -5,6 +5,7 @@ plugins {
     alias(idofrontLibs.plugins.mia.copyjar)
     alias(idofrontLibs.plugins.mia.publication)
     alias(idofrontLibs.plugins.mia.autoversion)
+    alias(idofrontLibs.plugins.mia.docs)
     alias(idofrontLibs.plugins.jetbrainsCompose)
     alias(idofrontLibs.plugins.compose.compiler)
 }
@@ -41,4 +42,8 @@ dependencies {
 
     implementation(idofrontLibs.bundles.idofront.core)
     implementation(idofrontLibs.idofront.nms)
+}
+
+idofront {
+    docsVersion = "0.0.4"
 }
