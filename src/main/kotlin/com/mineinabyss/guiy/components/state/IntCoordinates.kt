@@ -8,7 +8,7 @@ value class IntCoordinates(val pair: Long) {
     operator fun component1() = x
     operator fun component2() = y
 
-    constructor(x: Int, y: Int) : this((x.toLong() shl 32) or y.toLong())
+    constructor(x: Int, y: Int) : this((x.toLong() shl 32) or (y.toLong() and 0xFFFFFFFFL))
 
     override fun toString(): String = "($x, $y)"
 
@@ -25,7 +25,7 @@ value class IntSize(val pair: Long) {
     operator fun component1() = width
     operator fun component2() = height
 
-    constructor(width: Int, height: Int) : this((width.toLong() shl 32) or height.toLong())
+    constructor(width: Int, height: Int) : this((width.toLong() shl 32) or (height.toLong() and 0xFFFFFFFFL))
 
     override fun toString(): String = "($width, $height)"
 }
