@@ -46,55 +46,56 @@ fun <T> Scrollable(
     val itemsPerLine = if (scrollDirection == ScrollDirection.VERTICAL) size.width else size.height
     val totalLines = if (scrollDirection == ScrollDirection.VERTICAL) size.height else size.width
 
-    Box(Modifier.fillMaxSize().onSizeChanged {println("Exterior box size: $it")}) {
+    Box(Modifier.fillMaxSize().onSizeChanged { println("Exterior box size: $it") }) {
         val start = line * itemsPerLine
-    val lineCount = if(itemsPerLine == 0) 1 else (-((-items.size).floorDiv(itemsPerLine))).coerceAtLeast(1)
-    val coercedLine = line.coerceIn(0, lineCount - 1)
-    Box(Modifier.fillMaxSize()) {
-        val start = coercedLine * itemsPerLine
-        val end = start + (itemsPerLine * totalLines)
-        val pageItems = remember(items, start, end) {
-            if (start < 0 || start >= items.size) emptyList()
-            else items.subList(start, end.coerceAtMost(items.size))
-        }
-
-        // Extract original size of contents
-        Box(Modifier.onSizeChanged{
-            size = it
-        }) {
-            content(pageItems)
-        }
-
-        // Clear out the previous Box
-        Box(Modifier.onSizeChanged{
-            clearSize = it
-        }.fillMaxSize()) {
-            VerticalGrid(){
-                MutableList(clearSize.width * clearSize.height) {Item(null)}
+        val lineCount = if (itemsPerLine == 0) 1 else (-((-items.size).floorDiv(itemsPerLine))).coerceAtLeast(1)
+        val coercedLine = line.coerceIn(0, lineCount - 1)
+        Box(Modifier.fillMaxSize()) {
+            val start = coercedLine * itemsPerLine
+            val end = start + (itemsPerLine * totalLines)
+            val pageItems = remember(items, start, end) {
+                if (start < 0 || start >= items.size) emptyList()
+                else items.subList(start, end.coerceAtMost(items.size))
             }
-        }
 
-        NavbarLayout(
-            position = navbarPosition,
-            navbar = {
-                NavbarButtons(navbarPosition, navbarBackground) {
-                    if (coercedLine > 0) Box(Modifier.clickable { onLineChange(coercedLine - 1) }) {
-                        previousButton()
-                    }
-                    else Spacer(1, 1)
-                    if (end < items.size) Box(Modifier.clickable { onLineChange(coercedLine + 1) }) {
-                        nextButton()
-                    }
-                    else Spacer(1, 1)
-                }
-            },
-            content = {
-                // Actually render the correct amount of items into a box that can fit them including offsets
-                Box(Modifier.fillMaxSize()) {
-                    content(pageItems)
+            // Extract original size of contents
+            Box(Modifier.onSizeChanged {
+                size = it
+            }) {
+                content(pageItems)
+            }
+
+            // Clear out the previous Box
+            Box(Modifier.onSizeChanged {
+                clearSize = it
+            }.fillMaxSize()) {
+                VerticalGrid() {
+                    MutableList(clearSize.width * clearSize.height) { Item(null) }
                 }
             }
 
-        )
+            NavbarLayout(
+                position = navbarPosition,
+                navbar = {
+                    NavbarButtons(navbarPosition, navbarBackground) {
+                        if (coercedLine > 0) Box(Modifier.clickable { onLineChange(coercedLine - 1) }) {
+                            previousButton()
+                        }
+                        else Spacer(1, 1)
+                        if (end < items.size) Box(Modifier.clickable { onLineChange(coercedLine + 1) }) {
+                            nextButton()
+                        }
+                        else Spacer(1, 1)
+                    }
+                },
+                content = {
+                    // Actually render the correct amount of items into a box that can fit them including offsets
+                    Box(Modifier.fillMaxSize()) {
+                        content(pageItems)
+                    }
+                }
+
+            )
+        }
     }
 }
