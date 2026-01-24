@@ -1,11 +1,11 @@
-val idofrontVersion: String by project
-
 plugins {
     alias(idofrontLibs.plugins.mia.kotlin.jvm)
     alias(idofrontLibs.plugins.mia.papermc)
+    alias(idofrontLibs.plugins.mia.nms)
     alias(idofrontLibs.plugins.mia.copyjar)
     alias(idofrontLibs.plugins.mia.publication)
     alias(idofrontLibs.plugins.mia.autoversion)
+    alias(idofrontLibs.plugins.mia.docs)
     alias(idofrontLibs.plugins.jetbrainsCompose)
     alias(idofrontLibs.plugins.compose.compiler)
 }
@@ -33,7 +33,6 @@ dependencies {
     compileOnly(idofrontLibs.kotlinx.coroutines)
     compileOnly(idofrontLibs.minecraft.mccoroutine)
     compileOnly(idofrontLibs.kotlin.reflect)
-    compileOnly(idofrontLibs.minecraft.anvilgui)
 
     // Shaded
     api(compose.runtime) {
@@ -43,4 +42,8 @@ dependencies {
 
     implementation(idofrontLibs.bundles.idofront.core)
     implementation(idofrontLibs.idofront.nms)
+}
+
+idofront {
+    docsVersion = "0.0.4"
 }

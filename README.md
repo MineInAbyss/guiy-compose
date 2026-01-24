@@ -3,7 +3,7 @@
 # Guiy
 
 [![Maven](https://img.shields.io/maven-metadata/v?metadataUrl=https://repo.mineinabyss.com/releases/com/mineinabyss/guiy-compose/maven-metadata.xml)](https://repo.mineinabyss.com/#/releases/com/mineinabyss/guiy-compose)
-[![Contribute](https://shields.io/badge/Contribute-e57be5?logo=github%20sponsors&style=flat&logoColor=white)](https://wiki.mineinabyss.com/contribute/)
+[![Contribute](https://shields.io/badge/Contribute-e57be5?logo=github%20sponsors&style=flat&logoColor=white)](https://mineinabyss.com/contributing)
 </div>
 
 A Minecraft UI library for PaperMC, built on the Compose compiler.
@@ -24,8 +24,8 @@ See the `guiy-example` package for a full demonstration of project setup and dif
 ### Entry
 
 ```kotlin
-guiy {
-    ExampleMenu(player)
+guiy(player) {
+    ExampleMenu()
 }
 ```
 
@@ -33,10 +33,9 @@ guiy {
 
 ```kotlin
 @Composable
-fun ExampleMenu(player: Player) {
-    val owner = LocalGuiyOwner.current
+fun ExampleMenu() {
     // Guiy will dynamically update players, title, or height if you use a state.
-    Chest(setOf(player), title = "Example", height = 4, onClose = { owner.exit() /*owner.reopen()*/ }) {
+    Chest(title = "Example", modifier = Modifier.height(4), onClose = { exit() /*back()*/ }) {
         ToggleButton()
     }
 }
@@ -144,8 +143,9 @@ our [main project](https://github.com/MineInAbyss/MineInAbyss/tree/master/minein
 
 ```kotlin
 plugins {
-    // Match version in guiy's build.gradle.kts
-    id("org.jetbrains.compose") version "1.x.x"
+    // Try to match version in guiy's build.gradle.kts
+    id("org.jetbrains.kotlin.plugin.compose") version "<kotlin-version>"
+    id("org.jetbrains.compose") version "<compose-version>"
 }
 
 repositories {

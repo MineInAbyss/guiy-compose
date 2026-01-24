@@ -3,7 +3,7 @@ package com.mineinabyss.guiy.layout
 import androidx.compose.runtime.Stable
 import com.mineinabyss.guiy.components.state.IntOffset
 import com.mineinabyss.guiy.components.state.IntSize
-import com.mineinabyss.guiy.inventory.GuiyCanvas
+import com.mineinabyss.guiy.canvas.GuiyCanvas
 import com.mineinabyss.guiy.modifiers.Constraints
 import com.mineinabyss.guiy.nodes.GuiyNode
 

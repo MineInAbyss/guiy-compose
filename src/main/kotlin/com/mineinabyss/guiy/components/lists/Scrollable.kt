@@ -7,6 +7,10 @@ import com.mineinabyss.guiy.components.VerticalGrid
 import com.mineinabyss.guiy.layout.Box
 import com.mineinabyss.guiy.layout.Size
 import com.mineinabyss.guiy.modifiers.*
+import com.mineinabyss.guiy.modifiers.Modifier
+import com.mineinabyss.guiy.modifiers.click.clickable
+import com.mineinabyss.guiy.modifiers.fillMaxSize
+import com.mineinabyss.guiy.modifiers.onSizeChanged
 import com.mineinabyss.idofront.items.editItemMeta
 import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
@@ -24,6 +28,7 @@ enum class ScrollDirection {
 fun <T> Scrollable(
     items: List<T>,
     line: Int,
+    onLineChange: (line: Int) -> Unit,
     scrollDirection: ScrollDirection,
     nextButton: @Composable () -> Unit,
     previousButton: @Composable () -> Unit,
@@ -43,9 +48,13 @@ fun <T> Scrollable(
 
     Box(Modifier.fillMaxSize().onSizeChanged {println("Exterior box size: $it")}) {
         val start = line * itemsPerLine
+    val lineCount = if(itemsPerLine == 0) 1 else (-((-items.size).floorDiv(itemsPerLine))).coerceAtLeast(1)
+    val coercedLine = line.coerceIn(0, lineCount - 1)
+    Box(Modifier.fillMaxSize()) {
+        val start = coercedLine * itemsPerLine
         val end = start + (itemsPerLine * totalLines)
         val pageItems = remember(items, start, end) {
-            if (start < 0) emptyList()
+            if (start < 0 || start >= items.size) emptyList()
             else items.subList(start, end.coerceAtMost(items.size))
         }
 
@@ -69,9 +78,13 @@ fun <T> Scrollable(
             position = navbarPosition,
             navbar = {
                 NavbarButtons(navbarPosition, navbarBackground) {
-                    if (line > 0) previousButton()
+                    if (coercedLine > 0) Box(Modifier.clickable { onLineChange(coercedLine - 1) }) {
+                        previousButton()
+                    }
                     else Spacer(1, 1)
-                    if (end < items.size) nextButton()
+                    if (end < items.size) Box(Modifier.clickable { onLineChange(coercedLine + 1) }) {
+                        nextButton()
+                    }
                     else Spacer(1, 1)
                 }
             },

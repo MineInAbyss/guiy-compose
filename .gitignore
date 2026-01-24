@@ -11,3 +11,5 @@ out
 eclipse
 *.ipr
 *.iws
+
+.DS_Store

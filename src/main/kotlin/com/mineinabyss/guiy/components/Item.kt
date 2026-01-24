@@ -2,7 +2,8 @@ package com.mineinabyss.guiy.components
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
-import com.mineinabyss.guiy.inventory.GuiyCanvas
+import com.mineinabyss.guiy.canvas.GuiyCanvas
+import com.mineinabyss.guiy.canvas.InventoryCanvas
 import com.mineinabyss.guiy.layout.Layout
 import com.mineinabyss.guiy.layout.MeasureResult
 import com.mineinabyss.guiy.layout.Renderer
@@ -27,9 +28,13 @@ fun Item(itemStack: ItemStack?, modifier: Modifier = Modifier) {
         },
         renderer = object : Renderer {
             override fun GuiyCanvas.render(node: GuiyNode) {
-                for (x in 0 until node.width)
-                    for (y in 0 until node.height)
-                        set(x, y, itemStack)
+                when (this) {
+                    is InventoryCanvas -> {
+                        for (x in 0 until node.width)
+                            for (y in 0 until node.height)
+                                set(x, y, itemStack)
+                    }
+                }
             }
         },
         modifier = Modifier.sizeIn(minWidth = 1, minHeight = 1).then(modifier)

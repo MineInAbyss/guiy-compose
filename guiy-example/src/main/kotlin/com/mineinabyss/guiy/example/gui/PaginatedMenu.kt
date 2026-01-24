@@ -6,35 +6,31 @@ import com.mineinabyss.guiy.components.Item
 import com.mineinabyss.guiy.components.canvases.Chest
 import com.mineinabyss.guiy.components.lists.NavbarPosition
 import com.mineinabyss.guiy.components.lists.Paginated
-import com.mineinabyss.guiy.inventory.LocalGuiyOwner
 import com.mineinabyss.guiy.modifiers.Modifier
 import com.mineinabyss.guiy.modifiers.click.clickable
 import com.mineinabyss.guiy.modifiers.fillMaxSize
 import com.mineinabyss.guiy.modifiers.size
 import org.bukkit.Material
-import org.bukkit.entity.Player
 import org.bukkit.inventory.ItemStack
 
 @Composable
-fun PaginatedMenu(player: Player) {
-    val owner = LocalGuiyOwner.current
+fun PaginatedMenu() {
     Chest(
-        setOf(player),
         "Pagination example",
-        onClose = { owner.exit() },
         modifier = Modifier.fillMaxSize()
     ) {
         var items by remember {
             val materials = Material.entries
-            mutableStateOf((1..100).map { ItemStack(materials[it]) })
+            mutableStateOf((1..103).map { ItemStack(materials[it]) })
         }
         var page by remember { mutableStateOf(0) }
         Paginated(
             items,
             page = page,
+            onPageChange = { page = it },
             navbarPosition = NavbarPosition.END,
-            previousButton = { Item(Material.RED_CONCRETE, "Previous", modifier = Modifier.clickable { page-- }) },
-            nextButton = { Item(Material.BLUE_CONCRETE, "Next", modifier = Modifier.clickable { page++ }) },
+            previousButton = { Item(Material.RED_CONCRETE, "Previous") },
+            nextButton = { Item(Material.BLUE_CONCRETE, "Next") },
         ) { pageItems ->
             HorizontalGrid(Modifier.size(4, 5)) {
                 pageItems.forEach { item ->

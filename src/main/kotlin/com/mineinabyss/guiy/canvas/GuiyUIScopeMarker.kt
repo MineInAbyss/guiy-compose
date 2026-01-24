@@ -1,4 +1,4 @@
-package com.mineinabyss.guiy.inventory
+package com.mineinabyss.guiy.canvas
 
 @DslMarker
 annotation class GuiyUIScopeMarker

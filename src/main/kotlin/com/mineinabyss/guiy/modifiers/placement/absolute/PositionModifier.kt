@@ -13,5 +13,5 @@ class PositionModifier(
     override fun modifyPosition(offset: IntOffset) = IntOffset(this.x, this.y)
 }
 
-/** Places an element at an absolute offset in the inventory. */
+/** Places an element at an absolute offset in the canvas. */
 fun Modifier.at(x: Int = 0, y: Int = 0) = then(PositionModifier(x, y))
