@@ -27,8 +27,8 @@ fun <T> Paginated(
     items: List<T>,
     page: Int,
     onPageChange: (page: Int) -> Unit,
-    nextButton: @Composable () -> Unit,
-    previousButton: @Composable () -> Unit,
+    nextButton: @Composable (Modifier) -> Unit,
+    previousButton: @Composable (Modifier) -> Unit,
     navbarPosition: NavbarPosition = NavbarPosition.BOTTOM,
     navbarBackground: ItemStack? = remember {
         ItemStack(Material.GRAY_STAINED_GLASS_PANE).editItemMeta {
@@ -70,13 +70,9 @@ fun <T> Paginated(
             position = navbarPosition,
             navbar = {
                 NavbarButtons(navbarPosition, navbarBackground) {
-                    if (coercedPage > 0) Box(Modifier.clickable { onPageChange(coercedPage - 1) }) {
-                        previousButton()
-                    }
+                    if (coercedPage > 0) previousButton(Modifier.clickable { onPageChange(coercedPage - 1) })
                     else Spacer(1, 1)
-                    if (end < items.size) Box(Modifier.clickable { onPageChange(coercedPage + 1) }) {
-                        nextButton()
-                    }
+                    if (end < items.size) nextButton(Modifier.clickable { onPageChange(coercedPage + 1) })
                     else Spacer(1, 1)
                 }
             },

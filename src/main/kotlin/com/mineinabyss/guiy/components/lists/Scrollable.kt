@@ -30,8 +30,8 @@ fun <T> Scrollable(
     line: Int,
     onLineChange: (line: Int) -> Unit,
     scrollDirection: ScrollDirection,
-    nextButton: @Composable () -> Unit,
-    previousButton: @Composable () -> Unit,
+    nextButton: @Composable (Modifier) -> Unit,
+    previousButton: @Composable (Modifier) -> Unit,
     navbarPosition: NavbarPosition = NavbarPosition.BOTTOM,
     navbarBackground: ItemStack? = remember {
         ItemStack(Material.GRAY_STAINED_GLASS_PANE).editItemMeta {
@@ -78,13 +78,9 @@ fun <T> Scrollable(
                 position = navbarPosition,
                 navbar = {
                     NavbarButtons(navbarPosition, navbarBackground) {
-                        if (coercedLine > 0) Box(Modifier.clickable { onLineChange(coercedLine - 1) }) {
-                            previousButton()
-                        }
+                        if (coercedLine > 0) previousButton(Modifier.clickable { onLineChange(coercedLine - 1) })
                         else Spacer(1, 1)
-                        if (end < items.size) Box(Modifier.clickable { onLineChange(coercedLine + 1) }) {
-                            nextButton()
-                        }
+                        if (end < items.size) nextButton(Modifier.clickable { onLineChange(coercedLine + 1) })
                         else Spacer(1, 1)
                     }
                 },
