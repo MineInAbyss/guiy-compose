@@ -52,8 +52,8 @@ fun Inventory(
         LocalInventory provides inventory
     ) {
         Box(
-            // TODO Consume click so only the visible inventory can process clicks
-            modifier = modifier.clickable { isConsumed = false }.drawWithContent(canvas) {
+            // Consume click so only the visible inventory can process clicks
+            modifier = modifier.clickable { isConsumed = true }.drawWithContent(canvas) {
                 canvas.clear()
                 drawContent()
 
