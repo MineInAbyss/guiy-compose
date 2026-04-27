@@ -1,0 +1,7 @@
+[versions]
+compose-mini = "0.0.2-SNAPSHOT"
+
+[libraries]
+compose-mini-runtime = { module = "me.dvyy.compose.mini:runtime", version.ref = "compose-mini"}
+compose-mini-layout = { module = "me.dvyy.compose.mini:layout", version.ref = "compose-mini"}
+compose-mini-modifier = { module = "me.dvyy.compose.mini:modifier", version.ref = "compose-mini"}

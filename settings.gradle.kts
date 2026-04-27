@@ -26,4 +26,4 @@ include(
     "guiy-example",
 )
 
-includeBuild("../compose-mini")
+//includeBuild("../compose-mini")

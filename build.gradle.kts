@@ -41,8 +41,8 @@ dependencies {
     }
 
     implementation(idofrontLibs.bundles.idofront.core)
-    api("me.dvyy.compose.mini:runtime")
-    api("me.dvyy.compose.mini:layout")
-    api("me.dvyy.compose.mini:modifier")
+    api(libs.compose.mini.layout)
+    api(libs.compose.mini.runtime)
+    api(libs.compose.mini.modifier)
     implementation(idofrontLibs.idofront.nms)
 }
