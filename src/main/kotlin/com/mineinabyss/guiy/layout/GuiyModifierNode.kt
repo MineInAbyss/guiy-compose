@@ -98,12 +98,11 @@ internal class GuiyModifierNode(
     }
 
     fun processClickEvent(event: ClickEvent): Boolean {
-        if (!isInBounds(event)) return false
         // start from last child since user is shown last inventory added to tree
         if (next == null) return root.children.asReversed().any { it.layoutDelegate.processClickEvent(event) }
         val node = node
         next!!.processClickEvent(event)
-        if(node is InteractionModifierNode && !event.isConsumed) {
+        if(node is InteractionModifierNode && !event.isConsumed && isInBounds(event)) {
             event.position = event.globalPosition - IntOffset(x, y)
             node.onEvent(event)
         }
