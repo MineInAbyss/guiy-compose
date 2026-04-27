@@ -1,12 +1,14 @@
 package com.mineinabyss.guiy.example.gui
 
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import com.mineinabyss.guiy.components.Item
 import com.mineinabyss.guiy.components.VerticalGrid
 import com.mineinabyss.guiy.components.canvases.Chest
 import com.mineinabyss.guiy.components.lists.NavbarPosition
 import com.mineinabyss.guiy.components.lists.ScrollDirection
 import com.mineinabyss.guiy.components.lists.Scrollable
+import com.mineinabyss.guiy.components.lists.ScrollableState
 import me.dvyy.compose.mini.layout.modifiers.fillMaxSize
 import me.dvyy.compose.mini.modifier.Modifier
 import org.bukkit.Material
@@ -22,15 +24,10 @@ fun ScrollingMenu() {
             val materials = Material.entries
             (1..100).map { ItemStack(materials[it]) }
         }
-        var line by remember { mutableStateOf(0) }
         Scrollable(
             items,
-            line = line,
-            onLineChange = { line = it },
-            scrollDirection = ScrollDirection.VERTICAL,
+            state = remember { ScrollableState(ScrollDirection.VERTICAL) },
             navbarPosition = NavbarPosition.END,
-            previousButton = { Item(Material.RED_CONCRETE, "Previous") },
-            nextButton = { Item(Material.BLUE_CONCRETE, "Next") },
         ) { pageItems ->
             VerticalGrid(Modifier.fillMaxSize()) {
                 pageItems.forEach { item ->
