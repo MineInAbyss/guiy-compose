@@ -76,10 +76,19 @@ class GuiyOwner(
     private val readStatesOnDraw = mutableSetOf<Any>()//TODO mutableScatterSetOf<Any>()
     private val readStatesOnDrawObserver: (Any) -> Unit = readStatesOnDraw::add
 
+    // Watch changed states and invalidate layout/draw as needed (this part is mostly necessary for Modifiers that read states)
+    private val applyObserver = Snapshot.registerApplyObserver { changedStates, _ ->
+        for (state in changedStates) {
+            if (state in readStatesOnLayout) requiresLayout = true
+            if (state in readStatesOnDraw) requiresDraw = true
+        }
+    }
+
 
     fun update() {
         if (requiresLayout) {
             requiresLayout = false
+            readStatesOnLayout.clear()
             Snapshot.observe(readObserver = readStatesOnLayoutObserver) {
                 rootNode.layoutDelegate.measure(constraints = Constraints())
                 rootNode.layoutDelegate.placeAt(0, 0)
@@ -89,6 +98,7 @@ class GuiyOwner(
         }
         if (requiresDraw) {
             requiresDraw = false
+            readStatesOnDraw.clear()
             Snapshot.observe(readObserver = readStatesOnDrawObserver) {
                 rootNode.layoutDelegate.drawTo(GuiyNodeDrawScope())
             }
@@ -101,6 +111,7 @@ class GuiyOwner(
 
     fun exit() {
         composition.close()
+        applyObserver.dispose()
     }
 
     fun start(

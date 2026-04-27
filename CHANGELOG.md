@@ -5,6 +5,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 This project does NOT adhere to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Changed
+
+- Moved out most layout and modifier declarations to `compose-mini`, these use compose's newer `Modifier.Node` syntax that will cache changes better
+- Merged Paginated and Scrollable into one `Scrollable` composable that takes a `ScrollableState`, making use of weight modifiers to more cleanly place it
+
+### Added
+- `HorizontalScrollbar` and `VerticalScrollbar` composables for `Scrollable`
+- New layout modifiers provided by `compose-mini` include `onPlaced`,`weight`/`align` under Box/Row/Column.
+- Added `drawBehind`, `drawWithContent` Modifiers following compose's internals more closely. These are aware of other positioning modifiers like in jetpack compose, (i.e. `padding(1.dp).drawBehind{}` will draw inside the padded area while `drawBehind{}.padding(1.dp)` will draw outside)
+
+### Fixed
+- Only register one global write observer tied to main tick loop instead of per menu
+- Switched to keeping track of states read on layout/draw phases to only update menus that changed each tick.
+
 ## [0.14.2] - 2025-10-11
 
 ### Changed
