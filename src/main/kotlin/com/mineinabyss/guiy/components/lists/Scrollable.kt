@@ -1,22 +1,19 @@
 package com.mineinabyss.guiy.components.lists
 
 import androidx.compose.runtime.*
+import androidx.compose.ui.unit.IntSize
 import com.mineinabyss.guiy.components.Item
-import com.mineinabyss.guiy.components.Spacer
 import com.mineinabyss.guiy.components.VerticalGrid
-import com.mineinabyss.guiy.layout.Box
-import com.mineinabyss.guiy.layout.Size
-import com.mineinabyss.guiy.modifiers.*
-import com.mineinabyss.guiy.modifiers.Modifier
-import com.mineinabyss.guiy.modifiers.click.clickable
-import com.mineinabyss.guiy.modifiers.fillMaxSize
-import com.mineinabyss.guiy.modifiers.onSizeChanged
 import com.mineinabyss.idofront.items.editItemMeta
+import me.dvyy.compose.mini.layout.jetpack.Box
+import me.dvyy.compose.mini.layout.modifiers.fillMaxSize
+import me.dvyy.compose.mini.layout.modifiers.onSizeChanged
+import me.dvyy.compose.mini.modifier.Modifier
 import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
 
 enum class ScrollDirection {
-    VERTICAL, HORIZONTAL;
+    VERTICAL, HORIZONTAL, PAGINATED;
 }
 
 /**
@@ -40,8 +37,8 @@ fun <T> Scrollable(
     },
     content: @Composable (page: List<T>) -> Unit,
 ) {
-    var size by remember { mutableStateOf(Size(0, 0)) }
-    var clearSize by remember { mutableStateOf(Size(0, 0)) }
+    var size by remember { mutableStateOf(IntSize(0, 0)) }
+    var clearSize by remember { mutableStateOf(IntSize(0, 0)) }
 
     val itemsPerLine = if (scrollDirection == ScrollDirection.VERTICAL) size.width else size.height
     val totalLines = if (scrollDirection == ScrollDirection.VERTICAL) size.height else size.width
@@ -77,12 +74,12 @@ fun <T> Scrollable(
             NavbarLayout(
                 position = navbarPosition,
                 navbar = {
-                    NavbarButtons(navbarPosition, navbarBackground) {
-                        if (coercedLine > 0) previousButton(Modifier.clickable { onLineChange(coercedLine - 1) })
-                        else Spacer(1, 1)
-                        if (end < items.size) nextButton(Modifier.clickable { onLineChange(coercedLine + 1) })
-                        else Spacer(1, 1)
-                    }
+//                    NavbarButtons(navbarPosition, navbarBackground) {
+//                        if (coercedLine > 0) previousButton(Modifier.clickable { onLineChange(coercedLine - 1) })
+//                        else Spacer(1.dp, 1.dp)
+//                        if (end < items.size) nextButton(Modifier.clickable { onLineChange(coercedLine + 1) })
+//                        else Spacer(1.dp, 1.dp)
+//                    }
                 },
                 content = {
                     // Actually render the correct amount of items into a box that can fit them including offsets

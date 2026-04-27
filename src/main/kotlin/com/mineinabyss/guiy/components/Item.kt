@@ -2,16 +2,13 @@ package com.mineinabyss.guiy.components
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
-import com.mineinabyss.guiy.canvas.GuiyCanvas
-import com.mineinabyss.guiy.canvas.InventoryCanvas
-import com.mineinabyss.guiy.layout.Layout
-import com.mineinabyss.guiy.layout.MeasureResult
-import com.mineinabyss.guiy.layout.Renderer
-import com.mineinabyss.guiy.modifiers.Modifier
-import com.mineinabyss.guiy.modifiers.sizeIn
-import com.mineinabyss.guiy.nodes.GuiyNode
+import androidx.compose.ui.unit.dp
+import com.mineinabyss.guiy.modifiers.drawBehind
 import com.mineinabyss.idofront.items.editItemMeta
 import com.mineinabyss.idofront.textcomponents.miniMsg
+import me.dvyy.compose.mini.layout.Layout
+import me.dvyy.compose.mini.layout.modifiers.sizeIn
+import me.dvyy.compose.mini.modifier.Modifier
 import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
 
@@ -23,21 +20,12 @@ import org.bukkit.inventory.ItemStack
 @Composable
 fun Item(itemStack: ItemStack?, modifier: Modifier = Modifier) {
     Layout(
-        measurePolicy = { _, constraints ->
-            MeasureResult(constraints.minWidth, constraints.minHeight) {}
-        },
-        renderer = object : Renderer {
-            override fun GuiyCanvas.render(node: GuiyNode) {
-                when (this) {
-                    is InventoryCanvas -> {
-                        for (x in 0 until node.width)
-                            for (y in 0 until node.height)
-                                set(x, y, itemStack)
-                    }
-                }
-            }
-        },
-        modifier = Modifier.sizeIn(minWidth = 1, minHeight = 1).then(modifier)
+        measurePolicy = { _, constraints -> layout(constraints.minWidth, constraints.minHeight) {} },
+        modifier = modifier.drawBehind {
+            for (x in 0 until width)
+                for (y in 0 until height)
+                    drawItem(x, y, itemStack)
+        }.sizeIn(minWidth = 1.dp, minHeight = 1.dp)
     )
 }
 
@@ -71,3 +59,5 @@ fun Item(
 
     Item(item, modifier)
 }
+
+

@@ -1,11 +1,10 @@
 package com.mineinabyss.guiy.components.button
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.staticCompositionLocalOf
 import com.mineinabyss.guiy.components.canvases.LocalInventory
-import com.mineinabyss.guiy.layout.Box
-import com.mineinabyss.guiy.modifiers.Modifier
 import com.mineinabyss.guiy.modifiers.click.clickable
+import me.dvyy.compose.mini.layout.jetpack.Box
+import me.dvyy.compose.mini.modifier.Modifier
 import org.bukkit.entity.Player
 
 @Composable

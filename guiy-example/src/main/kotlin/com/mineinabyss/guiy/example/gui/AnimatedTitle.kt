@@ -2,9 +2,9 @@ package com.mineinabyss.guiy.example.gui
 
 import androidx.compose.runtime.*
 import com.mineinabyss.guiy.components.canvases.Chest
-import com.mineinabyss.guiy.modifiers.Modifier
-import com.mineinabyss.guiy.modifiers.fillMaxHeight
 import kotlinx.coroutines.delay
+import me.dvyy.compose.mini.layout.modifiers.fillMaxHeight
+import me.dvyy.compose.mini.modifier.Modifier
 
 @Composable
 fun AnimatedTitle() {

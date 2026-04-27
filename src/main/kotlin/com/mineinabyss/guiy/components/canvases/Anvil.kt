@@ -1,21 +1,22 @@
 package com.mineinabyss.guiy.components.canvases
 
 import androidx.compose.runtime.*
+import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.dp
 import com.mineinabyss.guiy.canvas.CurrentPlayer
 import com.mineinabyss.guiy.canvas.inventory.GuiyInventoryHolder
 import com.mineinabyss.guiy.canvas.inventory.InventoryCloseScope
 import com.mineinabyss.guiy.components.items.InvisibleItem
 import com.mineinabyss.guiy.components.rememberMiniMsg
-import com.mineinabyss.guiy.components.state.IntCoordinates
 import com.mineinabyss.guiy.guiyPlugin
-import com.mineinabyss.guiy.layout.Box
-import com.mineinabyss.guiy.layout.Row
-import com.mineinabyss.guiy.modifiers.Modifier
 import com.mineinabyss.guiy.modifiers.click.clickable
-import com.mineinabyss.guiy.modifiers.size
 import com.mineinabyss.idofront.textcomponents.toPlainText
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterNotNull
+import me.dvyy.compose.mini.layout.jetpack.Box
+import me.dvyy.compose.mini.layout.jetpack.Row
+import me.dvyy.compose.mini.layout.modifiers.size
+import me.dvyy.compose.mini.modifier.Modifier
 import org.bukkit.Bukkit
 import org.bukkit.event.inventory.InventoryType
 import org.bukkit.inventory.Inventory
@@ -47,7 +48,7 @@ fun Anvil(
         }
     }
 
-    val constrainedModifier = Modifier.size(width = 3, height = 1)
+    val constrainedModifier = Modifier.size(width = 3.dp, height = 1.dp)
 
     Inventory(
         inventory,
@@ -55,15 +56,15 @@ fun Anvil(
         title = titleMM,
         modifier = constrainedModifier,
         gridToInventoryIndex = { it.x },
-        inventoryIndexToGrid = { IntCoordinates(it, 0) }) {
+        inventoryIndexToGrid = { IntOffset(it, 0) }) {
         Row {
-            Box(Modifier.size(1)) {
+            Box(Modifier.size(1.dp)) {
                 inputLeft()
             }
-            Box(Modifier.size(1)) {
+            Box(Modifier.size(1.dp)) {
                 inputRight()
             }
-            Box(Modifier.size(1).clickable { onSubmit(playerViewText) }) {
+            Box(Modifier.size(1.dp).clickable { onSubmit(playerViewText) }) {
                 output()
             }
         }

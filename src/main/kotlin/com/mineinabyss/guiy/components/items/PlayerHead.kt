@@ -7,9 +7,9 @@ import com.destroystokyo.paper.profile.PlayerProfile
 import com.mineinabyss.guiy.components.Item
 import com.mineinabyss.guiy.components.items.PlayerHeadType.*
 import com.mineinabyss.guiy.components.rememberMiniMsg
-import com.mineinabyss.guiy.modifiers.Modifier
 import com.mineinabyss.idofront.items.editItemMeta
 import com.mineinabyss.idofront.textcomponents.miniMsg
+import me.dvyy.compose.mini.modifier.Modifier
 import org.bukkit.Material
 import org.bukkit.OfflinePlayer
 import org.bukkit.inventory.ItemStack

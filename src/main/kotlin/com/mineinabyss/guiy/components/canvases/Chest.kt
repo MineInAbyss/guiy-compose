@@ -1,16 +1,16 @@
 package com.mineinabyss.guiy.components.canvases
 
 import androidx.compose.runtime.*
+import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.IntSize
+import androidx.compose.ui.unit.dp
 import com.mineinabyss.guiy.canvas.inventory.GuiyInventoryHolder
 import com.mineinabyss.guiy.canvas.inventory.InventoryCloseScope
 import com.mineinabyss.guiy.components.rememberMiniMsg
-import com.mineinabyss.guiy.components.state.IntCoordinates
-import com.mineinabyss.guiy.layout.Layout
-import com.mineinabyss.guiy.layout.Size
-import com.mineinabyss.guiy.layout.StaticMeasurePolicy
-import com.mineinabyss.guiy.modifiers.Modifier
-import com.mineinabyss.guiy.modifiers.onSizeChanged
-import com.mineinabyss.guiy.modifiers.sizeIn
+import me.dvyy.compose.mini.layout.jetpack.Box
+import me.dvyy.compose.mini.layout.modifiers.onSizeChanged
+import me.dvyy.compose.mini.layout.modifiers.sizeIn
+import me.dvyy.compose.mini.modifier.Modifier
 import net.kyori.adventure.text.Component
 import org.bukkit.inventory.Inventory
 
@@ -51,17 +51,16 @@ fun Chest(
     content: @Composable () -> Unit,
 ) {
     val holder: GuiyInventoryHolder = LocalInventoryHolder.current
-    var size by remember { mutableStateOf(Size()) }
+    var size by remember { mutableStateOf(IntSize(0, 0)) }
     val constrainedModifier =
-        Modifier.sizeIn(CHEST_WIDTH, CHEST_WIDTH, MIN_CHEST_HEIGHT, MAX_CHEST_HEIGHT).then(modifier)
+        Modifier
             .onSizeChanged { if (size != it) size = it }
+            .sizeIn(CHEST_WIDTH.dp, CHEST_WIDTH.dp, MIN_CHEST_HEIGHT.dp, MAX_CHEST_HEIGHT.dp)
+            .then(modifier)
 
     // Draw nothing if empty
-    if (size == Size()) {
-        Layout(
-            measurePolicy = StaticMeasurePolicy,
-            modifier = constrainedModifier
-        )
+    if (size == IntSize(0, 0)) {
+        Box(modifier= constrainedModifier) {  }
         return
     }
 
@@ -79,7 +78,7 @@ fun Chest(
             else x + y * CHEST_WIDTH
         },
         inventoryIndexToGrid = { index ->
-            IntCoordinates(index % CHEST_WIDTH, index / CHEST_WIDTH)
+            IntOffset(index % CHEST_WIDTH, index / CHEST_WIDTH)
         },
     ) {
         content()

@@ -38,6 +38,6 @@ class GuiyUIDispatcher() : CoroutineDispatcher(), Closeable {
          *
          * All UI operations should run on this dispatcher, including recompositions and [com.mineinabyss.guiy.viewmodel.GuiyViewModel]'s viewModelScope.
          */
-        val Main = guiyPlugin.minecraftDispatcher + GuiyUIDispatcher()
+        val Main = guiyPlugin.minecraftDispatcher + GuiyUIDispatcher() + guiyPlugin.frameClock
     }
 }

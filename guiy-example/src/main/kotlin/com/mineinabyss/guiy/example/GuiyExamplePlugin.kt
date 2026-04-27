@@ -9,42 +9,42 @@ class GuiyExamplePlugin : JavaPlugin() {
     override fun onEnable() = commands {
         "guiyexample" {
             "arrangement" {
-                playerExecutes {
+                executes.asPlayer {
                     guiy(player) { ArrangementMenu() }
                 }
             }
             "animated" {
-                playerExecutes {
+                executes.asPlayer {
                     guiy(player) { AnimatedTitle() }
                 }
             }
             "autoReopen" {
-                playerExecutes {
+                executes.asPlayer {
                     guiy(player) { AutoReopen() }
                 }
             }
             "creative" {
-                playerExecutes {
+                executes.asPlayer {
                     guiy(player) { CreativeMenu() }
                 }
             }
             "cursor" {
-                playerExecutes {
+                executes.asPlayer {
                     guiy(player) { Cursor() }
                 }
             }
             "pagination" {
-                playerExecutes {
+                executes.asPlayer {
                     guiy(player) { PaginatedMenu() }
                 }
             }
             "scrolling" {
-                playerExecutes {
+                executes.asPlayer {
                     guiy(player) { ScrollingMenu() }
                 }
             }
             "anvil" {
-                playerExecutes {
+                executes.asPlayer {
                     guiy(player) { AnvilGUI() }
                 }
             }

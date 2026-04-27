@@ -1,8 +1,6 @@
 package com.mineinabyss.guiy.canvas.inventory
 
-import com.mineinabyss.guiy.components.state.IntCoordinates
-import com.mineinabyss.guiy.modifiers.click.ClickScope
-import org.bukkit.Material
+import com.mineinabyss.guiy.interaction.ClickEvent
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
@@ -23,23 +21,9 @@ class GuiyEventListener : Listener {
         if (clickedInventory.holder !== guiyHolder) return
         isCancelled = true
 
-        val scope = ClickScope(
-            click, slot, whoClicked
-        )
-        guiyHolder.processClick(scope, this)
+        val event = ClickEvent.fromSlot(click, slot, whoClicked)
+        guiyHolder.onClick(event, this)
     }
-
-    @EventHandler
-    fun InventoryCloseEvent.onClose() {
-        val guiyHolder = inventory.holder as? GuiyInventoryHolder ?: return
-
-        if (reason != InventoryCloseEvent.Reason.PLUGIN) {
-            guiyHolder.onClose(player as Player)
-        } else {
-            guiyHolder.closeIfNoLongerViewing(player as Player)
-        }
-    }
-
 
     @EventHandler
     fun InventoryDragEvent.onInventoryDrag() {
@@ -50,10 +34,21 @@ class GuiyEventListener : Listener {
         if (newItems.size == 1 && inGuiy.size == 1) {
             isCancelled = true
             val clicked = inGuiy.entries.first()
-            val scope = ClickScope(LEFT, clicked.key, whoClicked)
-            guiyHolder.processClick(scope, this)
+            val scope = ClickEvent.fromSlot(LEFT, clicked.key, whoClicked)
+            guiyHolder.onClick(scope, this)
         } else if (inGuiy.isNotEmpty()) {
             isCancelled = true
+        }
+    }
+
+    @EventHandler
+    fun InventoryCloseEvent.onClose() {
+        val guiyHolder = inventory.holder as? GuiyInventoryHolder ?: return
+
+        if (reason != InventoryCloseEvent.Reason.PLUGIN) {
+            guiyHolder.onClose(player as Player)
+        } else {
+            guiyHolder.closeIfNoLongerViewing(player as Player)
         }
     }
 }

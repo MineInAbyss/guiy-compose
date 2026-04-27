@@ -4,8 +4,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import com.mineinabyss.guiy.components.Item
 import com.mineinabyss.guiy.components.rememberMiniMsg
-import com.mineinabyss.guiy.modifiers.Modifier
 import com.mineinabyss.idofront.items.editItemMeta
+import me.dvyy.compose.mini.modifier.Modifier
 import net.kyori.adventure.text.Component
 
 /**

@@ -1,14 +1,24 @@
 package com.mineinabyss.guiy.nodes
 
 import androidx.compose.runtime.AbstractApplier
-import com.mineinabyss.guiy.layout.LayoutNode
+import com.mineinabyss.guiy.layout.GuiyNode
 
-internal class GuiyNodeApplier(root: LayoutNode) : AbstractApplier<LayoutNode>(root) {
-    override fun insertTopDown(index: Int, instance: LayoutNode) {
+internal class GuiyNodeApplier(
+    root: GuiyNode,
+    private val onChanges: () -> Unit = {},
+) : AbstractApplier<GuiyNode>(root) {
+    override fun onBeginChanges() {
+        super.onBeginChanges()
+
+        // We invoke this here rather than in the end change callback to try and ensure
+        // no one relies on it to signal the end of changes.
+        onChanges.invoke()
+    }
+    override fun insertTopDown(index: Int, instance: GuiyNode) {
         // Ignored, we insert bottom-up.
     }
 
-    override fun insertBottomUp(index: Int, instance: LayoutNode) {
+    override fun insertBottomUp(index: Int, instance: GuiyNode) {
         current.children.add(index, instance)
         check(instance.parent == null) {
             "$instance must not have a parent when being inserted."

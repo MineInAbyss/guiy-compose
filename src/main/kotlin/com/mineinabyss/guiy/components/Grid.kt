@@ -1,10 +1,9 @@
 package com.mineinabyss.guiy.components
 
 import androidx.compose.runtime.Composable
-import com.mineinabyss.guiy.layout.Layout
-import com.mineinabyss.guiy.layout.MeasurePolicy
-import com.mineinabyss.guiy.layout.MeasureResult
-import com.mineinabyss.guiy.modifiers.Modifier
+import me.dvyy.compose.mini.layout.Layout
+import me.dvyy.compose.mini.layout.jetpack.MeasurePolicy
+import me.dvyy.compose.mini.modifier.Modifier
 import kotlin.math.ceil
 
 /**
@@ -44,7 +43,7 @@ fun gridMeasurePolicy(vertical: Boolean) = MeasurePolicy { measurables, constrai
     val placeables = measurables.map { it.measure(noMinConstraints) }
     val cellWidth = placeables.maxOfOrNull { it.width } ?: 0
     val cellHeight = placeables.maxOfOrNull { it.height } ?: 0
-    if (cellWidth == 0 || cellHeight == 0) return@MeasurePolicy MeasureResult(
+    if (cellWidth == 0 || cellHeight == 0) return@MeasurePolicy layout(
         constraints.minWidth,
         constraints.minHeight
     ) {}
@@ -57,15 +56,15 @@ fun gridMeasurePolicy(vertical: Boolean) = MeasurePolicy { measurables, constrai
         val h = (ceil(placeables.size / itemsPerLine.toFloat()).toInt()) * cellHeight
         w to h
     } else {
-        val w = (ceil(placeables.size / itemsPerLine.toFloat()).toInt())  * cellWidth
+        val w = (ceil(placeables.size / itemsPerLine.toFloat()).toInt()) * cellWidth
         val h = itemsPerLine * cellHeight
         w to h
     }
-    MeasureResult(width, height) {
+    layout(width, height) {
         var placeAtX = 0
         var placeAtY = 0
         for (child in placeables) {
-            child.placeAt(placeAtX, placeAtY)
+            child.place(placeAtX, placeAtY)
 
             if (vertical) {
                 placeAtX += cellWidth

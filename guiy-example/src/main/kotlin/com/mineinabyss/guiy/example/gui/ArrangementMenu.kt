@@ -1,14 +1,15 @@
 package com.mineinabyss.guiy.example.gui
 
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.unit.dp
 import com.mineinabyss.guiy.components.Item
 import com.mineinabyss.guiy.components.canvases.Chest
-import com.mineinabyss.guiy.jetpack.Arrangement
-import com.mineinabyss.guiy.layout.Column
-import com.mineinabyss.guiy.layout.Row
-import com.mineinabyss.guiy.modifiers.Modifier
-import com.mineinabyss.guiy.modifiers.fillMaxSize
-import com.mineinabyss.guiy.modifiers.fillMaxWidth
+import me.dvyy.compose.mini.layout.jetpack.Arrangement
+import me.dvyy.compose.mini.layout.jetpack.Column
+import me.dvyy.compose.mini.layout.jetpack.Row
+import me.dvyy.compose.mini.layout.modifiers.fillMaxSize
+import me.dvyy.compose.mini.layout.modifiers.fillMaxWidth
+import me.dvyy.compose.mini.modifier.Modifier
 import org.bukkit.Material
 
 @Composable
@@ -19,7 +20,7 @@ fun ArrangementMenu() {
     ) {
         Column {
             val modifier = Modifier.fillMaxWidth()
-            Row(modifier, horizontalArrangement = Arrangement.spacedBy(1)) {
+            Row(modifier, horizontalArrangement = Arrangement.spacedBy(1.dp)) {
                 Items(4)
             }
             Row(modifier, horizontalArrangement = Arrangement.Center) {

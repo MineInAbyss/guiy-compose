@@ -1,9 +1,9 @@
 package com.mineinabyss.guiy.components
 
 import androidx.compose.runtime.Composable
-import com.mineinabyss.guiy.modifiers.Modifier
 import com.mineinabyss.guiy.modifiers.click.clickable
 import com.mineinabyss.idofront.messaging.error
+import me.dvyy.compose.mini.modifier.Modifier
 import org.bukkit.GameMode
 import org.bukkit.event.inventory.ClickType
 import org.bukkit.inventory.ItemStack

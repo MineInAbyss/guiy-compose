@@ -7,9 +7,8 @@ import com.mineinabyss.guiy.components.canvases.Chest
 import com.mineinabyss.guiy.components.lists.NavbarPosition
 import com.mineinabyss.guiy.components.lists.ScrollDirection
 import com.mineinabyss.guiy.components.lists.Scrollable
-import com.mineinabyss.guiy.modifiers.Modifier
-import com.mineinabyss.guiy.modifiers.click.clickable
-import com.mineinabyss.guiy.modifiers.fillMaxSize
+import me.dvyy.compose.mini.layout.modifiers.fillMaxSize
+import me.dvyy.compose.mini.modifier.Modifier
 import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
 

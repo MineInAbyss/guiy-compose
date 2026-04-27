@@ -23,5 +23,7 @@ dependencyResolutionManagement {
 rootProject.name = "guiy-compose"
 
 include(
-    "guiy-example"
+    "guiy-example",
 )
+
+includeBuild("../compose-mini")

@@ -41,9 +41,8 @@ dependencies {
     }
 
     implementation(idofrontLibs.bundles.idofront.core)
+    api("me.dvyy.compose.mini:runtime")
+    api("me.dvyy.compose.mini:layout")
+    api("me.dvyy.compose.mini:modifier")
     implementation(idofrontLibs.idofront.nms)
-}
-
-idofront {
-    docsVersion = "0.0.4"
 }

@@ -4,9 +4,9 @@ import androidx.compose.runtime.Composable
 import com.mineinabyss.guiy.components.CreativeItem
 import com.mineinabyss.guiy.components.Item
 import com.mineinabyss.guiy.components.canvases.Chest
-import com.mineinabyss.guiy.layout.Row
-import com.mineinabyss.guiy.modifiers.Modifier
-import com.mineinabyss.guiy.modifiers.fillMaxWidth
+import me.dvyy.compose.mini.layout.jetpack.Row
+import me.dvyy.compose.mini.layout.modifiers.fillMaxWidth
+import me.dvyy.compose.mini.modifier.Modifier
 import org.bukkit.Material
 import org.bukkit.inventory.ItemStack
 

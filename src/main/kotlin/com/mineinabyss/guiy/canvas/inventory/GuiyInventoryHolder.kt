@@ -5,7 +5,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.Snapshot
 import com.mineinabyss.guiy.components.canvases.CHEST_WIDTH
-import com.mineinabyss.guiy.modifiers.click.ClickScope
+import com.mineinabyss.guiy.interaction.ClickEvent
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -55,7 +55,7 @@ abstract class GuiyInventoryHolder(initialViewers: Set<Player>) : InventoryHolde
         activeInventory = inventory
     }
 
-    abstract fun processClick(scope: ClickScope, event: Cancellable)
+    abstract fun onClick(event: ClickEvent, bukkitEvent: Cancellable)
 
     abstract fun onClose(player: Player)
 

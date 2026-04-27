@@ -5,8 +5,8 @@ import com.mineinabyss.guiy.canvas.LocalGuiyOwner
 import com.mineinabyss.guiy.components.button.Button
 import com.mineinabyss.guiy.components.canvases.Chest
 import com.mineinabyss.guiy.components.items.Text
-import com.mineinabyss.guiy.modifiers.Modifier
-import com.mineinabyss.guiy.modifiers.fillMaxHeight
+import me.dvyy.compose.mini.layout.modifiers.fillMaxHeight
+import me.dvyy.compose.mini.modifier.Modifier
 
 /**
  * Demonstrates how to prevent players from closing a GUI on `Esc`.

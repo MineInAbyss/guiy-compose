@@ -3,12 +3,11 @@ package com.mineinabyss.guiy.components.canvases
 import androidx.compose.runtime.*
 import com.github.shynixn.mccoroutine.bukkit.launch
 import com.github.shynixn.mccoroutine.bukkit.minecraftDispatcher
-import com.mineinabyss.guiy.canvas.LocalClickHandler
 import com.mineinabyss.guiy.canvas.LocalGuiyOwner
 import com.mineinabyss.guiy.canvas.inventory.GuiyInventoryHolder
 import com.mineinabyss.guiy.canvas.inventory.InventoryCloseScope
 import com.mineinabyss.guiy.guiyPlugin
-import com.mineinabyss.guiy.modifiers.click.ClickScope
+import com.mineinabyss.guiy.interaction.ClickEvent
 import com.mineinabyss.guiy.navigation.LocalBackGestureDispatcher
 import com.mineinabyss.idofront.nms.entities.title
 import kotlinx.coroutines.delay
@@ -87,14 +86,13 @@ fun InventoryHolder(
 fun rememberInventoryHolder(
     initialViewers: Set<Player> = emptySet(),
 ): GuiyInventoryHolder {
-    val clickHandler = LocalClickHandler.current
     val owner = LocalGuiyOwner.current
     val backDispatcher = LocalBackGestureDispatcher.current
 
-    return remember(clickHandler) {
+    return remember(owner, backDispatcher) {
         object : GuiyInventoryHolder(initialViewers) {
-            override fun processClick(scope: ClickScope, event: Cancellable) {
-                clickHandler.processClick(scope)
+            override fun onClick(event: ClickEvent, bukkitEvent: Cancellable) {
+                owner.handleClick(event)
             }
 
             override fun onClose(player: Player) {

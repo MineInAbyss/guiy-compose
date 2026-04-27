@@ -1,4 +1,4 @@
-package com.mineinabyss.guiy.canvas
+package com.mineinabyss.guiy.components
 
 data class ClickResult(
     val clickConsumed: Boolean? = null,
