@@ -2,9 +2,14 @@ package com.mineinabyss.guiy
 
 import androidx.compose.runtime.BroadcastFrameClock
 import androidx.compose.runtime.snapshots.Snapshot
+import com.mineinabyss.dependencies.DI
+import com.mineinabyss.dependencies.DIContext
+import com.mineinabyss.dependencies.getLazy
 import com.mineinabyss.guiy.canvas.GuiyScopeManager
 import com.mineinabyss.guiy.canvas.inventory.GuiyEventListener
 import com.mineinabyss.guiy.canvas.inventory.GuiyInventoryHolder
+import com.mineinabyss.idofront.features.singlePluginLogger
+import com.mineinabyss.idofront.messaging.ComponentLogger
 import com.mineinabyss.idofront.nms.interceptServerbound
 import com.mineinabyss.idofront.plugin.listeners
 import kotlinx.coroutines.cancel
@@ -20,7 +25,12 @@ import kotlin.concurrent.atomics.ExperimentalAtomicApi
 val guiyPlugin: GuiyPlugin = Bukkit.getPluginManager().getPlugin("Guiy") as GuiyPlugin
 
 @OptIn(ExperimentalAtomicApi::class)
-class GuiyPlugin : JavaPlugin() {
+class GuiyPlugin : JavaPlugin(), DI {
+    override val di: DIContext = DI {
+        singlePluginLogger(this@GuiyPlugin)
+    }
+    val logger by di.getLazy<ComponentLogger>()
+
     val anvilPacketFlow = MutableStateFlow<Pair<String, Player>?>(null)
     private val applyScheduled = AtomicBoolean(false)
     val frameClock = BroadcastFrameClock()

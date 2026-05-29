@@ -1,13 +1,15 @@
+import net.minecrell.pluginyml.paper.PaperPluginDescription
+
 plugins {
-    alias(idofrontLibs.plugins.mia.kotlin.jvm)
-    alias(idofrontLibs.plugins.mia.papermc)
-    alias(idofrontLibs.plugins.mia.nms)
-    alias(idofrontLibs.plugins.mia.copyjar)
-    alias(idofrontLibs.plugins.mia.publication)
-    alias(idofrontLibs.plugins.mia.autoversion)
-    alias(idofrontLibs.plugins.mia.docs)
-    alias(idofrontLibs.plugins.jetbrainsCompose)
-    alias(idofrontLibs.plugins.compose.compiler)
+    alias(miaLibs.plugins.mia.kotlin.jvm)
+    alias(miaLibs.plugins.mia.papermc)
+    alias(miaLibs.plugins.mia.nms)
+    alias(miaLibs.plugins.mia.copyjar)
+    alias(miaLibs.plugins.mia.publication)
+    alias(miaLibs.plugins.mia.autoversion)
+    alias(miaLibs.plugins.mia.docs)
+    alias(miaLibs.plugins.jetbrainsCompose)
+    alias(miaLibs.plugins.compose.compiler)
 }
 
 kotlin {
@@ -30,9 +32,9 @@ allprojects {
 
 dependencies {
     // MineInAbyss platform
-    compileOnly(idofrontLibs.kotlinx.coroutines)
-    compileOnly(idofrontLibs.minecraft.mccoroutine)
-    compileOnly(idofrontLibs.kotlin.reflect)
+    compileOnly(miaLibs.kotlinx.coroutines)
+    compileOnly(miaLibs.minecraft.mccoroutine)
+    compileOnly(miaLibs.kotlin.reflect)
 
     // Shaded
     api(compose.runtime) {
@@ -40,9 +42,22 @@ dependencies {
         exclude("org.jetbrains.kotlinx")
     }
 
-    implementation(idofrontLibs.bundles.idofront.core)
+    implementation(miaLibs.bundles.idofront.core)
     api(libs.compose.mini.layout)
     api(libs.compose.mini.runtime)
     api(libs.compose.mini.modifier)
-    implementation(idofrontLibs.idofront.nms)
+    implementation(miaLibs.idofront.nms)
+}
+
+paper {
+    main = "com.mineinabyss.guiy.GuiyPlugin"
+    name = "Guiy"
+    description = "Minecraft UI built on Jetpack Compose"
+    author = "Offz"
+    serverDependencies {
+        register("Idofront") {
+            joinClasspath = true
+            load = PaperPluginDescription.RelativeLoadOrder.BEFORE
+        }
+    }
 }

@@ -10,14 +10,14 @@ pluginManagement {
 }
 
 dependencyResolutionManagement {
-    val idofrontVersion: String by settings
+    val miaLibs: String by settings
 
     repositories {
         maven("https://repo.mineinabyss.com/releases")
         maven("https://repo.mineinabyss.com/snapshots")
     }
 
-    versionCatalogs.create("idofrontLibs").from("com.mineinabyss:catalog:$idofrontVersion")
+    versionCatalogs.create("miaLibs").from("com.mineinabyss:catalog:$miaLibs")
 }
 
 rootProject.name = "guiy-compose"

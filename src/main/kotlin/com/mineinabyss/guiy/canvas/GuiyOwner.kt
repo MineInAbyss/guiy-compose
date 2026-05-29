@@ -14,7 +14,6 @@ import com.mineinabyss.guiy.navigation.BackGestureDispatcher
 import com.mineinabyss.guiy.navigation.LocalBackGestureDispatcher
 import com.mineinabyss.guiy.nodes.GuiyNodeApplier
 import com.mineinabyss.guiy.viewmodel.GuiyViewModel
-import com.mineinabyss.idofront.messaging.injectedLogger
 import me.dvyy.compose.mini.layout.ComposeMiniNode
 import me.dvyy.compose.mini.layout.LayoutFactory
 import me.dvyy.compose.mini.layout.LocalLayoutFactory
@@ -33,7 +32,7 @@ class GuiyOwner(
     initialViewers: Set<Player> = setOf(),
 ) {
     private val rootNode = GuiyNode()
-    val logger = guiyPlugin.injectedLogger()
+    val logger = guiyPlugin.logger
 
     //FIXME I think SnapshotHandle impl here will set applyScheduled to true for ALL GuiyOwner instances when any of them update?
     private val composition = MinimalComposition(
