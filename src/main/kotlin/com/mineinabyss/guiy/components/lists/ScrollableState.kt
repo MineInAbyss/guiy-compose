@@ -16,6 +16,7 @@ class ScrollableState(
         internal set
     var page by mutableStateOf(0)
         internal set
+
     val pageMax
         get() = if (itemsPerPage == 0) 1
         else (-((-itemCount).floorDiv(itemsPerPage))).coerceAtLeast(1)
@@ -39,11 +40,15 @@ class ScrollableState(
     val end get() = (page + pagesOnScreen) * itemsPerPage
 
     fun nextPage() {
-        page = (page + 1).coerceIn(0, pageMax - 1)
+        setPage(page + 1)
     }
 
     fun previousPage() {
-        page = (page - 1).coerceIn(0, pageMax - 1)
+        setPage(page - 1)
+    }
+
+    fun setPage(page: Int) {
+        this.page = (page).coerceIn(0, pageMax - 1)
     }
 
     internal fun setSize(size: IntSize) {
