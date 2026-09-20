@@ -30,6 +30,11 @@ allprojects {
     }
 }
 
+// Idofront shades androidx.collection for every plugin, compose pulls it in through several paths and a second shaded copy makes Paper reject one of them with a LinkageError
+configurations.runtimeClasspath {
+    exclude(group = "androidx.collection")
+}
+
 dependencies {
     // MineInAbyss platform
     compileOnly(miaLibs.kotlinx.coroutines)
@@ -41,6 +46,8 @@ dependencies {
         exclude("org.jetbrains.kotlin")
         exclude("org.jetbrains.kotlinx")
     }
+
+    compileOnly(miaLibs.androidx.collection)
 
     implementation(miaLibs.bundles.idofront.core)
     api(libs.compose.mini.layout)
