@@ -2,20 +2,25 @@ package com.mineinabyss.guiy
 
 import androidx.compose.runtime.BroadcastFrameClock
 import androidx.compose.runtime.snapshots.Snapshot
+import com.github.shynixn.mccoroutine.bukkit.launch
 import com.mineinabyss.dependencies.DI
 import com.mineinabyss.dependencies.DIContext
 import com.mineinabyss.dependencies.getLazy
 import com.mineinabyss.guiy.canvas.GuiyScopeManager
 import com.mineinabyss.guiy.canvas.inventory.GuiyEventListener
 import com.mineinabyss.guiy.canvas.inventory.GuiyInventoryHolder
+import com.mineinabyss.guiy.modifiers.scroll.BundleScrolling
 import com.mineinabyss.idofront.features.singlePluginLogger
 import com.mineinabyss.idofront.messaging.ComponentLogger
+import com.mineinabyss.idofront.nms.interceptClientbound
 import com.mineinabyss.idofront.nms.interceptServerbound
 import com.mineinabyss.idofront.plugin.listeners
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
+import net.minecraft.network.protocol.common.ClientboundUpdateTagsPacket
 import net.minecraft.network.protocol.game.ServerboundRenameItemPacket
+import net.minecraft.network.protocol.game.ServerboundSelectBundleItemPacket
 import org.bukkit.Bukkit
 import org.bukkit.entity.Player
 import org.bukkit.plugin.java.JavaPlugin
@@ -44,7 +49,14 @@ class GuiyPlugin : JavaPlugin(), DI {
             if (packet is ServerboundRenameItemPacket && player != null) {
                 anvilPacketFlow.update { packet.name to player }
             }
+            if (packet is ServerboundSelectBundleItemPacket && player != null && player.openInventory.topInventory.holder is GuiyInventoryHolder) {
+                launch { BundleScrolling.onSelect(player, packet.slotId, packet.selectedItemIndex) }
+                return@interceptServerbound null
+            }
             packet
+        }
+        interceptClientbound { packet, _: Player? ->
+            if (packet is ClientboundUpdateTagsPacket) BundleScrolling.withCarrierInBundleTag(packet) else packet
         }
 
         Bukkit.getScheduler().scheduleSyncRepeatingTask(this, {

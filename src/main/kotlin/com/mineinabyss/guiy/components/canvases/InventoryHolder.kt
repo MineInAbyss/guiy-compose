@@ -8,6 +8,7 @@ import com.mineinabyss.guiy.canvas.inventory.GuiyInventoryHolder
 import com.mineinabyss.guiy.canvas.inventory.InventoryCloseScope
 import com.mineinabyss.guiy.guiyPlugin
 import com.mineinabyss.guiy.interaction.ClickEvent
+import com.mineinabyss.guiy.interaction.ScrollEvent
 import com.mineinabyss.guiy.navigation.LocalBackGestureDispatcher
 import com.mineinabyss.idofront.nms.entities.title
 import kotlinx.coroutines.delay
@@ -93,6 +94,10 @@ fun rememberInventoryHolder(
         object : GuiyInventoryHolder(initialViewers) {
             override fun onClick(event: ClickEvent, bukkitEvent: Cancellable) {
                 owner.handleClick(event)
+            }
+
+            override fun onScroll(event: ScrollEvent) {
+                owner.handleScroll(event)
             }
 
             override fun onClose(player: Player) {

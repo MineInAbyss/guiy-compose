@@ -2,6 +2,7 @@ package com.mineinabyss.guiy.components.lists
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import com.mineinabyss.guiy.modifiers.scroll.onScroll
 import me.dvyy.compose.mini.layout.jetpack.Box
 import me.dvyy.compose.mini.layout.jetpack.Column
 import me.dvyy.compose.mini.layout.jetpack.Row
@@ -32,6 +33,7 @@ enum class NavbarPosition {
  * A scrollable or paginated list of items, with buttons to go to the next and previous pages.
  *
  * Content must set a size or fillMaxSize Modifier to be visible.
+ * With [scrollWheel] the mouse wheel over any item in the list or its scrollbar also changes the page.
  * Useful in combination with composables like [VerticalScrollbar], [com.mineinabyss.guiy.components.VerticalGrid], etc.
  *
  * @sample com.mineinabyss.guiy.example.gui.PaginatedMenu
@@ -42,6 +44,7 @@ fun <T> Scrollable(
     items: List<T>,
     state: ScrollableState = rememberScrollableState(ScrollDirection.PAGINATED),
     navbarPosition: NavbarPosition = NavbarPosition.BOTTOM,
+    scrollWheel: Boolean = true,
     scrollbar: @Composable () -> Unit = {
         if (navbarPosition.isVertical()) VerticalScrollbar(state)
         else HorizontalScrollbar(state)
@@ -56,8 +59,10 @@ fun <T> Scrollable(
         else items.subList(start, end.coerceAtMost(items.size))
     }
 
+    val modifier = if (scrollWheel) Modifier.onScroll { state.scroll(delta) } else Modifier
+
     //TODO switch to min intrinsic width
-    if (navbarPosition.isHorizontal()) Column {
+    if (navbarPosition.isHorizontal()) Column(modifier) {
         val isTop = navbarPosition == NavbarPosition.TOP
         if (isTop) scrollbar()
         Box(Modifier.fillMaxWidth().weight(1f).onSizeChanged { state.setSize(it) }) {
@@ -65,7 +70,7 @@ fun <T> Scrollable(
         }
         if (!isTop) scrollbar()
     }
-    else Row {
+    else Row(modifier) {
         val isStart = navbarPosition == NavbarPosition.START
         if (isStart) scrollbar()
         Box(Modifier.fillMaxHeight().weight(1f).onSizeChanged { state.setSize(it) }) {

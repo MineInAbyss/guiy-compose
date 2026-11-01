@@ -1,6 +1,7 @@
 package com.mineinabyss.guiy.canvas.inventory
 
 import com.mineinabyss.guiy.interaction.ClickEvent
+import com.mineinabyss.guiy.modifiers.scroll.BundleScrolling
 import org.bukkit.entity.Player
 import org.bukkit.event.EventHandler
 import org.bukkit.event.Listener
@@ -13,6 +14,8 @@ class GuiyEventListener : Listener {
     @EventHandler
     fun InventoryClickEvent.onClick() {
         val guiyHolder = inventory.holder as? GuiyInventoryHolder ?: return
+        // A cancelled click resends the slots, which resets the client's bundle selection
+        BundleScrolling.reset(whoClicked as Player)
 
         // Avoid any exploits shift clicking or double-clicking into/from the GUI
         if (click !in setOf(LEFT, RIGHT, MIDDLE)) isCancelled = true
@@ -44,6 +47,7 @@ class GuiyEventListener : Listener {
     @EventHandler
     fun InventoryCloseEvent.onClose() {
         val guiyHolder = inventory.holder as? GuiyInventoryHolder ?: return
+        BundleScrolling.reset(player as Player)
 
         if (reason != InventoryCloseEvent.Reason.PLUGIN) {
             guiyHolder.onClose(player as Player)

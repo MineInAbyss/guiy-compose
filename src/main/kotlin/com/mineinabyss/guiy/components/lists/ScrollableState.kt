@@ -47,6 +47,12 @@ class ScrollableState(
         setPage(page - 1)
     }
 
+    /** Moves one page per wheel step, stopping once the last row or column is on screen where [nextPage] keeps going until only one is left */
+    fun scroll(delta: Int) {
+        if (delta < 0) previousPage()
+        else if (page < pageMax - pagesOnScreen) nextPage()
+    }
+
     fun setPage(page: Int) {
         this.page = (page).coerceIn(0, pageMax - 1)
     }

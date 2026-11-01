@@ -3,6 +3,7 @@ package com.mineinabyss.guiy.components.lists
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.unit.dp
 import com.mineinabyss.guiy.components.Item
+import com.mineinabyss.guiy.components.items.LocalItemTheme
 import com.mineinabyss.guiy.modifiers.background
 import com.mineinabyss.guiy.modifiers.click.clickable
 import com.mineinabyss.guiy.modifiers.drawWithContent
@@ -28,7 +29,7 @@ internal fun InvisibleBox(
 @Composable
 fun HorizontalScrollbar(
     state: ScrollableState,
-    modifier: Modifier = Modifier.fillMaxWidth().background(Material.GRAY_STAINED_GLASS_PANE).padding(horizontal = 1.dp),
+    modifier: Modifier = Modifier.fillMaxWidth().background(LocalItemTheme.current.hiddenTooltip).padding(horizontal = 1.dp),
     hideWhenNoPage: Boolean = true,
     nextButton: @Composable () -> Unit = {
         Item(Material.RED_CONCRETE, "Next", modifier = Modifier.clickable { state.nextPage() })
@@ -46,7 +47,7 @@ fun HorizontalScrollbar(
 @Composable
 fun VerticalScrollbar(
     state: ScrollableState,
-    modifier: Modifier = Modifier.fillMaxHeight().background(Material.GRAY_STAINED_GLASS_PANE).padding(vertical = 1.dp),
+    modifier: Modifier = Modifier.fillMaxHeight().background(LocalItemTheme.current.hiddenTooltip).padding(vertical = 1.dp),
     hideWhenNoPage: Boolean = true,
     nextButton: @Composable () -> Unit = {
         Item(Material.RED_CONCRETE, "Next", modifier = Modifier.clickable { state.nextPage() })

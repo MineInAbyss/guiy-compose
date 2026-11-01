@@ -23,6 +23,9 @@ fun Modifier.background(
     //TODO change to node to cache ItemStack instance
     drawBehind { drawItemRect(itemStack = ItemStack(material)) }
 
+@Stable
+fun Modifier.background(itemStack: ItemStack) = drawBehind { drawItemRect(itemStack = itemStack) }
+
 fun Modifier.drawWithContent(
     overrideCanvas: InventoryCanvas? = null,
     onDraw: ContentDrawScope.() -> Unit,

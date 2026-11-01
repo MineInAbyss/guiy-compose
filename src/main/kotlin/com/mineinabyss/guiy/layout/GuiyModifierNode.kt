@@ -6,8 +6,11 @@ import androidx.compose.ui.unit.IntSize
 import com.mineinabyss.guiy.draw.ContentDrawScope
 import com.mineinabyss.guiy.draw.InventoryCanvas
 import com.mineinabyss.guiy.interaction.ClickEvent
+import com.mineinabyss.guiy.interaction.ScrollEvent
 import com.mineinabyss.guiy.modifiers.DrawModifierNode
 import com.mineinabyss.guiy.modifiers.InteractionModifierNode
+import com.mineinabyss.guiy.modifiers.ItemTransformModifierNode
+import com.mineinabyss.guiy.modifiers.ScrollModifierNode
 import me.dvyy.compose.mini.layout.jetpack.*
 import me.dvyy.compose.mini.layout.modifiers.LayoutAwareModifierNode
 import me.dvyy.compose.mini.modifier.Modifier
@@ -45,8 +48,10 @@ internal class GuiyModifierNode(
         }
     }
 
-    fun isInBounds(event: ClickEvent) =
-        (event.globalPosition.x in x until (x + width) && event.globalPosition.y in y until (y + height))
+    fun isInBounds(event: ClickEvent) = isInBounds(event.globalPosition)
+
+    private fun isInBounds(position: IntOffset) =
+        (position.x in x until (x + width) && position.y in y until (y + height))
 
     override fun measure(constraints: Constraints): Placeable {
         val node = node
@@ -108,19 +113,32 @@ internal class GuiyModifierNode(
         }
         return event.isConsumed
     }
+
+    fun processScrollEvent(event: ScrollEvent): Boolean {
+        if (next == null) return root.children.asReversed().any { it.layoutDelegate.processScrollEvent(event) }
+        val node = node
+        next!!.processScrollEvent(event)
+        if (node is ScrollModifierNode && !event.isConsumed && isInBounds(event.globalPosition)) {
+            event.position = event.globalPosition - IntOffset(x, y)
+            node.onScroll(event)
+        }
+        return event.isConsumed
+    }
 }
 
-internal class GuiyNodeDrawScope() : ContentDrawScope {
+internal class GuiyNodeDrawScope : ContentDrawScope {
     override var width: Int = 0
     override var height: Int = 0
     var x = 0
     var y = 0
     var canvas: InventoryCanvas? = null
     var drawNode: GuiyModifierNode? = null
+    private var itemTransform: ((ItemStack) -> ItemStack)? = null
 
     override fun drawItem(x: Int, y: Int, itemStack: ItemStack?) {
         val canvas = canvas ?: return
-        canvas.set(this.x + x, this.y + y, itemStack)
+        val transform = itemTransform
+        canvas.set(this.x + x, this.y + y, if (itemStack != null && transform != null) transform(itemStack) else itemStack)
     }
 
     override fun drawItemRect(offset: IntOffset, size: IntSize, itemStack: ItemStack?) {
@@ -134,12 +152,22 @@ internal class GuiyNodeDrawScope() : ContentDrawScope {
         val next = node.next ?: return node.root.children.forEach { it.layoutDelegate.drawTo(this) }
         val drawNode = node.node
         this.drawNode = next
-        if (drawNode is DrawModifierNode) {
-            draw(drawNode.overrideCanvas, IntOffset(node.x, node.y), IntSize(node.width, node.height)) {
-                drawNode.run { draw() }
+
+        when (drawNode) {
+            is DrawModifierNode ->
+                draw(drawNode.overrideCanvas, IntOffset(node.x, node.y), IntSize(node.width, node.height)) {
+                    drawNode.run { draw() }
+                }
+            is ItemTransformModifierNode -> {
+                val outer = itemTransform
+                itemTransform = if (outer == null) drawNode::transform else { item -> outer(drawNode.transform(item)) }
+                try {
+                    drawContent()
+                } finally {
+                    itemTransform = outer
+                }
             }
-        } else {
-            drawContent()
+            else -> drawContent()
         }
         this.drawNode = node
     }
@@ -153,11 +181,13 @@ internal class GuiyNodeDrawScope() : ContentDrawScope {
         val prevOffset = IntOffset(x, y)
         val prevSize = IntSize(width, height)
         val prevCanvas = canvas
+
         x = offset.x
         y = offset.y
         width = size.width
         height = size.height
         if (overrideCanvas != null) canvas = overrideCanvas
+
         try {
             block()
         } finally {

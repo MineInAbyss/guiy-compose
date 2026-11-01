@@ -8,6 +8,7 @@ import androidx.compose.ui.unit.Constraints
 import com.mineinabyss.guiy.components.canvases.InventoryHolder
 import com.mineinabyss.guiy.guiyPlugin
 import com.mineinabyss.guiy.interaction.ClickEvent
+import com.mineinabyss.guiy.interaction.ScrollEvent
 import com.mineinabyss.guiy.layout.GuiyNode
 import com.mineinabyss.guiy.layout.GuiyNodeDrawScope
 import com.mineinabyss.guiy.navigation.BackGestureDispatcher
@@ -106,6 +107,10 @@ class GuiyOwner(
 
     fun handleClick(event: ClickEvent) {
         rootNode.layoutDelegate.processClickEvent(event)
+    }
+
+    fun handleScroll(event: ScrollEvent) {
+        rootNode.layoutDelegate.processScrollEvent(event)
     }
 
     fun exit() {
