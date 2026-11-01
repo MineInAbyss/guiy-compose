@@ -4,8 +4,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.unit.dp
 import com.mineinabyss.guiy.modifiers.drawBehind
-import com.mineinabyss.idofront.items.editItemMeta
 import com.mineinabyss.idofront.textcomponents.miniMsg
+import io.papermc.paper.datacomponent.DataComponentTypes
+import io.papermc.paper.datacomponent.item.ItemLore
+import io.papermc.paper.datacomponent.item.TooltipDisplay
 import me.dvyy.compose.mini.layout.Layout
 import me.dvyy.compose.mini.layout.modifiers.sizeIn
 import me.dvyy.compose.mini.modifier.Modifier
@@ -50,10 +52,10 @@ fun Item(
     val loreMM = remember(lore) { lore.map { it.miniMsg() } }
 
     val item = remember(material, title, amount, lore, hideTooltip) {
-        ItemStack(material, amount).editItemMeta {
-            itemName(titleMM)
-            lore(loreMM)
-            isHideTooltip = hideTooltip
+        ItemStack.of(material, amount).apply {
+            if (titleMM != null) setData(DataComponentTypes.ITEM_NAME, titleMM)
+            setData(DataComponentTypes.LORE, ItemLore.lore(loreMM))
+            if (hideTooltip) setData(DataComponentTypes.TOOLTIP_DISPLAY, TooltipDisplay.tooltipDisplay().hideTooltip(true))
         }
     }
 

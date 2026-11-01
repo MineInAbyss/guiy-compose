@@ -7,13 +7,15 @@ import com.destroystokyo.paper.profile.PlayerProfile
 import com.mineinabyss.guiy.components.Item
 import com.mineinabyss.guiy.components.items.PlayerHeadType.*
 import com.mineinabyss.guiy.components.rememberMiniMsg
-import com.mineinabyss.idofront.items.editItemMeta
 import com.mineinabyss.idofront.textcomponents.miniMsg
+import io.papermc.paper.datacomponent.DataComponentTypes
+import io.papermc.paper.datacomponent.item.CustomModelData
+import io.papermc.paper.datacomponent.item.ItemLore
+import io.papermc.paper.datacomponent.item.ResolvableProfile
 import me.dvyy.compose.mini.modifier.Modifier
 import org.bukkit.Material
 import org.bukkit.OfflinePlayer
 import org.bukkit.inventory.ItemStack
-import org.bukkit.inventory.meta.SkullMeta
 
 enum class PlayerHeadType {
     NORMAL,
@@ -35,17 +37,18 @@ fun PlayerHead(
     val title = remember(title) { title?.miniMsg() }
     val lore = rememberMiniMsg(*lore)
     val item = remember(profile, title, lore) {
-        ItemStack(Material.PLAYER_HEAD).editItemMeta<SkullMeta> {
-            if (playerProfile != null) this.playerProfile = playerProfile
-            itemName(title)
-            lore(lore.toList())
-            when (type) {
-                NORMAL -> {}
-                FLAT -> setCustomModelData(1) //TODO customize via CompositionLocal
-                LARGE -> setCustomModelData(2)
-                NORMAL_CENTER -> setCustomModelData(3)
-                LARGE_CENTER -> setCustomModelData(4)
+        ItemStack.of(Material.PLAYER_HEAD).apply {
+            if (profile != null) setData(DataComponentTypes.PROFILE, ResolvableProfile.resolvableProfile(profile))
+            if (title != null) setData(DataComponentTypes.ITEM_NAME, title)
+            setData(DataComponentTypes.LORE, ItemLore.lore(lore.toList()))
+            val modelData = when (type) {
+                NORMAL -> null
+                FLAT -> 1f //TODO customize via CompositionLocal
+                LARGE -> 2f
+                NORMAL_CENTER -> 3f
+                LARGE_CENTER -> 4f
             }
+            if (modelData != null) setData(DataComponentTypes.CUSTOM_MODEL_DATA, CustomModelData.customModelData().addFloat(modelData))
         }
     }
     Item(item, modifier)
