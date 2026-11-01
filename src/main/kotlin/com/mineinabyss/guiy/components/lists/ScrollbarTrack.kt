@@ -33,7 +33,7 @@ private enum class TrackPiece { START, MIDDLE, END, SINGLE }
  * Nothing is drawn while the list fits without scrolling.
  *
  * Every slot shows [model] with custom model data string 0 set to `vertical` and string 1 to `start`, `middle`, `end` or `single` for its piece of the frame.
- * The bottom slot also draws the thumb, float 0 is how many GUI pixels it sits above its lowest position
+ * The slot holding the thumb's bottom edge has flag 0 set, with float 0 being how many GUI pixels the thumb sits above its lowest position in that slot, from 0 to 17
  */
 @Composable
 fun VerticalScrollbarTrack(
@@ -50,7 +50,7 @@ fun VerticalScrollbarTrack(
  * Nothing is drawn while the list fits without scrolling.
  *
  * Every slot shows [model] with custom model data string 0 set to `horizontal` and string 1 to `start`, `middle`, `end` or `single` for its piece of the frame.
- * The rightmost slot also draws the thumb, float 0 is how many GUI pixels it sits left of its rightmost position
+ * The slot holding the thumb's right edge has flag 0 set, with float 0 being how many GUI pixels the thumb sits left of its rightmost position in that slot, from 0 to 17
  */
 @Composable
 fun HorizontalScrollbarTrack(
@@ -75,6 +75,9 @@ private fun ScrollbarTrack(
     if (lastPage <= 0) return
     val travel = ((length - 1) * SLOT_PITCH_PX - THUMB_INSET_PX).coerceAtLeast(0)
     val fromStart = (state.page.coerceAtMost(lastPage) * travel / lastPage.toFloat()).roundToInt()
+    val fromEnd = travel - fromStart
+    // Drawn by the slot holding the thumb's end side edge, so it only overflows towards the start into slots that render before it
+    val thumbIndex = length - 1 - fromEnd / SLOT_PITCH_PX
     val name = tooltip(state.page + 1, (state.page + state.pagesOnScreen).coerceAtMost(state.pageMax), state.pageMax)
 
     val slots: @Composable () -> Unit = {
@@ -85,8 +88,7 @@ private fun ScrollbarTrack(
                 index == length - 1 -> TrackPiece.END
                 else -> TrackPiece.MIDDLE
             }
-            // Drawn by the last slot since later slots render over earlier ones
-            val thumbOffset = if (index == length - 1) travel - fromStart else null
+            val thumbOffset = if (index == thumbIndex) fromEnd % SLOT_PITCH_PX else null
             val item = remember(model, orientation, piece, thumbOffset, name) {
                 ItemStack.of(Material.PAPER).apply {
                     setData(DataComponentTypes.ITEM_MODEL, model)
@@ -95,6 +97,7 @@ private fun ScrollbarTrack(
                         CustomModelData.customModelData()
                             .addString(orientation.name.lowercase())
                             .addString(piece.name.lowercase())
+                            .addFlag(thumbOffset != null)
                             .apply { if (thumbOffset != null) addFloat(thumbOffset.toFloat()) }
                     )
                     setData(DataComponentTypes.ITEM_NAME, name.miniMsg())
