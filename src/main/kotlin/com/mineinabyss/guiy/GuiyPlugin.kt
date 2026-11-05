@@ -49,7 +49,7 @@ class GuiyPlugin : JavaPlugin(), DI {
             if (packet is ServerboundRenameItemPacket && player != null) {
                 anvilPacketFlow.update { packet.name to player }
             }
-            if (packet is ServerboundSelectBundleItemPacket && player != null && player.openInventory.topInventory.holder is GuiyInventoryHolder) {
+            if (packet is ServerboundSelectBundleItemPacket && player != null && player.openInventory.topInventory.getHolder(false) is GuiyInventoryHolder) {
                 launch { BundleScrolling.onSelect(player, packet.slotId, packet.selectedItemIndex) }
                 return@interceptServerbound null
             }

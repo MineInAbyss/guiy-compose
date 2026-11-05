@@ -57,7 +57,7 @@ internal object BundleScrolling {
     /** Must run on the main thread */
     fun onSelect(player: Player, slot: Int, index: Int) {
         val inventory = player.openInventory.topInventory
-        val holder = inventory.holder as? GuiyInventoryHolder ?: return
+        val holder = inventory.getHolder(false) as? GuiyInventoryHolder ?: return
         if (slot !in 0 until inventory.size) return
 
         val item = inventory.getItem(slot)

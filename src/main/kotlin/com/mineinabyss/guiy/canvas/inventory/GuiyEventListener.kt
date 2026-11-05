@@ -13,7 +13,7 @@ import org.bukkit.event.inventory.InventoryDragEvent
 class GuiyEventListener : Listener {
     @EventHandler
     fun InventoryClickEvent.onClick() {
-        val guiyHolder = inventory.holder as? GuiyInventoryHolder ?: return
+        val guiyHolder = inventory.getHolder(false) as? GuiyInventoryHolder ?: return
         // A cancelled click resends the slots, which resets the client's bundle selection
         BundleScrolling.reset(whoClicked as Player)
 
@@ -21,7 +21,7 @@ class GuiyEventListener : Listener {
         if (click !in setOf(LEFT, RIGHT, MIDDLE)) isCancelled = true
 
         val clickedInventory = clickedInventory ?: return
-        if (clickedInventory.holder !== guiyHolder) return
+        if (clickedInventory.getHolder(false) !== guiyHolder) return
         isCancelled = true
 
         val event = ClickEvent.fromSlot(click, slot, whoClicked)
@@ -30,7 +30,7 @@ class GuiyEventListener : Listener {
 
     @EventHandler
     fun InventoryDragEvent.onInventoryDrag() {
-        val guiyHolder = inventory.holder as? GuiyInventoryHolder ?: return
+        val guiyHolder = inventory.getHolder(false) as? GuiyInventoryHolder ?: return
 //        val inPlayerInv = newItems.filter { it.key >= view.topInventory.size }
         val inGuiy = newItems.filter { it.key < view.topInventory.size }
         // Handle single slot drag events as clicks for better responsiveness
@@ -46,7 +46,7 @@ class GuiyEventListener : Listener {
 
     @EventHandler
     fun InventoryCloseEvent.onClose() {
-        val guiyHolder = inventory.holder as? GuiyInventoryHolder ?: return
+        val guiyHolder = inventory.getHolder(false) as? GuiyInventoryHolder ?: return
         BundleScrolling.reset(player as Player)
 
         if (reason != InventoryCloseEvent.Reason.PLUGIN) {
