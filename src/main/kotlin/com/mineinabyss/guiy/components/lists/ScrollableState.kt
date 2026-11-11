@@ -12,10 +12,19 @@ fun rememberScrollableState(
 class ScrollableState(
     val direction: ScrollDirection = ScrollDirection.PAGINATED,
 ) {
-    var itemCount by mutableStateOf(0)
-        internal set
+    private var _itemCount by mutableStateOf(0)
+
+    var itemCount: Int
+        get() = _itemCount
+        internal set(value) {
+            val shrank = value < _itemCount
+            _itemCount = value
+            if (shrank && page > lastFullPage) page = lastFullPage
+        }
     var page by mutableStateOf(0)
         internal set
+
+    private val lastFullPage get() = (pageMax - pagesOnScreen).coerceAtLeast(0)
 
     val pageMax
         get() = if (itemsPerPage == 0) 1
@@ -50,7 +59,7 @@ class ScrollableState(
     /** Moves one page per wheel step, stopping once the last row or column is on screen where [nextPage] keeps going until only one is left */
     fun scroll(delta: Int) {
         if (delta < 0) previousPage()
-        else if (page < pageMax - pagesOnScreen) nextPage()
+        else if (page < lastFullPage) nextPage()
     }
 
     fun setPage(page: Int) {
