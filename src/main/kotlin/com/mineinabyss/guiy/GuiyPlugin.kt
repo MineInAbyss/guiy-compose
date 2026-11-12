@@ -22,6 +22,7 @@ import net.minecraft.network.protocol.common.ClientboundUpdateTagsPacket
 import net.minecraft.network.protocol.game.ServerboundRenameItemPacket
 import net.minecraft.network.protocol.game.ServerboundSelectBundleItemPacket
 import org.bukkit.Bukkit
+import org.bukkit.craftbukkit.inventory.CraftInventoryCustom
 import org.bukkit.entity.Player
 import org.bukkit.plugin.java.JavaPlugin
 import kotlin.concurrent.atomics.AtomicBoolean
@@ -49,9 +50,12 @@ class GuiyPlugin : JavaPlugin(), DI {
             if (packet is ServerboundRenameItemPacket && player != null) {
                 anvilPacketFlow.update { packet.name to player }
             }
-            if (packet is ServerboundSelectBundleItemPacket && player != null && player.openInventory.topInventory.getHolder(false) is GuiyInventoryHolder) {
-                launch { BundleScrolling.onSelect(player, packet.slotId, packet.selectedItemIndex) }
-                return@interceptServerbound null
+            if (packet is ServerboundSelectBundleItemPacket && player != null) {
+                val top = player.openInventory.topInventory
+                if (top is CraftInventoryCustom && top.holder is GuiyInventoryHolder) {
+                    launch { BundleScrolling.onSelect(player, packet.slotId, packet.selectedItemIndex) }
+                    return@interceptServerbound null
+                }
             }
             packet
         }
